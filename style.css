@@ -1,6 +1,234 @@
-[build]
-  publish = "."
-  functions = "netlify/functions"
+*{
+  box-sizing:border-box;
+}
 
-[functions]
-  node_bundler = "esbuild"
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#eef2f7;
+  color:#06172c;
+}
+
+header{
+  background:linear-gradient(135deg,#06172c,#123b6d);
+  color:white;
+  padding:28px 20px 48px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+header h1{
+  margin:0;
+  font-size:34px;
+}
+
+header p{
+  margin:6px 0 0;
+  color:#dbeafe;
+}
+
+header b{
+  background:#f59e0b;
+  color:#111827;
+  padding:8px 14px;
+  border-radius:999px;
+}
+
+main{
+  max-width:1180px;
+  margin:-28px auto 40px;
+  padding:0 14px;
+}
+
+.panel{
+  background:white;
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:16px;
+  box-shadow:0 12px 30px rgba(15,23,42,.10);
+  border:1px solid #e5e7eb;
+}
+
+.controls{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+
+select,
+input,
+button{
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid #d1d5db;
+  font-size:15px;
+}
+
+button{
+  background:#2563eb;
+  color:white;
+  font-weight:800;
+  border:0;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#1d4ed8;
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+
+.cards h2{
+  font-size:38px;
+  margin:10px 0 0;
+}
+
+.match{
+  border:1px solid #e5e7eb;
+  border-radius:18px;
+  padding:18px;
+  margin:14px 0;
+  background:#fff;
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  color:#64748b;
+  font-weight:700;
+  font-size:14px;
+}
+
+.teams{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:16px;
+  align-items:center;
+  margin-top:16px;
+}
+
+.team{
+  text-align:center;
+}
+
+.name{
+  font-size:22px;
+  font-weight:900;
+}
+
+.pct{
+  font-size:30px;
+  font-weight:900;
+}
+
+.fav{
+  color:#16a34a;
+}
+
+.vs{
+  color:#64748b;
+  font-weight:900;
+}
+
+.runs{
+  text-align:center;
+  font-size:32px;
+  font-weight:900;
+  margin:18px 0;
+}
+
+.pill{
+  display:inline-block;
+  padding:6px 11px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  margin:3px;
+}
+
+.green{
+  background:#dcfce7;
+  color:#166534;
+}
+
+.blue{
+  background:#dbeafe;
+  color:#1d4ed8;
+}
+
+.orange{
+  background:#fef3c7;
+  color:#92400e;
+}
+
+.weather{
+  margin-top:12px;
+  padding:12px;
+  border-radius:14px;
+  background:#f8fafc;
+  border:1px solid #dbeafe;
+  color:#334155;
+  line-height:1.45;
+}
+
+.reason{
+  border-top:1px solid #e5e7eb;
+  margin-top:12px;
+  padding-top:10px;
+  color:#334155;
+}
+
+.table{
+  overflow:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,
+td{
+  padding:10px;
+  border-bottom:1px solid #e5e7eb;
+  text-align:left;
+}
+
+th{
+  color:#64748b;
+  font-size:12px;
+  text-transform:uppercase;
+}
+
+footer{
+  text-align:center;
+  color:#64748b;
+  padding:24px;
+}
+
+@media(max-width:850px){
+
+  header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .cards{
+    grid-template-columns:1fr;
+  }
+
+  .teams{
+    grid-template-columns:1fr;
+  }
+
+  .vs{
+    display:none;
+  }
+
+}
