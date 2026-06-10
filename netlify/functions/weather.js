@@ -96,10 +96,10 @@ exports.handler = async function(event) {
         source: "FMI Open Data",
         originalTime: time,
         targetUtc: targetUtc,
-        temperature: pick(extract(xml, "Temperature"), time),
-        windSpeed: pick(extract(xml, "WindSpeedMS"), time),
-        precipitation: pick(extract(xml, "Precipitation1h"), time),
-        windDirection: pick(extract(xml, "WindDirection"), time)
+temperature: pick(extract(xml, "Temperature"), targetUtc),
+windSpeed: pick(extract(xml, "WindSpeedMS"), targetUtc),
+precipitation: pick(extract(xml, "Precipitation1h"), targetUtc),
+windDirection: pick(extract(xml, "WindDirection"), targetUtc)
       })
     };
 
