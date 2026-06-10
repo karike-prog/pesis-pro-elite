@@ -94,12 +94,7 @@ function average(a, b, fallback) {
 function weatherAdjustment(weather) {
   return 0;
 }
-  
-  if (Number.isFinite(wind) && wind >= 7) adj -= 0.25;
-  if (Number.isFinite(rain) && rain >= 0.5) adj -= 0.35;
 
-  return adj;
-}
 
 function predict(homeTeam, awayTeam, stats, weather) {
   const home = stats[homeTeam.id];
