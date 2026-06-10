@@ -17,7 +17,7 @@ function finlandTimeToUtcIso(time) {
 function pick(series, time) {
   if (!series.length) return null;
 
-  const target = new Date(finlandTimeToUtcIso(time)).getTime();
+  const target = new Date(time).getTime();
 
   let best = series[0];
   let bd = Math.abs(new Date(series[0].time).getTime() - target);
