@@ -94,18 +94,7 @@ function average(a, b, fallback) {
 function weatherAdjustment(weather) {
   return 0;
 }
-  if (!weather || weather.error) return 0;
-
-  let adj = 0;
-  const temp = Number(weather.temperature);
-  const wind = Number(weather.windSpeed);
-  const rain = Number(weather.precipitation);
-
-  if (Number.isFinite(temp)) {
-    if (temp >= 20) adj += 0.35;
-    else if (temp <= 10) adj -= 0.35;
-  }
-
+  
   if (Number.isFinite(wind) && wind >= 7) adj -= 0.25;
   if (Number.isFinite(rain) && rain >= 0.5) adj -= 0.35;
 
