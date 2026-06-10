@@ -182,7 +182,7 @@ function weatherHtml(weather) {
       🌦️ FMI-sää: ${weather.temperature ?? "–"} °C,
       tuuli ${weather.windSpeed ?? "–"} m/s,
       sade ${weather.precipitation ?? "–"} mm/h<br>
-      <strong>Sääkorjaus:</strong>testiss ${sign}${adj.toFixed(2)} juoksua
+      <strong>Sääkorjaus:</strong> ${sign}${adj.toFixed(2)} juoksua
     </div>
   `;
 }
