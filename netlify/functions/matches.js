@@ -5,34 +5,58 @@ exports.handler = async function(event) {
   const level = q.level || "Superpesis";
   const series = q.series || "Miehet";
 
-  let url =
+  const base =
     "https://api.pesistulokset.fi/api/v1/public/matches" +
     "?season=2026" +
     "&level=" + encodeURIComponent(level) +
     "&region=" +
     "&series=" + encodeURIComponent(series) +
-    "&phase=Runkosarja" +
-    "&apikey=" + key;
+    "&phase=Runkosarja";
 
-  if (level === "Superpesis") {
-    url += "&group=Runkosarja";
-  }
+  const urls = [
+    base + "&group=Runkosarja&apikey=" + key,
+    base + "&apikey=" + key
+  ];
 
   try {
-    const r = await fetch(url);
-    const text = await r.text();
+    let lastText = "[]";
+    let lastStatus = 200;
+
+    for (const url of urls) {
+      const r = await fetch(url);
+      const text = await r.text();
+
+      lastText = text;
+      lastStatus = r.status;
+
+      try {
+        const json = JSON.parse(text);
+        if (Array.isArray(json) && json.length > 0) {
+          return {
+            statusCode: 200,
+            headers: {
+              "Content-Type": "application/json",
+              "Cache-Control": "public, max-age=60"
+            },
+            body: text
+          };
+        }
+      } catch (e) {}
+    }
 
     return {
-      statusCode: r.status,
+      statusCode: lastStatus,
       headers: {
         "Content-Type": "application/json",
         "Cache-Control": "public, max-age=60"
       },
-      body: text
+      body: lastText
     };
+
   } catch (e) {
     return {
       statusCode: 500,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ error: e.message })
     };
   }
