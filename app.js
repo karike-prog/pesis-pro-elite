@@ -184,9 +184,20 @@ function weatherHtml(weather) {
     </div>
   `;
 }
+const FALLBACK_STADIUMS = {
+  "Kyrön Sähkö Center": {
+    lat: 60.764,
+    lng: 22.697
+  }
+};
 
 async function fetchWeather(match) {
-  const geometry = match.stadium?.details?.place?.geometry;
+  let geometry = match.stadium?.details?.place?.geometry;
+
+if ((!geometry?.lat || !geometry?.lng) &&
+    FALLBACK_STADIUMS[match.stadium?.name]) {
+  geometry = FALLBACK_STADIUMS[match.stadium.name];
+}
 
   if (!geometry?.lat || !geometry?.lng) {
     return { error: "Ei stadionin koordinaatteja" };
