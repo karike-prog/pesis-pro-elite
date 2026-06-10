@@ -185,7 +185,7 @@ function weatherHtml(weather) {
   `;
 }
 const FALLBACK_STADIUMS = {
-  "Kyrön Sähkö Center": {
+  "Kyrön Sähkö Center, Pöytyä": {
     lat: 60.764,
     lng: 22.697
   }
