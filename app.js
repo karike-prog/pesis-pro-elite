@@ -92,6 +92,8 @@ function average(a, b, fallback) {
 }
 
 function weatherAdjustment(weather) {
+  return 0;
+}
   if (!weather || weather.error) return 0;
 
   let adj = 0;
