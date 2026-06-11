@@ -88,7 +88,7 @@ exports.handler = async function(event) {
     };
   }
 
-  const targetUtc = finlandTimeToUtcIso(time);
+const targetUtc = time;
 
   const params = "Temperature,WindSpeedMS,Precipitation1h";
 
