@@ -171,23 +171,25 @@ function weatherHtml(weather) {
   `;
 }
 const FALLBACK_STADIUMS = {
-  "Kyrön Sähkö Center, Pöytyä": {
-    lat: 60.764,
-    lng: 22.697
-  },
-
-  "K Power Stadion, Lapua": {
-    lat: 62.970,
-    lng: 23.009
-  }
+  "Kyrön Sähkö Center, Pöytyä": { lat: 60.764, lng: 22.697 },
+  "K Power Stadion, Lapua": { lat: 62.970, lng: 23.009 },
+  "Hehku Arena, Nurmo (Seinäjoki)": { lat: 62.870, lng: 22.883 },
+  "Pihkalan pesäpallostadion, Hyvinkää": { lat: 60.635, lng: 24.859 },
+  "Hietalahden Pesäpallostadion, Vaasa": { lat: 63.094, lng: 21.604 },
+  "Osuma Arena, Kuopio": { lat: 62.893, lng: 27.677 },
+  "Unico Arena, Seinäjoki": { lat: 62.792, lng: 22.841 },
+  "Saltex Arena, Alajärvi": { lat: 63.001, lng: 23.816 },
+  "KSS Energia Areena, Kouvola": { lat: 60.868, lng: 26.704 },
+  "Rantakenttä, Kitee": { lat: 62.101, lng: 30.138 }
 };
 
 async function fetchWeather(match) {
   let geometry = match.stadium?.details?.place?.geometry;
+  const stadiumName = match.stadium?.name?.trim();
 
-if ((!geometry?.lat || !geometry?.lng) &&
-    FALLBACK_STADIUMS[match.stadium?.name]) {
-  geometry = FALLBACK_STADIUMS[match.stadium.name];
+  if ((!geometry?.lat || !geometry?.lng) && FALLBACK_STADIUMS[stadiumName]) {
+    geometry = FALLBACK_STADIUMS[stadiumName];
+  }
 }
 
   if (!geometry?.lat || !geometry?.lng) {
