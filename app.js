@@ -184,7 +184,22 @@ const FALLBACK_STADIUMS = {
 };
 
 async function fetchWeather(match) {
-  let geometry = match.stadium?.details?.place?.geometry;
+    let geometry = match.stadium?.details?.place?.geometry;
+
+    console.log("OTTELUN AIKA:", match.date);
+    console.log("match:", match);
+    console.log("stadion:", match.stadium?.name);
+
+    console.log("WEATHER TEST:", {
+        series: match.series,
+        stadium: match.stadium?.name,
+        geometry,
+        fallback: FALLBACK_STADIUMS[match.stadium?.name?.trim()],
+        date: match.date,
+    });
+
+    ...
+}
   
 
   const stadiumName = match.stadium?.name?.trim();
