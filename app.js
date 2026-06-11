@@ -192,7 +192,7 @@ console.log("WEATHER TEST:", {
   geometry: geometry,
   fallback: FALLBACK_STADIUMS[match.stadium?.name?.trim()],
   date: match.date,
-  weatherUrl: url
+
 });
   const stadiumName = match.stadium?.name?.trim();
 
