@@ -173,7 +173,7 @@ function weatherHtml(weather) {
 const FALLBACK_STADIUMS = {
   "Kyrön Sähkö Center, Pöytyä": { lat: 60.764, lng: 22.697 },
   "K Power Stadion, Lapua": { lat: 62.970, lng: 23.009 },
-  "Hehku Arena, Nurmo (Seinäjoki)": { lat: 62.870, lng: 22.883 },
+  "Hehku Areena, Nurmo (Seinäjoki)": { lat: 62.870, lng: 22.883 },
   "Pihkalan pesäpallostadion, Hyvinkää": { lat: 60.635, lng: 24.859 },
   "Hietalahden Pesäpallostadion, Vaasa": { lat: 63.094, lng: 21.604 },
   "Osuma Arena, Kuopio": { lat: 62.893, lng: 27.677 },
