@@ -90,7 +90,7 @@ exports.handler = async function(event) {
 
   const targetUtc = finlandTimeToUtcIso(time);
 
-  const params = "Temperature,WindSpeedMS,Precipitation1h,WindDirection";
+  const params = "Temperature,WindSpeedMS,Precipitation1h";
 
   const url =
     "https://opendata.fmi.fi/wfs" +
