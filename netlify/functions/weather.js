@@ -34,28 +34,42 @@ function pick(series, time) {
 }
 
 function extract(xml, param) {
-  const blocks = xml.split(/<wml2:MeasurementTimeseries/).slice(1);
+  const members = xml.split(/<wfs:member>/).slice(1);
 
-  const block = blocks.find(x =>
-    x.includes(`<gml:name>${param}</gml:name>`) ||
-    x.includes(`/${param}`) ||
-    x.includes(`:${param}`)
+  const member = members.find(x =>
+    x.includes(`param=${param}`) ||
+    x.includes(`param%3D${param}`) ||
+    x.includes(`-${param}`)
   );
 
-  if (!block) return [];
+  if (!member) return [];
 
   const out = [];
-  const re = /<wml2:time>(.*?)<\/wml2:time>[\s\S]*?<wml2:value>(.*?)<\/wml2:value>/g;
 
-  let m;
-  while ((m = re.exec(block)) !== null) {
-    const v = Number(m[2]);
-    if (Number.isFinite(v)) {
-      out.push({
-        time: m[1],
-        value: v
-      });
-    }
+  const timeRe = /<gml:timePosition>(.*?)<\/gml:timePosition>/g;
+  const valueRe = /<wml2:value>(.*?)<\/wml2:value>/g;
+
+  const times = [];
+  const values = [];
+
+  let mt;
+  while ((mt = timeRe.exec(member)) !== null) {
+    times.push(mt[1]);
+  }
+
+  let mv;
+  while ((mv = valueRe.exec(member)) !== null) {
+    const v = Number(mv[1]);
+    if (Number.isFinite(v)) values.push(v);
+  }
+
+  const n = Math.min(times.length, values.length);
+
+  for (let i = 0; i < n; i++) {
+    out.push({
+      time: times[i],
+      value: values[i]
+    });
   }
 
   return out;
