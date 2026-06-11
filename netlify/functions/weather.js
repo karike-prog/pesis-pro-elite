@@ -90,6 +90,7 @@ exports.handler = async function(event) {
   try {
     const r = await fetch(url);
     const xml = await r.text();
+    console.log(xml.substring(0, 5000));
 
     return {
       statusCode: 200,
