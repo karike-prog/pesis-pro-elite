@@ -190,7 +190,6 @@ async function fetchWeather(match) {
   if ((!geometry?.lat || !geometry?.lng) && FALLBACK_STADIUMS[stadiumName]) {
     geometry = FALLBACK_STADIUMS[stadiumName];
   }
-}
 
   if (!geometry?.lat || !geometry?.lng) {
     return { error: "Ei stadionin koordinaatteja" };
