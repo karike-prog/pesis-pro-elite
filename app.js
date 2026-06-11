@@ -174,6 +174,11 @@ const FALLBACK_STADIUMS = {
   "Kyrön Sähkö Center, Pöytyä": {
     lat: 60.764,
     lng: 22.697
+  },
+
+  "K Power Stadion, Lapua": {
+    lat: 62.970,
+    lng: 23.009
   }
 };
 
