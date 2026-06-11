@@ -198,7 +198,6 @@ async function fetchWeather(match) {
         date: match.date,
     });
 
-    ...
 }
 
   const stadiumName = match.stadium?.name?.trim();
