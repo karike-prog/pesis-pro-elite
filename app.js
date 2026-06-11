@@ -186,11 +186,13 @@ const FALLBACK_STADIUMS = {
 async function fetchWeather(match) {
   let geometry = match.stadium?.details?.place?.geometry;
   
-  console.log("WEATHER TEST:", {
+console.log("WEATHER TEST:", {
   series: match.series,
   stadium: match.stadium?.name,
   geometry: geometry,
-  fallback: FALLBACK_STADIUMS[match.stadium?.name?.trim()]
+  fallback: FALLBACK_STADIUMS[match.stadium?.name?.trim()],
+  date: match.date,
+  weatherUrl: url
 });
   const stadiumName = match.stadium?.name?.trim();
 
