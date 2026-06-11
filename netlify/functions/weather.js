@@ -35,7 +35,12 @@ function pick(series, time) {
 
 function extract(xml, param) {
   const blocks = xml.split(/<wml2:MeasurementTimeseries/).slice(1);
-  const block = blocks.find(x => x.includes(param));
+
+  const block = blocks.find(x =>
+    x.includes(`<gml:name>${param}</gml:name>`) ||
+    x.includes(`/${param}`) ||
+    x.includes(`:${param}`)
+  );
 
   if (!block) return [];
 
