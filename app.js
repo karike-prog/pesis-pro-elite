@@ -270,14 +270,19 @@ try {
 }
 async function fetchLineup(match) {
   try {
-    const url =
-      `https://www.pesistulokset.fi/api/match?id=${match.id}`;
+    const url = `https://www.pesistulokset.fi/api/match?id=${match.id}`;
 
     const res = await fetch(url);
-    if (!res.ok) return null;
 
-    return await res.json();
+    console.log("Status:", res.status);
+
+    const text = await res.text();
+    console.log(text);
+
+    return JSON.parse(text);
+
   } catch (e) {
+    console.log(e);
     return null;
   }
 }
