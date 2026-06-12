@@ -275,34 +275,41 @@ async function fetchLineup(match) {
 
     const res = await fetch(url);
     if (!res.ok) return null;
-const json = await res.json();
-console.log("LINEUP JSON:", json);
-return json;
-    return await res.json();
+
+    const json = await res.json();
+    console.log("LINEUP JSON:", json);
+    return json;
   } catch (e) {
+    console.log("LINEUP VIRHE:", e);
     return null;
   }
 }
 function lineupHtml(lineup) {
-  if (!lineup || !lineup.home?.players || !lineup.away?.players) {
+  const data = lineup?.data || lineup?.match || lineup;
+
+  const homePlayers = data?.home?.players || [];
+  const awayPlayers = data?.away?.players || [];
+
+  if (!homePlayers.length || !awayPlayers.length) {
+    console.log("LINEUP EI LÖYTYNYT:", lineup);
     return `<div class="lineup">📋 Kokoonpanot eivät vielä saatavilla</div>`;
   }
-  const homePlayers = lineup.home.players || [];
-  const awayPlayers = lineup.away.players || [];
 
   const playerRows = (players) =>
-    players.map(p => `<div>${p.number}. ${p.name}</div>`).join("");
+    players
+      .map(p => `<div>${p.number}. ${p.name}</div>`)
+      .join("");
 
   return `
     <div class="lineup">
       <strong>📋 Kokoonpanot</strong>
       <div class="lineup-grid">
         <div>
-          <b>${lineup.home.shorthand}</b>
+          <b>${data.home.shorthand}</b>
           ${playerRows(homePlayers)}
         </div>
         <div>
-          <b>${lineup.away.shorthand}</b>
+          <b>${data.away.shorthand}</b>
           ${playerRows(awayPlayers)}
         </div>
       </div>
