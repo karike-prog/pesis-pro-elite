@@ -92,7 +92,7 @@ const targetUtc = time;
   try {
     const r = await fetch(url);
     const xml = await r.text();
-    console.log(xml.substring(0, 5000));
+console.log(xml);
 
     return {
       statusCode: 200,
