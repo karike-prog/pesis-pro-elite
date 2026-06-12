@@ -270,15 +270,12 @@ try {
 }
 async function fetchLineup(match) {
   try {
-    const url =
-      `https://www.pesistulokset.fi/taso/rest/match?id=${match.id}&apikey=wRX0tTke3DZ8RLKAMntjZ81LwgNQuSN9`;
+    const url = `/.netlify/functions/lineup?id=${match.id}`;
 
     const res = await fetch(url);
     if (!res.ok) return null;
 
-    const json = await res.json();
-    console.log("LINEUP JSON:", json);
-    return json;
+    return await res.json();
   } catch (e) {
     console.log("LINEUP VIRHE:", e);
     return null;
