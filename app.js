@@ -275,7 +275,9 @@ async function fetchLineup(match) {
 
     const res = await fetch(url);
     if (!res.ok) return null;
-
+const json = await res.json();
+console.log("LINEUP JSON:", json);
+return json;
     return await res.json();
   } catch (e) {
     return null;
