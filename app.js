@@ -32,6 +32,17 @@ const TEAM_LOGOS = {
 "Fera": "images/logos/fera.png",
 "Jyske": "images/logos/jyske.png",
 "Mailattaret": "images/logos/mailattaret.png"
+  "HP": "images/logos/hp.png",
+"KaMa": "images/logos/kama.png",
+"KiRi": "images/logos/kiri.png",
+"NJ": "images/logos/nj.png",
+"PuMu": "images/logos/pumu.png",
+"PuPe": "images/logos/pupe.png",
+"SiKi": "images/logos/siki.png",
+"SMJ": "images/logos/smj.png",
+"UPV": "images/logos/upv.png",
+"Ura": "images/logos/ura.png",
+"SiiPe": "images/logos/siipe.png",
 };
 function fmtDate(iso) {
   return new Date(iso).toLocaleString("fi-FI", {
