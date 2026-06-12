@@ -110,7 +110,7 @@ const targetUtc = time;
       statusCode: 200,
       headers: {
         "Content-Type": "application/json",
-        "Cache-Control": "public, max-age=900"
+      "Cache-Control": "no-store"
       },
       body: JSON.stringify({
         source: "FMI Open Data",
