@@ -241,6 +241,27 @@ footer{
   display: block;
   margin: 0 auto 6px auto;
 }
+.lineup {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.lineup-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+@media (max-width: 700px) {
+  .lineup-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 .name {
   display: flex;
