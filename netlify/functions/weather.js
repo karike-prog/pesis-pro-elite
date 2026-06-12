@@ -37,10 +37,8 @@ function extract(xml, param) {
   const members = xml.split("</wfs:member>").slice(1);
 
   const member = members.find(x =>
-    x.includes(`param=${param}`) ||
-    x.includes(`param%3D${param}`) ||
-    x.includes(`-${param}`)
-  );
+  x.toLowerCase().includes(param.toLowerCase())
+);
 
   if (!member) return [];
 
