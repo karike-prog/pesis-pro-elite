@@ -116,6 +116,7 @@ const targetUtc = time;
         source: "FMI Open Data",
         originalTime: time,
         targetUtc: targetUtc,
+        requestedTime: time,
 temperature: pick(extract(xml, "Temperature"), targetUtc),
 windSpeed: pick(extract(xml, "WindSpeedMS"), targetUtc),
 precipitation: pick(extract(xml, "Precipitation1h"), targetUtc),
