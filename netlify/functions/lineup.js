@@ -11,7 +11,7 @@ exports.handler = async function(event) {
   }
 
 const url =
-  `https://www.pesistulokset.fi/api/match?id=${id}&apikey=wRX0tTke3DZ8RLKAMntjZ81LwgNQuSN9`;
+  `https://api.pesistulokset.fi/api/v1/public/match?id=${id}&apikey=wRX0tTke3DZ8RLKAMntjZ81LwgNQuSN9`;
 
   try {
     const r = await fetch(url, {
