@@ -230,6 +230,7 @@ const FALLBACK_STADIUMS = {
   "Saltex Arena, Alajärvi": { lat: 63.001, lng: 23.816 },
   "KSS Energia Areena, Kouvola": { lat: 60.868, lng: 26.704 },
   "Rantakenttä, Kitee": { lat: 62.101, lng: 30.138 }
+  "Huikoo Areena, Pori": {lat: 61.485,lng: 21.797},
 };
 
 async function fetchWeather(match) {
