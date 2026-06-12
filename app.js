@@ -268,6 +268,46 @@ try {
   return { error: e.message };
 }
 }
+async function fetchLineup(match) {
+  try {
+    const url =
+      `https://www.pesistulokset.fi/api/match?id=${match.id}`;
+
+    const res = await fetch(url);
+    if (!res.ok) return null;
+
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+function lineupHtml(lineup) {
+  if (!lineup || !lineup.home || !lineup.away) {
+    return `<div class="lineup">📋 Kokoonpanot eivät vielä saatavilla</div>`;
+  }
+
+  const homePlayers = lineup.home.players || [];
+  const awayPlayers = lineup.away.players || [];
+
+  const playerRows = (players) =>
+    players.map(p => `<div>${p.number}. ${p.name}</div>`).join("");
+
+  return `
+    <div class="lineup">
+      <strong>📋 Kokoonpanot</strong>
+      <div class="lineup-grid">
+        <div>
+          <b>${lineup.home.shorthand}</b>
+          ${playerRows(homePlayers)}
+        </div>
+        <div>
+          <b>${lineup.away.shorthand}</b>
+          ${playerRows(awayPlayers)}
+        </div>
+      </div>
+    </div>
+  `;
+}
 
 function renderPowerTable(stats) {
   const rows = Object.values(stats)
@@ -312,6 +352,7 @@ async function renderMatches(matches, stats) {
 
   for (const match of matches) {
     const weather = await fetchWeather(match);
+    const lineup = await fetchLineup(match);
     const prediction = predict(match.home, match.away, stats, weather);
 
     const homeFav = prediction.homePct >= prediction.awayPct;
@@ -371,6 +412,7 @@ const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
         <span class="pill orange">ID ${match.id}</span>
 
         ${weatherHtml(weather)}
+        ${lineupHtml(lineup)}
 
         <div class="reason">${prediction.note}</div>
       </div>
