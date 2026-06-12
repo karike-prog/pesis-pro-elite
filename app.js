@@ -270,7 +270,8 @@ try {
 }
 async function fetchLineup(match) {
   try {
-    const url = `https://www.pesistulokset.fi/api/match?id=${match.id}`;
+const url =
+  `https://www.pesistulokset.fi/taso/rest/match?id=${match.id}&apikey=wRX0tTke3DZ8RLKAMntjZ81LwgNQuSN9`;
 
     const res = await fetch(url);
 
