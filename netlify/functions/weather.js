@@ -34,7 +34,7 @@ function pick(series, time) {
 }
 
 function extract(xml, param) {
-  const members = xml.split(/<wfs:member>/).slice(1);
+  const members = xml.split("</wfs:member>").slice(1);
 
   const member = members.find(x =>
     x.includes(`param=${param}`) ||
@@ -46,30 +46,18 @@ function extract(xml, param) {
 
   const out = [];
 
-  const timeRe = /<gml:timePosition>(.*?)<\/gml:timePosition>/g;
-  const valueRe = /<wml2:value>(.*?)<\/wml2:value>/g;
+  const re =
+    /<wml2:MeasurementTVP>[\s\S]*?<wml2:time>(.*?)<\/wml2:time>[\s\S]*?<wml2:value>(.*?)<\/wml2:value>[\s\S]*?<\/wml2:MeasurementTVP>/g;
 
-  const times = [];
-  const values = [];
-
-  let mt;
-  while ((mt = timeRe.exec(member)) !== null) {
-    times.push(mt[1]);
-  }
-
-  let mv;
-  while ((mv = valueRe.exec(member)) !== null) {
-    const v = Number(mv[1]);
-    if (Number.isFinite(v)) values.push(v);
-  }
-
-  const n = Math.min(times.length, values.length);
-
-  for (let i = 0; i < n; i++) {
-    out.push({
-      time: times[i],
-      value: values[i]
-    });
+  let m;
+  while ((m = re.exec(member)) !== null) {
+    const v = Number(m[2]);
+    if (Number.isFinite(v)) {
+      out.push({
+        time: m[1],
+        value: v
+      });
+    }
   }
 
   return out;
