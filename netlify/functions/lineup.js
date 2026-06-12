@@ -13,8 +13,28 @@ exports.handler = async function(event) {
     `https://www.pesistulokset.fi/taso/rest/match?id=${id}&apikey=wRX0tTke3DZ8RLKAMntjZ81LwgNQuSN9`;
 
   try {
-    const r = await fetch(url);
+    const r = await fetch(url, {
+      headers: {
+        "Accept": "application/json, text/plain, */*",
+        "X-Requested-With": "XMLHttpRequest",
+        "Referer": `https://www.pesistulokset.fi/ottelut/${id}`,
+        "User-Agent": "Mozilla/5.0"
+      }
+    });
+
     const text = await r.text();
+
+    if (text.trim().startsWith("<")) {
+      return {
+        statusCode: 502,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          error: "Pesistulokset palautti HTML:n",
+          url,
+          start: text.slice(0, 200)
+        })
+      };
+    }
 
     return {
       statusCode: 200,
@@ -27,7 +47,9 @@ exports.handler = async function(event) {
   } catch (e) {
     return {
       statusCode: 500,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ error: e.message })
     };
   }
+};
 };
