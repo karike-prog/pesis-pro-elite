@@ -270,28 +270,21 @@ try {
 }
 async function fetchLineup(match) {
   try {
-const url =
-  `https://www.pesistulokset.fi/taso/rest/match?id=${match.id}&apikey=wRX0tTke3DZ8RLKAMntjZ81LwgNQuSN9`;
+    const url =
+      `https://www.pesistulokset.fi/taso/rest/match?id=${match.id}&apikey=wRX0tTke3DZ8RLKAMntjZ81LwgNQuSN9`;
 
     const res = await fetch(url);
+    if (!res.ok) return null;
 
-    console.log("Status:", res.status);
-
-    const text = await res.text();
-    console.log(text);
-
-    return JSON.parse(text);
-
+    return await res.json();
   } catch (e) {
-    console.log(e);
     return null;
   }
 }
 function lineupHtml(lineup) {
-  if (!lineup || !lineup.home || !lineup.away) {
+  if (!lineup || !lineup.home?.players || !lineup.away?.players) {
     return `<div class="lineup">📋 Kokoonpanot eivät vielä saatavilla</div>`;
   }
-
   const homePlayers = lineup.home.players || [];
   const awayPlayers = lineup.away.players || [];
 
