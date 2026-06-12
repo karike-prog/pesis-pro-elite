@@ -105,7 +105,10 @@ const targetUtc = time;
         originalTime: time,
         targetUtc: targetUtc,
         requestedTime: time,
-temperature: pick(extract(xml, "Temperature"), targetUtc),
+temperature:
+  pick(extract(xml, "Temperature"), targetUtc) ??
+  pick(extract(xml, "temperature"), targetUtc) ??
+  pick(extract(xml, "t2m"), targetUtc),
 windSpeed: pick(extract(xml, "WindSpeedMS"), targetUtc),
 precipitation: pick(extract(xml, "Precipitation1h"), targetUtc),
 windDirection: pick(extract(xml, "WindDirection"), targetUtc)
