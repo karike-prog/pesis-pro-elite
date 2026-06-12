@@ -5,6 +5,7 @@ exports.handler = async function(event) {
   if (!id) {
     return {
       statusCode: 400,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ error: "id puuttuu" })
     };
   }
@@ -30,7 +31,7 @@ exports.handler = async function(event) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           error: "Pesistulokset palautti HTML:n",
-          url,
+          url: url,
           start: text.slice(0, 200)
         })
       };
@@ -44,6 +45,7 @@ exports.handler = async function(event) {
       },
       body: text
     };
+
   } catch (e) {
     return {
       statusCode: 500,
@@ -51,5 +53,4 @@ exports.handler = async function(event) {
       body: JSON.stringify({ error: e.message })
     };
   }
-};
 };
