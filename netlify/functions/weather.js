@@ -34,7 +34,10 @@ function pick(series, time) {
 }
 
 function extract(xml, param) {
-  const members = xml.split("</wfs:member>").slice(1);
+const members = xml
+  .split("<wfs:member>")
+  .slice(1)
+  .map(x => x.split("</wfs:member>")[0]);
 
   const member = members.find(x =>
   x.toLowerCase().includes(param.toLowerCase())
