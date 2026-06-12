@@ -297,6 +297,12 @@ async function renderMatches(matches, stats) {
       tagClass = "blue";
     }
 
+const homeName = match.home.shorthand || match.home.name;
+const awayName = match.away.shorthand || match.away.name;
+
+const homeLogo = TEAM_LOGOS[homeName] || "images/logos/default.png";
+const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
+    
     cards.push(`
       <div class="match">
         <div class="top">
@@ -306,14 +312,20 @@ async function renderMatches(matches, stats) {
 
         <div class="teams">
           <div class="team">
-            <div class="name">${match.home.shorthand || match.home.name}</div>
+            <div class="name">
+  <img src="${homeLogo}" class="team-logo" alt="${homeName}">
+  <span>${homeName}</span>
+</div>
             <div class="pct ${homeFav ? "fav" : ""}">${prediction.homePct.toFixed(0)} %</div>
           </div>
 
           <div class="vs">vs</div>
 
           <div class="team">
-            <div class="name">${match.away.shorthand || match.away.name}</div>
+<div class="name">
+  <img src="${awayLogo}" class="team-logo" alt="${awayName}">
+  <span>${awayName}</span>
+</div>
             <div class="pct ${!homeFav ? "fav" : ""}">${prediction.awayPct.toFixed(0)} %</div>
           </div>
         </div>
