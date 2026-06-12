@@ -31,7 +31,7 @@ const TEAM_LOGOS = {
 "Roihuttaret": "images/logos/roihu.png",
 "Fera": "images/logos/fera.png",
 "Jyske": "images/logos/jyske.png",
-"Mailattaret": "images/logos/mailattaret.png"
+"Mailattaret": "images/logos/mailattaret.png",
   "HP": "images/logos/hp.png",
 "KaMa": "images/logos/kama.png",
 "KiRi": "images/logos/kiri.png",
