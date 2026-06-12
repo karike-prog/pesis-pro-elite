@@ -5,6 +5,34 @@ function today() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
+const TEAM_LOGOS = {
+  "AA": "images/logos/aa.png",
+"HP": "images/logos/hp.png",
+"Tahko": "images/logos/tahko.png",
+"IPV": "images/logos/ipv.png",
+"JoMa": "images/logos/joma.png",
+"KeKi": "images/logos/keki.png",
+"KPL": "images/logos/kpl.png",
+"KoU": "images/logos/kou.png",
+"Manse": "images/logos/manse.png",
+"PattU": "images/logos/pattu.png",
+"SoJy": "images/logos/sojy.png",
+"KiPa": "images/logos/kipa.png",
+"Veto": "images/logos/veto.png"
+  "Jussittaret": "images/logos/jussittaret.png",
+"JoMa N": "images/logos/joma_n.png",
+"JoMa": "images/logos/joma_n.png",
+"Manse N": "images/logos/manse_n.png",
+"Pesäkarhut": "images/logos/pesakarhut.png",
+"Virkiä": "images/logos/virkia.png",
+"Kirittäret": "images/logos/kirittaret.png",
+"Lippo Naiset": "images/logos/lippo.png",
+"PöU Pesis": "images/logos/poytya.png",
+"Roihuttaret": "images/logos/roihu.png",
+"Fera": "images/logos/fera.png",
+"Jyske": "images/logos/jyske.png",
+"Mailattaret": "images/logos/mailattaret.png"
+};
 function fmtDate(iso) {
   return new Date(iso).toLocaleString("fi-FI", {
     weekday: "short",
