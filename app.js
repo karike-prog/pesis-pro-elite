@@ -176,7 +176,7 @@ function predict(homeTeam, awayTeam, stats, weather) {
 
   homeRuns += 0.25;
 
-  const wAdj = weatherAdjustment(weather);
+ const wAdj = weatherAdjustment(weather?.start || weather);
   homeRuns += wAdj / 2;
   awayRuns += wAdj / 2;
 
@@ -197,14 +197,24 @@ function weatherHtml(weather) {
     return `<div class="weather">🌦️ Sää: ei saatavilla</div>`;
   }
 
-  const adj = weatherAdjustment(weather);
+  const now = weather.now || weather;
+  const start = weather.start || weather;
+
+  const adj = weatherAdjustment(start);
   const sign = adj > 0 ? "+" : "";
 
   return `
     <div class="weather">
-      🌦️ FMI-sää: ${weather.temperature ?? "–"} °C,
-      tuuli ${weather.windSpeed ?? "–"} m/s,
-      sade ${weather.precipitation ?? "–"} mm/h<br>
+      <strong>🌦️ Sää nyt:</strong>
+      ${now.temperature ?? "-"} °C,
+      tuuli ${now.windSpeed ?? "-"} m/s,
+      sade ${now.precipitation ?? "-"} mm/h
+      <br>
+      <strong>⏱️ Sää pelin alkaessa:</strong>
+      ${start.temperature ?? "-"} °C,
+      tuuli ${start.windSpeed ?? "-"} m/s,
+      sade ${start.precipitation ?? "-"} mm/h
+      <br>
       <strong>Sääkorjaus:</strong> ${sign}${adj.toFixed(2)} juoksua
     </div>
   `;
