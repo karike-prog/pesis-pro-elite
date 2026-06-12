@@ -236,16 +236,27 @@ async function fetchWeather(match) {
     return { error: "Ei stadionin koordinaatteja" };
   }
 
-  const url =
-    `/.netlify/functions/weather?lat=${geometry.lat}&lon=${geometry.lng}&time=${encodeURIComponent(match.date)}`;
+const startUrl =
+  `/.netlify/functions/weather?lat=${geometry.lat}&lon=${geometry.lng}&time=${encodeURIComponent(match.date)}`;
 
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return { error: "Säähaku epäonnistui" };
-    return await res.json();
-  } catch (e) {
-    return { error: e.message };
+const nowUrl =
+  `/.netlify/functions/weather?lat=${geometry.lat}&lon=${geometry.lng}&time=${encodeURIComponent(new Date().toISOString())}`;
+
+try {
+  const startRes = await fetch(startUrl);
+  const nowRes = await fetch(nowUrl);
+
+  if (!startRes.ok || !nowRes.ok) {
+    return { error: "Säähaku epäonnistui" };
   }
+
+  return {
+    start: await startRes.json(),
+    now: await nowRes.json()
+  };
+} catch (e) {
+  return { error: e.message };
+}
 }
 
 function renderPowerTable(stats) {
