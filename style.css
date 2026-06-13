@@ -281,10 +281,9 @@ footer{
 
 .resultBox.live {
   border: 3px solid #22c55e;
-  background: #ffffff;
+  background: #eef2f7;
   color: #14532d;
 }
-
 .resultBox.hit {
   border: 3px solid #16a34a;
   background: #ecfdf5;
@@ -309,17 +308,14 @@ footer{
 }
 
 .teletextBoard {
-  margin-top: 12px;
-  font-family: monospace;
-  background: #eef2f7;
-  border: 1px solid #dbeafe;
+  background: transparent;
+  border: none;
   color: #0f2d62;
   padding: 14px;
   border-radius: 12px;
   display: inline-block;
   min-width: 320px;
 }
-
 .teleRow {
   display: grid;
   grid-template-columns: 90px repeat(4, 32px) 20px 50px;
