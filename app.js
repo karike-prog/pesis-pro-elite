@@ -322,6 +322,25 @@ function sumRuns(arr) {
 }
 
 function liveScoreboardHtml(match, lr) {
+  const periodIndex = lr.lastPeriod ?? 0;
+  const periodRuns = lr.runs?.[periodIndex] || { home: [], away: [] };
+
+  const homeInnings = periodRuns.home || [];
+  const awayInnings = periodRuns.away || [];
+
+  const max = 4;
+
+  const homeCells = [];
+  const awayCells = [];
+
+  for (let i = 0; i < max; i++) {
+    homeCells.push(homeInnings[i] ?? "x");
+    awayCells.push(awayInnings[i] ?? "x");
+  }
+
+  const homeTotal = sumRuns(homeInnings);
+  const awayTotal = sumRuns(awayInnings);
+
   const p1 = lr.runs?.[0] || { home: [], away: [] };
   const p2 = lr.runs?.[1] || { home: [], away: [] };
 
@@ -332,22 +351,29 @@ function liveScoreboardHtml(match, lr) {
 
   return `
     <div class="teletextBoard">
-      <div class="teleRow compact header">
-        <span></span><span>1J</span><span>2J</span><span>Yht.</span>
+      <div class="periodSummary">
+        Jaksot: ${homeP1}–${awayP1} / ${homeP2}–${awayP2}
       </div>
 
-      <div class="teleRow compact">
+      <div class="teleRow header">
+        <span></span>
+        <span>1</span><span>2</span><span>3</span><span>4</span>
+        <span>|</span>
+        <span>Yht.</span>
+      </div>
+
+      <div class="teleRow">
         <strong>${match.home.shorthand}</strong>
-        <span>${homeP1}</span>
-        <span>${homeP2}</span>
-        <strong>${homeP1 + homeP2}</strong>
+        ${homeCells.map(v => `<span>${v}</span>`).join("")}
+        <span>|</span>
+        <strong>${homeTotal}</strong>
       </div>
 
-      <div class="teleRow compact">
+      <div class="teleRow">
         <strong>${match.away.shorthand}</strong>
-        <span>${awayP1}</span>
-        <span>${awayP2}</span>
-        <strong>${awayP1 + awayP2}</strong>
+        ${awayCells.map(v => `<span>${v}</span>`).join("")}
+        <span>|</span>
+        <strong>${awayTotal}</strong>
       </div>
     </div>
   `;
