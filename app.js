@@ -374,10 +374,13 @@ async function renderMatches(matches, stats) {
 
   const cards = [];
 
-  for (const match of matches) {
-    const weather = await fetchWeather(match);
-    const lineup = await fetchLineup(match);
-    const prediction = predict(match.home, match.away, stats, weather);
+ for (const match of matches) {
+
+  console.log("MATCH:", match);
+
+  const weather = await fetchWeather(match);
+  const lineup = await fetchLineup(match);
+  const prediction = predict(match.home, match.away, stats, weather);
 
     const homeFav = prediction.homePct >= prediction.awayPct;
     const total = prediction.homeRuns + prediction.awayRuns;
