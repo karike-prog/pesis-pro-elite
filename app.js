@@ -18,7 +18,7 @@ const TEAM_LOGOS = {
 "PattU": "images/logos/pattu.png",
 "SoJy": "images/logos/sojy.png",
 "KiPa": "images/logos/kipa.png",
-"Vive": "images/logos/veto.png",
+"ViVe": "images/logos/veto.png",
   "Jussittaret": "images/logos/jussittaret.png",
 "JoMa N": "images/logos/joma_n.png",
 "JoMa": "images/logos/joma_n.png",
