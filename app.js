@@ -317,18 +317,28 @@ function lineupHtml(lineup) {
   `;
 }
 
-function resultHtml(match) {
-
+function resultHtml(match, prediction) {
   if (!match.result) return "";
 
   const r = match.result;
   const d = r.details;
 
-  return `
-    <div class="resultBox finished">
+  const homeWon = d.periods_home > d.periods_away;
+  const awayWon = d.periods_away > d.periods_home;
 
-<div><strong>🏁 ${match.home.shorthand} – ${match.away.shorthand}</strong></div>
-<div><strong>Lopputulos: ${r.result_string}</strong></div>
+  const elitePickedHome = prediction.homePct > prediction.awayPct;
+  const eliteHit =
+    (elitePickedHome && homeWon) ||
+    (!elitePickedHome && awayWon);
+
+  return `
+    <div class="resultBox finished ${eliteHit ? "hit" : "miss"}">
+      <div><strong>🏁 Lopputulos</strong></div>
+      <div><strong>${match.home.shorthand} – ${match.away.shorthand} ${r.result_string}</strong></div>
+
+      <div style="margin-top:6px;">
+        ${eliteHit ? "✅ Elite osui" : "❌ Elite yllättyi"}
+      </div>
 
       <div style="margin-top:6px;">
         1. jakso: ${d.runs_home_first_period}–${d.runs_away_first_period}
@@ -343,7 +353,6 @@ function resultHtml(match) {
           ? `<div>Kotiutuskisa: ${d.runs_home_super_inning}–${d.runs_away_super_inning}</div>`
           : ""
       }
-
     </div>
   `;
 }
@@ -452,9 +461,9 @@ const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
         <span class="pill blue">Total ${total.toFixed(1)}</span>
         <span class="pill orange">ID ${match.id}</span>
         
-        ${resultHtml(match)}
-        ${weatherHtml(weather)}
-        ${lineupHtml(lineup)}
+${resultHtml(match, prediction)}
+${match.result ? "" : weatherHtml(weather)}
+${lineupHtml(lineup)}
 
         <div class="reason">${prediction.note}</div>
       </div>
