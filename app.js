@@ -327,7 +327,8 @@ function resultHtml(match) {
   return `
     <div class="resultBox finished">
 
-      <div><strong>🏁 Lopputulos: ${r.result_string}</strong></div>
+<div><strong>🏁 ${match.home.shorthand} – ${match.away.shorthand}</strong></div>
+<div><strong>Lopputulos: ${r.result_string}</strong></div>
 
       <div style="margin-top:6px;">
         1. jakso: ${d.runs_home_first_period}–${d.runs_away_first_period}
