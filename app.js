@@ -522,7 +522,9 @@ const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
         <span class="pill orange">ID ${match.id}</span>
         
 ${resultHtml(match, prediction)}
-${match.result ? "" : weatherHtml(weather)}
+${(match.result || match.liveResult?.finished)
+    ? ""
+    : weatherHtml(weather)}
 ${lineupHtml(lineup)}
 
         <div class="reason">${prediction.note}</div>
