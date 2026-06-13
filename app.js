@@ -317,6 +317,22 @@ function lineupHtml(lineup) {
   `;
 }
 
+function resultHtml(match) {
+  if (!match.result && !match.liveResult) {
+    return `<div class="resultBox upcoming">⏳ Ei alkanut</div>`;
+  }
+
+  if (match.liveResult && !match.liveResult.finished) {
+    return `<div class="resultBox live">🟢 Live</div>`;
+  }
+
+  if (match.result || match.liveResult?.finished) {
+    return `<div class="resultBox finished">🏁 Päättynyt</div>`;
+  }
+
+  return "";
+}
+
 function renderPowerTable(stats) {
   const rows = Object.values(stats)
     .filter(t => t.played > 0)
@@ -418,7 +434,8 @@ const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
         <span class="pill ${tagClass}">${tag}</span>
         <span class="pill blue">Total ${total.toFixed(1)}</span>
         <span class="pill orange">ID ${match.id}</span>
-
+        
+        ${resultHtml(match)}
         ${weatherHtml(weather)}
         ${lineupHtml(lineup)}
 
