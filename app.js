@@ -317,47 +317,37 @@ function lineupHtml(lineup) {
   `;
 }
 
+function sumRuns(arr) {
+  return (arr || []).reduce((s, v) => s + (Number(v) || 0), 0);
+}
+
 function liveScoreboardHtml(match, lr) {
-  const periodIndex = lr.lastPeriod ?? 0;
-  const periodRuns = lr.runs?.[periodIndex] || { home: [], away: [] };
+  const p1 = lr.runs?.[0] || { home: [], away: [] };
+  const p2 = lr.runs?.[1] || { home: [], away: [] };
 
-  const homeInnings = periodRuns.home || [];
-  const awayInnings = periodRuns.away || [];
-
-  const max = Math.max(homeInnings.length, awayInnings.length, 4);
-
-  const homeCells = [];
-  const awayCells = [];
-
-  for (let i = 0; i < max; i++) {
-    homeCells.push(homeInnings[i] ?? "x");
-    awayCells.push(awayInnings[i] ?? "x");
-  }
-
-  const homeTotal = homeInnings.reduce((s, v) => s + (Number(v) || 0), 0);
-  const awayTotal = awayInnings.reduce((s, v) => s + (Number(v) || 0), 0);
+  const homeP1 = sumRuns(p1.home);
+  const awayP1 = sumRuns(p1.away);
+  const homeP2 = sumRuns(p2.home);
+  const awayP2 = sumRuns(p2.away);
 
   return `
     <div class="teletextBoard">
-      <div class="teleRow header">
-        <span></span>
-        ${homeCells.map((_, i) => `<span>${i + 1}</span>`).join("")}
-        <span>|</span>
-        <span>Yht.</span>
+      <div class="teleRow compact header">
+        <span></span><span>1J</span><span>2J</span><span>Yht.</span>
       </div>
 
-      <div class="teleRow">
+      <div class="teleRow compact">
         <strong>${match.home.shorthand}</strong>
-        ${homeCells.map(v => `<span>${v}</span>`).join("")}
-        <span>|</span>
-        <strong>${homeTotal}</strong>
+        <span>${homeP1}</span>
+        <span>${homeP2}</span>
+        <strong>${homeP1 + homeP2}</strong>
       </div>
 
-      <div class="teleRow">
+      <div class="teleRow compact">
         <strong>${match.away.shorthand}</strong>
-        ${awayCells.map(v => `<span>${v}</span>`).join("")}
-        <span>|</span>
-        <strong>${awayTotal}</strong>
+        <span>${awayP1}</span>
+        <span>${awayP2}</span>
+        <strong>${awayP1 + awayP2}</strong>
       </div>
     </div>
   `;
