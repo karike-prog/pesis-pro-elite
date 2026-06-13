@@ -317,28 +317,63 @@ function lineupHtml(lineup) {
   `;
 }
 
+function liveScoreboardHtml(match, lr) {
+  const periodIndex = lr.lastPeriod ?? 0;
+  const periodRuns = lr.runs?.[periodIndex] || { home: [], away: [] };
+
+  const homeInnings = periodRuns.home || [];
+  const awayInnings = periodRuns.away || [];
+
+  const max = Math.max(homeInnings.length, awayInnings.length, 4);
+
+  const homeCells = [];
+  const awayCells = [];
+
+  for (let i = 0; i < max; i++) {
+    homeCells.push(homeInnings[i] ?? "x");
+    awayCells.push(awayInnings[i] ?? "x");
+  }
+
+  const homeTotal = homeInnings.reduce((s, v) => s + (Number(v) || 0), 0);
+  const awayTotal = awayInnings.reduce((s, v) => s + (Number(v) || 0), 0);
+
+  return `
+    <div class="teletextBoard">
+      <div class="teleRow header">
+        <span></span>
+        ${homeCells.map((_, i) => `<span>${i + 1}</span>`).join("")}
+        <span>|</span>
+        <span>Yht.</span>
+      </div>
+
+      <div class="teleRow">
+        <strong>${match.home.shorthand}</strong>
+        ${homeCells.map(v => `<span>${v}</span>`).join("")}
+        <span>|</span>
+        <strong>${homeTotal}</strong>
+      </div>
+
+      <div class="teleRow">
+        <strong>${match.away.shorthand}</strong>
+        ${awayCells.map(v => `<span>${v}</span>`).join("")}
+        <span>|</span>
+        <strong>${awayTotal}</strong>
+      </div>
+    </div>
+  `;
+}
+
 function resultHtml(match, prediction) {
 if (!match.result && match.liveResult && !match.liveResult.finished) {
   const lr = match.liveResult;
+  const live = liveScoreboardHtml(match, lr);
 
   return `
     <div class="resultBox live">
       <div><strong>🟢 LIVE</strong></div>
-
-      <div style="font-size:1.2rem; margin:8px 0;">
-        ${match.home.shorthand} – ${match.away.shorthand}
-      </div>
-
-      <div>
-        ${((lr.lastPeriod ?? 0) + 1)}. jakso
-      </div>
-
-      <div>
-        ${lr.lastInning ?? "-"}. vuoropari
-      </div>
-
-      <div>
-        ${lr.outs ?? 0} paloa
+      ${live}
+      <div style="margin-top:8px;">
+        ${((lr.lastPeriod ?? 0) + 1)}. jakso • ${lr.lastInning ?? "-"}. vuoropari • ${lr.outs ?? 0} paloa
       </div>
     </div>
   `;
