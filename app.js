@@ -318,21 +318,34 @@ function lineupHtml(lineup) {
 }
 
 function resultHtml(match) {
-  if (!match.result && !match.liveResult) {
-    return `<div class="resultBox upcoming">⏳ Ei alkanut</div>`;
-  }
 
-  if (match.liveResult && !match.liveResult.finished) {
-    return `<div class="resultBox live">🟢 Live</div>`;
-  }
+  if (!match.result) return "";
 
-  if (match.result || match.liveResult?.finished) {
-    return `<div class="resultBox finished">🏁 Päättynyt</div>`;
-  }
+  const r = match.result;
+  const d = r.details;
 
-  return "";
+  return `
+    <div class="resultBox finished">
+
+      <div><strong>🏁 Lopputulos: ${r.result_string}</strong></div>
+
+      <div style="margin-top:6px;">
+        1. jakso: ${d.runs_home_first_period}–${d.runs_away_first_period}
+      </div>
+
+      <div>
+        2. jakso: ${d.runs_home_second_period}–${d.runs_away_second_period}
+      </div>
+
+      ${
+        !d.super_inning_is_not_played
+          ? `<div>Kotiutuskisa: ${d.runs_home_super_inning}–${d.runs_away_super_inning}</div>`
+          : ""
+      }
+
+    </div>
+  `;
 }
-
 function renderPowerTable(stats) {
   const rows = Object.values(stats)
     .filter(t => t.played > 0)
