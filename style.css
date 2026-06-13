@@ -338,3 +338,6 @@ footer{
   color: #000000;
   font-weight: 900;
 }
+.teleRow.compact {
+  grid-template-columns: 110px 45px 45px 60px;
+}
