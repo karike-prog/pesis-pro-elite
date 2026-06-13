@@ -318,17 +318,31 @@ function lineupHtml(lineup) {
 }
 
 function resultHtml(match, prediction) {
-    if (!match.result && match.liveResult && !match.liveResult.finished) {
-    const lr = match.liveResult;
+if (!match.result && match.liveResult && !match.liveResult.finished) {
+  const lr = match.liveResult;
 
-    return `
-      <div class="resultBox live">
-        <div><strong>🟢 LIVE</strong></div>
-        <div>${match.home.shorthand} – ${match.away.shorthand}</div>
-        <div>Jakso: ${lr.lastPeriod || "-"}</div>
+  return `
+    <div class="resultBox live">
+      <div><strong>🟢 LIVE</strong></div>
+
+      <div style="font-size:1.2rem; margin:8px 0;">
+        ${match.home.shorthand} – ${match.away.shorthand}
       </div>
-    `;
-  }
+
+      <div>
+        ${((lr.lastPeriod ?? 0) + 1)}. jakso
+      </div>
+
+      <div>
+        ${lr.lastInning ?? "-"}. vuoropari
+      </div>
+
+      <div>
+        ${lr.outs ?? 0} paloa
+      </div>
+    </div>
+  `;
+}
   if (!match.result) return "";
 
   const r = match.result;
