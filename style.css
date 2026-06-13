@@ -312,3 +312,8 @@ footer{
   background: #fef2f2;
   color: #7f1d1d;
 }
+.resultBox.live {
+  border: 3px solid #22c55e;
+  background: #f0fdf4;
+  color: #14532d;
+}
