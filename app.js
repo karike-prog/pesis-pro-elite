@@ -318,6 +318,17 @@ function lineupHtml(lineup) {
 }
 
 function resultHtml(match, prediction) {
+    if (!match.result && match.liveResult && !match.liveResult.finished) {
+    const lr = match.liveResult;
+
+    return `
+      <div class="resultBox live">
+        <div><strong>🟢 LIVE</strong></div>
+        <div>${match.home.shorthand} – ${match.away.shorthand}</div>
+        <div>Jakso: ${lr.lastPeriod || "-"}</div>
+      </div>
+    `;
+  }
   if (!match.result) return "";
 
   const r = match.result;
