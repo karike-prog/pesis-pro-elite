@@ -269,3 +269,25 @@ footer{
   align-items: center;
   gap: 4px;
 }
+.resultBox {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.resultBox.live {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.resultBox.finished {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.resultBox.upcoming {
+  background: #f1f5f9;
+  color: #475569;
+}
