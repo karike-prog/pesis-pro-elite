@@ -392,7 +392,7 @@ if (!match.result && match.liveResult && !match.liveResult.finished) {
     (!elitePickedHome && awayWon);
 
   return `
-    <div class="resultBox finished ${eliteHit ? "hit" : "miss"}">
+    <div class="resultBox hit ${eliteHit ? "hit" : "miss"}">
       <div><strong>🏁 Lopputulos</strong></div>
       <div><strong>${match.home.shorthand} – ${match.away.shorthand} ${r.result_string}</strong></div>
 
