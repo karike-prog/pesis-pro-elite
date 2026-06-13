@@ -296,11 +296,7 @@ footer{
   color: #7f1d1d;
 }
 
-.resultBox.finished {
-  border: 3px solid #6366f1;
-  background: #eef2ff;
-  color: #1e3a8a;
-}
+
 
 .resultBox.upcoming {
   background: #f1f5f9;
