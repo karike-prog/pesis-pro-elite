@@ -338,7 +338,7 @@ const TOP20_LYOJAT = [
   { name: "Aappo Savikoski", team: "IPV" },
   { name: "Petteri Kortelainen", team: "AA" },
   { name: "Samuel Huotari", team: "SoJy" },
-  { name: "Aaro Ojanperä", team: "KeKi" }
+  { name: "Aaro Ojanperä", team: "KeKi" },
   { name: "Aino-Kaisa Mantere", team: "Jussittaret" },
   { name: "Janette Lepistö", team: "Virkiä" },
   { name: "Siri Eskola", team: "Manse" },
@@ -358,7 +358,7 @@ const TOP20_LYOJAT = [
   { name: "Tinja Töyrylä", team: "Kirittäret" },
   { name: "Iina Valkeejärvi", team: "Fera" },
   { name: "Anni Laakso", team: "Jussittaret" },
-  { name: "Essi Ilmanen", team: "PöU Pesis" }
+  { name: "Essi Ilmanen", team: "PöU Pesis" },
 ];
 
 function keyPlayerAbsenceHtml(match, lineup) {
