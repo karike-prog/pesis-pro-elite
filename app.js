@@ -317,6 +317,68 @@ function lineupHtml(lineup) {
   `;
 }
 
+
+const TOP20_LYOJAT = [
+  { name: "Juho Toivola", team: "JoMa" },
+  { name: "Jukka-Pekka Vainionpää", team: "Manse" },
+  { name: "Perttu Ruuska", team: "Manse" },
+  { name: "Henri Puputti", team: "ViVe" },
+  { name: "Patrik Wahlsten", team: "KPL" },
+  { name: "Roope Korhonen", team: "SoJy" },
+  { name: "Martti Viitasalo", team: "PattU" },
+  { name: "Matias Rinta-aho", team: "ViVe" },
+  { name: "Rasmus Teppo", team: "KoU" },
+  { name: "Ville-Veikko Olli", team: "IPV" },
+  { name: "Juha Niemi", team: "Tahko" },
+  { name: "Antti Korhonen", team: "Manse" },
+  { name: "Janne Mäkelä", team: "KiPa" },
+  { name: "Santtu Patova", team: "Tahko" },
+  { name: "Ossi Meriläinen", team: "KeKi" },
+  { name: "Tuukka Sarkkinen", team: "KeKi" },
+  { name: "Aappo Savikoski", team: "IPV" },
+  { name: "Petteri Kortelainen", team: "AA" },
+  { name: "Samuel Huotari", team: "SoJy" },
+  { name: "Aaro Ojanperä", team: "KeKi" }
+];
+
+function keyPlayerAbsenceHtml(match, lineup) {
+  const data = lineup?.data || lineup?.match || lineup;
+
+  const homePlayers = data?.home?.players || [];
+  const awayPlayers = data?.away?.players || [];
+
+  if (!homePlayers.length || !awayPlayers.length) return "";
+
+  const homeName = match.home.shorthand || match.home.name;
+  const awayName = match.away.shorthand || match.away.name;
+
+  const homeLineupNames = homePlayers.map(p => p.name);
+  const awayLineupNames = awayPlayers.map(p => p.name);
+
+  const missing = [];
+
+  TOP20_LYOJAT.forEach(player => {
+    if (player.team === homeName) {
+      const found = homeLineupNames.includes(player.name);
+      if (!found) missing.push(`${player.name} pois kokoonpanosta`);
+    }
+
+    if (player.team === awayName) {
+      const found = awayLineupNames.includes(player.name);
+      if (!found) missing.push(`${player.name} pois kokoonpanosta`);
+    }
+    
+  });
+
+  if (!missing.length) return "";
+
+  return `
+    <div class="keyAbsence">
+      <strong>⚠️ Avainpelaaja huomio</strong>
+      ${missing.map(m => `<div>${m}</div>`).join("")}
+    </div>
+  `;
+}
 function sumRuns(arr) {
   return (arr || []).reduce((s, v) => s + (Number(v) || 0), 0);
 }
@@ -541,6 +603,7 @@ ${resultHtml(match, prediction)}
 ${(match.result || match.liveResult?.finished)
     ? ""
     : weatherHtml(weather)}
+${keyPlayerAbsenceHtml(match, lineup)}
 ${lineupHtml(lineup)}
 
         <div class="reason">${prediction.note}</div>
