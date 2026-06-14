@@ -439,7 +439,7 @@ const awayTotal = awayP1 + awayP2;
   
 return `
   <div class="teletextBoard">
-    <div class="liveTitle">🟢 LIVE</div>
+
 
     <div class="teleRow header">
       <span></span>
@@ -468,9 +468,7 @@ return `
       <strong>${awayTotal}</strong>
     </div>
 
-    <div class="liveMeta">
-      ${((lr.lastPeriod ?? 0) + 1)}. jakso • ${lr.lastInning ?? "-"} vuoropari • ${lr.outs ?? 0} paloa
-    </div>
+
   </div>
 `;
 }
