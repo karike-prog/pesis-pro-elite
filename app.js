@@ -481,14 +481,10 @@ if (!match.result && match.liveResult && !match.liveResult.finished) {
   const live = liveScoreboardHtml(match, lr);
 
   return `
-    <div class="resultBox live">
-      <div><strong>🟢 LIVE</strong></div>
-      ${live}
-      <div style="margin-top:8px;">
-        ${((lr.lastPeriod ?? 0) + 1)}. jakso • ${lr.lastInning ?? "-"}. vuoropari • ${lr.outs ?? 0} paloa
-      </div>
-    </div>
-  `;
+  <div class="resultBox live">
+    ${live}
+  </div>
+`;
 }
   if (!match.result) return "";
 
