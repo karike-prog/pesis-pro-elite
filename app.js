@@ -426,6 +426,15 @@ const awayP2 = sumRuns(p2.away);
 
 const homeTotal = homeP1 + homeP2;
 const awayTotal = awayP1 + awayP2;
+
+  const homePeriods = lr.periods?.home ?? 0;
+const awayPeriods = lr.periods?.away ?? 0;
+
+const k = lr.runs?.[2] || lr.superInning || { home: [], away: [] };
+const homeK = sumRuns(k.home);
+const awayK = sumRuns(k.away);
+
+const showK = homePeriods === 1 && awayPeriods === 1;
   
 return `
   <div class="teletextBoard">
@@ -443,8 +452,9 @@ return `
       ${p1Home.map(v => `<span>${v}</span>`).join("")}
       <span></span>
       ${p2Home.map(v => `<span>${v}</span>`).join("")}
-      <span></span>
-      <strong>${homeTotal}</strong>
+<span></span>
+<strong>${showK ? homeK : "x"}</strong>
+<strong>${homePeriods}</strong>
     </div>
 
     <div class="teleRow">
@@ -452,8 +462,9 @@ return `
       ${p1Away.map(v => `<span>${v}</span>`).join("")}
       <span></span>
       ${p2Away.map(v => `<span>${v}</span>`).join("")}
-      <span></span>
-      <strong>${awayTotal}</strong>
+ <span></span>
+<strong>${showK ? awayK : "x"}</strong>
+<strong>${awayPeriods}</strong>
     </div>
   </div>
 `;
