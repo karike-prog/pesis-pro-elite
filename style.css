@@ -381,3 +381,22 @@ footer{
   line-height: 1.4;
   white-space: nowrap;
 }
+@media (max-width: 700px) {
+
+  .teletextBoard {
+    width: 100%;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+
+  .teleRow {
+    grid-template-columns: 70px repeat(4, 24px) 15px 35px;
+    gap: 2px;
+    font-size: 0.9rem;
+  }
+
+  .teleRow strong {
+    font-size: 0.95rem;
+  }
+}
