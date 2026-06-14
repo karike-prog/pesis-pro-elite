@@ -431,11 +431,14 @@ const awayTotal = awayP1 + awayP2;
   const p1 = lr.runs?.[0] || { home: [], away: [] };
   const p2 = lr.runs?.[1] || { home: [], away: [] };
 
-  const homeP1 = sumRuns(p1.home);
-  const awayP1 = sumRuns(p1.away);
-  const homeP2 = sumRuns(p2.home);
-  const awayP2 = sumRuns(p2.away);
+const homeP1 = sumRuns(p1.home);
+const awayP1 = sumRuns(p1.away);
+const homeP2 = sumRuns(p2.home);
+const awayP2 = sumRuns(p2.away);
 
+const homeTotal = homeP1 + homeP2;
+const awayTotal = awayP1 + awayP2;
+  
   return `
     <div class="teletextBoard">
       <div class="periodSummary">
