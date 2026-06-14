@@ -666,8 +666,8 @@ async function load() {
     $("tc").textContent = Object.keys(stats).length;
     $("dc").textContent = dayMatches.length;
 
-    renderPowerTable(stats);
-await renderMatches(dayMatches, stats, selectedSeries);
+renderPowerTable(stats);
+await renderMatches(dayMatches, stats, series);
 
     $("status").textContent = `Päivitetty ${new Date().toLocaleTimeString("fi-FI")}`;
   } catch (e) {
