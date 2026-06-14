@@ -342,3 +342,13 @@ footer{
   color: #0f2d62;
   margin-bottom: 8px;
 }
+.keyAbsence {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #fff7ed;
+  border: 2px solid #f97316;
+  color: #7c2d12;
+  font-weight: 700;
+  line-height: 1.5;
+}
