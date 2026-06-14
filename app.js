@@ -378,6 +378,7 @@ function keyPlayerAbsenceHtml(match, lineup) {
   const missing = [];
 
 TOP20_LYOJAT.forEach(player => {
+  console.log("MATCH SERIES:", match.series, match);
   if (player.series !== match.series) return;
 
   if (player.team === homeName) {
