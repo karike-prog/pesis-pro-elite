@@ -377,18 +377,17 @@ function keyPlayerAbsenceHtml(match, lineup) {
 
   const missing = [];
 
-  TOP20_LYOJAT.forEach(player => {
-    if (player.team === homeName) {
-      const found = homeLineupNames.includes(player.name);
-      if (!found) missing.push(`${player.name} pois kokoonpanosta`);
-    }
+TOP20_LYOJAT.forEach(player => {
+  if (player.team === homeName) {
+    const found = homeLineupNames.includes(player.name);
+    if (!found) missing.push(`${player.name} (${player.team}) pois kokoonpanosta`);
+  }
 
-    if (player.team === awayName) {
-      const found = awayLineupNames.includes(player.name);
-      if (!found) missing.push(`${player.name} pois kokoonpanosta`);
-    }
-    
-  });
+  if (player.team === awayName) {
+    const found = awayLineupNames.includes(player.name);
+    if (!found) missing.push(`${player.name} (${player.team}) pois kokoonpanosta`);
+  }
+});
 
   if (!missing.length) return "";
 
