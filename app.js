@@ -547,7 +547,7 @@ function renderPowerTable(stats) {
   $("power").innerHTML = rows;
 }
 
-async function renderMatches(matches, stats) {
+async function renderMatches(matches, stats, selectedSeries) {
   if (!matches.length) {
     $("matches").innerHTML = "<p>Otteluita ei löytynyt valitulle päivälle.</p>";
     return;
@@ -667,7 +667,7 @@ async function load() {
     $("dc").textContent = dayMatches.length;
 
     renderPowerTable(stats);
-    await renderMatches(dayMatches, stats);
+await renderMatches(dayMatches, stats, selectedSeries);
 
     $("status").textContent = `Päivitetty ${new Date().toLocaleTimeString("fi-FI")}`;
   } catch (e) {
