@@ -412,7 +412,64 @@ function sumRuns(arr) {
   return (arr || []).reduce((s, v) => s + (Number(v) || 0), 0);
 }
 
+function sumRuns(arr) {
+  return (arr || []).reduce((s, v) => s + (Number(v) || 0), 0);
+}
 
+function liveScoreboardHtml(match, lr) {
+  const p1 = lr.runs?.[0] || { home: [], away: [] };
+  const p2 = lr.runs?.[1] || { home: [], away: [] };
+
+  const p1Home = Array.from({ length: 4 }, (_, i) => p1.home?.[i] ?? "x");
+  const p1Away = Array.from({ length: 4 }, (_, i) => p1.away?.[i] ?? "x");
+  const p2Home = Array.from({ length: 4 }, (_, i) => p2.home?.[i] ?? "x");
+  const p2Away = Array.from({ length: 4 }, (_, i) => p2.away?.[i] ?? "x");
+
+  const homeP1 = sumRuns(p1.home);
+  const awayP1 = sumRuns(p1.away);
+  const homeP2 = sumRuns(p2.home);
+  const awayP2 = sumRuns(p2.away);
+
+  return `
+    <div class="teletextMobile">
+      <div class="teleHeader">
+        <span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>|</span><span>Y</span>
+      </div>
+
+      <div class="teleSection">1. jakso</div>
+
+      <div class="teleLine">
+        <b>${match.home.shorthand}</b>
+        ${p1Home.map(v => `<span>${v}</span>`).join("")}
+        <span>|</span><b>${homeP1}</b>
+      </div>
+
+      <div class="teleLine">
+        <b>${match.away.shorthand}</b>
+        ${p1Away.map(v => `<span>${v}</span>`).join("")}
+        <span>|</span><b>${awayP1}</b>
+      </div>
+
+      <div class="teleSection">2. jakso</div>
+
+      <div class="teleLine">
+        <b>${match.home.shorthand}</b>
+        ${p2Home.map(v => `<span>${v}</span>`).join("")}
+        <span>|</span><b>${homeP2}</b>
+      </div>
+
+      <div class="teleLine">
+        <b>${match.away.shorthand}</b>
+        ${p2Away.map(v => `<span>${v}</span>`).join("")}
+        <span>|</span><b>${awayP2}</b>
+      </div>
+
+      <div class="teleSection">
+        ${((lr.lastPeriod ?? 0) + 1)}. jakso • ${lr.lastInning ?? "-"} vp • ${lr.outs ?? 0} paloa
+      </div>
+    </div>
+  `;
+}
 function resultHtml(match, prediction) {
 if (!match.result && match.liveResult && !match.liveResult.finished) {
   const lr = match.liveResult;
