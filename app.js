@@ -378,6 +378,8 @@ function keyPlayerAbsenceHtml(match, lineup) {
   const missing = [];
 
 TOP20_LYOJAT.forEach(player => {
+  if (player.series !== match.series) return;
+
   if (player.team === homeName) {
     const found = homeLineupNames.includes(player.name);
     if (!found) missing.push(`${player.name} (${player.team}) pois kokoonpanosta`);
