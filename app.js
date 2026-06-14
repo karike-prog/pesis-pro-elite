@@ -231,8 +231,8 @@ const FALLBACK_STADIUMS = {
   "KSS Energia Areena, Kouvola": { lat: 60.868, lng: 26.704 },
   "Rantakenttä, Kitee": { lat: 62.101, lng: 30.138 },
   "Huikoo Areena, Pori": {lat: 61.485,lng: 21.797},
-  "Saarikenttä, Vimpeli": { lat: 63.1605, lon: 23.8220 },
-  "Mantun kenttä, Siilinjärvi": { lat: 63.076, lon: 27.661 },
+  "Saarikenttä, Vimpeli": { lat: 63.1605, lng: 23.8220 },
+  "Mantun kenttä, Siilinjärvi": { lat: 63.076, lng: 27.661 },
 };
 
 async function fetchWeather(match) {
