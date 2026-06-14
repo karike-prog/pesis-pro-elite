@@ -452,18 +452,18 @@ return `
 
     <div class="teleRow">
       <strong>${match.home.shorthand}</strong>
-      ${(p1.home || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v}</span>`).join("")}
+      ${(p1.home || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v ?? "x"}</span>`).join("")}
       <span>|</span>
-      ${(p2.home || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v}</span>`).join("")}
+      ${(p2.home || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v ?? "x"}</span>`).join("")}
       <span>|</span>
       <strong>${homeTotal}</strong>
     </div>
 
     <div class="teleRow">
       <strong>${match.away.shorthand}</strong>
-      ${(p1.away || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v}</span>`).join("")}
+      ${(p1.away || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v ?? "x"}</span>`).join("")}
       <span>|</span>
-      ${(p2.away || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v}</span>`).join("")}
+      ${(p2.away || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v ?? "x"}</span>`).join("")}
       <span>|</span>
       <strong>${awayTotal}</strong>
     </div>
