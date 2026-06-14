@@ -409,25 +409,15 @@ function sumRuns(arr) {
 }
 
 function liveScoreboardHtml(match, lr) {
-  const periodIndex = lr.lastPeriod ?? 0;
-  const periodRuns = lr.runs?.[periodIndex] || { home: [], away: [] };
-
-  const homeInnings = periodRuns.home || [];
-  const awayInnings = periodRuns.away || [];
-
-  const max = 4;
-
-  const homeCells = [];
-  const awayCells = [];
-
-  for (let i = 0; i < max; i++) {
-    homeCells.push(homeInnings[i] ?? "x");
-    awayCells.push(awayInnings[i] ?? "x");
-  }
-
+  
 
   const p1 = lr.runs?.[0] || { home: [], away: [] };
   const p2 = lr.runs?.[1] || { home: [], away: [] };
+  
+  const p1Home = Array.from({ length: 4 }, (_, i) => p1.home?.[i] ?? "x");
+const p1Away = Array.from({ length: 4 }, (_, i) => p1.away?.[i] ?? "x");
+const p2Home = Array.from({ length: 4 }, (_, i) => p2.home?.[i] ?? "x");
+const p2Away = Array.from({ length: 4 }, (_, i) => p2.away?.[i] ?? "x");
 
 const homeP1 = sumRuns(p1.home);
 const awayP1 = sumRuns(p1.away);
@@ -439,36 +429,32 @@ const awayTotal = awayP1 + awayP2;
   
 return `
   <div class="teletextBoard">
-
-
     <div class="teleRow header">
       <span></span>
       <span>1</span><span>2</span><span>3</span><span>4</span>
-      <span>|</span>
+      <span></span>
       <span>1</span><span>2</span><span>3</span><span>4</span>
-      <span>|</span>
+      <span></span>
       <span>K</span>
     </div>
 
     <div class="teleRow">
       <strong>${match.home.shorthand}</strong>
-      ${(p1.home || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v ?? "x"}</span>`).join("")}
-      <span>|</span>
-      ${(p2.home || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v ?? "x"}</span>`).join("")}
-      <span>|</span>
+      ${p1Home.map(v => `<span>${v}</span>`).join("")}
+      <span></span>
+      ${p2Home.map(v => `<span>${v}</span>`).join("")}
+      <span></span>
       <strong>${homeTotal}</strong>
     </div>
 
     <div class="teleRow">
       <strong>${match.away.shorthand}</strong>
-      ${(p1.away || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v ?? "x"}</span>`).join("")}
-      <span>|</span>
-      ${(p2.away || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v ?? "x"}</span>`).join("")}
-      <span>|</span>
+      ${p1Away.map(v => `<span>${v}</span>`).join("")}
+      <span></span>
+      ${p2Away.map(v => `<span>${v}</span>`).join("")}
+      <span></span>
       <strong>${awayTotal}</strong>
     </div>
-
-
   </div>
 `;
 }
