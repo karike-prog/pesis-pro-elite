@@ -339,6 +339,26 @@ const TOP20_LYOJAT = [
   { name: "Petteri Kortelainen", team: "AA" },
   { name: "Samuel Huotari", team: "SoJy" },
   { name: "Aaro Ojanperä", team: "KeKi" }
+  { name: "Aino-Kaisa Mantere", team: "" },
+  { name: "Janette Lepistö", team: "" },
+  { name: "Siri Eskola", team: "" },
+  { name: "Nelli Huotari", team: "" },
+  { name: "Maija Vastamäki", team: "" },
+  { name: "Taru Toikka", team: "" },
+  { name: "Maria Kaakinen", team: "" },
+  { name: "Lotta Nummikani", team: "" },
+  { name: "Hanna Toivanen", team: "" },
+  { name: "Anna Ala-Kauhaluoma", team: "" },
+  { name: "Sara Kujanen", team: "" },
+  { name: "Sohvi Korhonen", team: "" },
+  { name: "Emilia Linna", team: "" },
+  { name: "Tiia Valtanen", team: "" },
+  { name: "Tiia Peltonen", team: "" },
+  { name: "Nea Tuikka", team: "" },
+  { name: "Tinja Töyrylä", team: "" },
+  { name: "Iina Valkeejärvi", team: "" },
+  { name: "Anni Laakso", team: "" },
+  { name: "Essi Ilmanen", team: "" }
 ];
 
 function keyPlayerAbsenceHtml(match, lineup) {
