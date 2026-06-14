@@ -437,34 +437,42 @@ const awayP2 = sumRuns(p2.away);
 const homeTotal = homeP1 + homeP2;
 const awayTotal = awayP1 + awayP2;
   
-  return `
-    <div class="teletextBoard">
-      <div class="periodSummary">
-        Jaksot: ${homeP1}–${awayP1} / ${homeP2}–${awayP2}
-      </div>
+return `
+  <div class="teletextBoard">
+    <div class="liveTitle">🟢 LIVE</div>
 
-      <div class="teleRow header">
-        <span></span>
-        <span>1</span><span>2</span><span>3</span><span>4</span>
-        <span>|</span>
-<span>Ott.</span>
-      </div>
-
-      <div class="teleRow">
-        <strong>${match.home.shorthand}</strong>
-        ${homeCells.map(v => `<span>${v}</span>`).join("")}
-        <span>|</span>
-        <strong>${homeTotal}</strong>
-      </div>
-
-      <div class="teleRow">
-        <strong>${match.away.shorthand}</strong>
-        ${awayCells.map(v => `<span>${v}</span>`).join("")}
-        <span>|</span>
-        <strong>${awayTotal}</strong>
-      </div>
+    <div class="teleRow header">
+      <span></span>
+      <span>1</span><span>2</span><span>3</span><span>4</span>
+      <span>|</span>
+      <span>1</span><span>2</span><span>3</span><span>4</span>
+      <span>|</span>
+      <span>K</span>
     </div>
-  `;
+
+    <div class="teleRow">
+      <strong>${match.home.shorthand}</strong>
+      ${(p1.home || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v}</span>`).join("")}
+      <span>|</span>
+      ${(p2.home || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v}</span>`).join("")}
+      <span>|</span>
+      <strong>${homeTotal}</strong>
+    </div>
+
+    <div class="teleRow">
+      <strong>${match.away.shorthand}</strong>
+      ${(p1.away || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v}</span>`).join("")}
+      <span>|</span>
+      ${(p2.away || []).concat(["x","x","x","x"]).slice(0,4).map(v => `<span>${v}</span>`).join("")}
+      <span>|</span>
+      <strong>${awayTotal}</strong>
+    </div>
+
+    <div class="liveMeta">
+      ${((lr.lastPeriod ?? 0) + 1)}. jakso • ${lr.lastInning ?? "-"} vuoropari • ${lr.outs ?? 0} paloa
+    </div>
+  </div>
+`;
 }
 
 function resultHtml(match, prediction) {
