@@ -432,3 +432,45 @@ footer{
   font-weight: 800;
   color: #0f2d62;
 }
+.teletextMobile {
+  margin: 12px auto 0;
+  padding: 12px;
+  max-width: 330px;
+  background: #eef2f7;
+  border-radius: 12px;
+  font-family: monospace;
+  color: #0f2d62;
+}
+
+.teleHeader,
+.teleLine {
+  display: grid;
+  grid-template-columns: 76px 24px 24px 24px 24px 14px 28px;
+  gap: 2px;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.teleHeader {
+  font-weight: 900;
+  color: #000;
+}
+
+.teleLine b {
+  color: #000;
+  font-weight: 900;
+}
+
+.teleLine span,
+.teleLine b:last-child {
+  color: #0f2d62;
+  font-weight: 900;
+}
+
+.teleSection {
+  margin-top: 8px;
+  margin-bottom: 2px;
+  font-weight: 900;
+  color: #14532d;
+  text-align: left;
+}
