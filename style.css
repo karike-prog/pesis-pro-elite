@@ -374,3 +374,10 @@ footer{
 .teleRow strong:first-child {
   text-align: left;
 }
+.teleRow {
+  display: grid;
+  grid-template-columns: 70px repeat(4, 28px) 24px repeat(4, 28px) 24px 28px 28px;
+  align-items: center;
+  line-height: 1.4;
+  white-space: nowrap;
+}
