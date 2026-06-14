@@ -625,7 +625,7 @@ ${resultHtml(match, prediction)}
 ${(match.result || match.liveResult?.finished)
     ? ""
     : weatherHtml(weather)}
-${keyPlayerAbsenceHtml(match, lineup)}
+${keyPlayerAbsenceHtml(match, lineup, selectedSeries)}
 ${lineupHtml(lineup)}
 
         <div class="reason">${prediction.note}</div>
