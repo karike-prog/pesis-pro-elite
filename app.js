@@ -361,7 +361,7 @@ const TOP20_LYOJAT = [
   { name: "Essi Ilmanen", team: "PöU Pesis" },
 ];
 
-function keyPlayerAbsenceHtml(match, lineup) {
+function keyPlayerAbsenceHtml(match, lineup, selectedSeries) {
   const data = lineup?.data || lineup?.match || lineup;
 
   const homePlayers = data?.home?.players || [];
@@ -378,8 +378,8 @@ function keyPlayerAbsenceHtml(match, lineup) {
   const missing = [];
 
 TOP20_LYOJAT.forEach(player => {
-  console.log("MATCH SERIES:", match.series, match);
-  if (player.series !== match.series) return;
+
+if (player.series !== selectedSeries) return;
 
   if (player.team === homeName) {
     const found = homeLineupNames.includes(player.name);
