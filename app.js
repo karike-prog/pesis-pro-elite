@@ -408,66 +408,34 @@ function sumRuns(arr) {
   return (arr || []).reduce((s, v) => s + (Number(v) || 0), 0);
 }
 
-function liveScoreboardHtml(match, lr) {
-  
+function sumRuns(arr) {
+  return (arr || []).reduce((s, v) => s + (Number(v) || 0), 0);
+}
 
+function liveScoreboardHtml(match, lr) {
   const p1 = lr.runs?.[0] || { home: [], away: [] };
   const p2 = lr.runs?.[1] || { home: [], away: [] };
-  
-  const p1Home = Array.from({ length: 4 }, (_, i) => p1.home?.[i] ?? "x");
-const p1Away = Array.from({ length: 4 }, (_, i) => p1.away?.[i] ?? "x");
-const p2Home = Array.from({ length: 4 }, (_, i) => p2.home?.[i] ?? "x");
-const p2Away = Array.from({ length: 4 }, (_, i) => p2.away?.[i] ?? "x");
 
-const homeP1 = sumRuns(p1.home);
-const awayP1 = sumRuns(p1.away);
-const homeP2 = sumRuns(p2.home);
-const awayP2 = sumRuns(p2.away);
+  const homeP1 = sumRuns(p1.home);
+  const awayP1 = sumRuns(p1.away);
+  const homeP2 = sumRuns(p2.home);
+  const awayP2 = sumRuns(p2.away);
 
-const homeTotal = homeP1 + homeP2;
-const awayTotal = awayP1 + awayP2;
-
-  const homePeriods = lr.periods?.home ?? 0;
-const awayPeriods = lr.periods?.away ?? 0;
-
-const k = lr.runs?.[2] || lr.superInning || { home: [], away: [] };
-const homeK = sumRuns(k.home);
-const awayK = sumRuns(k.away);
-
-const showK = homePeriods === 1 && awayPeriods === 1;
-  
-return `
-  <div class="teletextBoard">
-    <div class="teleRow header">
-      <span></span>
-      <span>1</span><span>2</span><span>3</span><span>4</span>
-      <span></span>
-      <span>1</span><span>2</span><span>3</span><span>4</span>
-      <span></span>
-      <span>K</span>
+  return `
+    <div class="mobileLiveScore">
+      <div class="liveScoreRow">
+        <strong>${match.home.shorthand}</strong>
+        <span>${homeP1 + homeP2}</span>
+      </div>
+      <div class="liveScoreRow">
+        <strong>${match.away.shorthand}</strong>
+        <span>${awayP1 + awayP2}</span>
+      </div>
+      <div class="periodSummary">
+        Jaksot: ${homeP1}–${awayP1} / ${homeP2}–${awayP2}
+      </div>
     </div>
-
-    <div class="teleRow">
-      <strong>${match.home.shorthand}</strong>
-      ${p1Home.map(v => `<span>${v}</span>`).join("")}
-      <span></span>
-      ${p2Home.map(v => `<span>${v}</span>`).join("")}
-<span></span>
-<strong>${showK ? homeK : "x"}</strong>
-<strong>${homePeriods}</strong>
-    </div>
-
-    <div class="teleRow">
-      <strong>${match.away.shorthand}</strong>
-      ${p1Away.map(v => `<span>${v}</span>`).join("")}
-      <span></span>
-      ${p2Away.map(v => `<span>${v}</span>`).join("")}
- <span></span>
-<strong>${showK ? awayK : "x"}</strong>
-<strong>${awayPeriods}</strong>
-    </div>
-  </div>
-`;
+  `;
 }
 
 function resultHtml(match, prediction) {
