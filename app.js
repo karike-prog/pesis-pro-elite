@@ -412,31 +412,6 @@ function sumRuns(arr) {
   return (arr || []).reduce((s, v) => s + (Number(v) || 0), 0);
 }
 
-function liveScoreboardHtml(match, lr) {
-  const p1 = lr.runs?.[0] || { home: [], away: [] };
-  const p2 = lr.runs?.[1] || { home: [], away: [] };
-
-  const homeP1 = sumRuns(p1.home);
-  const awayP1 = sumRuns(p1.away);
-  const homeP2 = sumRuns(p2.home);
-  const awayP2 = sumRuns(p2.away);
-
-  return `
-    <div class="mobileLiveScore">
-      <div class="liveScoreRow">
-        <strong>${match.home.shorthand}</strong>
-        <span>${homeP1 + homeP2}</span>
-      </div>
-      <div class="liveScoreRow">
-        <strong>${match.away.shorthand}</strong>
-        <span>${awayP1 + awayP2}</span>
-      </div>
-      <div class="periodSummary">
-        Jaksot: ${homeP1}–${awayP1} / ${homeP2}–${awayP2}
-      </div>
-    </div>
-  `;
-}
 
 function resultHtml(match, prediction) {
 if (!match.result && match.liveResult && !match.liveResult.finished) {
