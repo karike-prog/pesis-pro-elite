@@ -425,8 +425,6 @@ function liveScoreboardHtml(match, lr) {
     awayCells.push(awayInnings[i] ?? "x");
   }
 
-const homeTotal = homeP1 + homeP2;
-const awayTotal = awayP1 + awayP2;
 
   const p1 = lr.runs?.[0] || { home: [], away: [] };
   const p2 = lr.runs?.[1] || { home: [], away: [] };
