@@ -234,6 +234,7 @@ const FALLBACK_STADIUMS = {
 };
 
 async function fetchWeather(match) {
+  console.log("WEATHER MATCH:", match.stadium);
     let geometry = match.stadium?.details?.place?.geometry;
 
 
