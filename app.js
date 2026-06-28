@@ -415,58 +415,57 @@ function sumRuns(arr) {
 function sumRuns(arr) {
   return (arr || []).reduce((s, v) => s + (Number(v) || 0), 0);
 }
-
+function teamShortName(team) {
+  return team?.shorthand || team?.name || "";
+}
 function liveScoreboardHtml(match, lr) {
   const p1 = lr.runs?.[0] || { home: [], away: [] };
   const p2 = lr.runs?.[1] || { home: [], away: [] };
 
-  const p1Home = Array.from({ length: 4 }, (_, i) => p1.home?.[i] ?? "x");
-  const p1Away = Array.from({ length: 4 }, (_, i) => p1.away?.[i] ?? "x");
-  const p2Home = Array.from({ length: 4 }, (_, i) => p2.home?.[i] ?? "x");
-  const p2Away = Array.from({ length: 4 }, (_, i) => p2.away?.[i] ?? "x");
+  const fill = (arr) => Array.from({ length: 4 }, (_, i) => arr?.[i] ?? "–");
+
+  const p1Home = fill(p1.home);
+  const p1Away = fill(p1.away);
+  const p2Home = fill(p2.home);
+  const p2Away = fill(p2.away);
 
   const homeP1 = sumRuns(p1.home);
   const awayP1 = sumRuns(p1.away);
   const homeP2 = sumRuns(p2.home);
   const awayP2 = sumRuns(p2.away);
 
+  const home = teamShortName(match.home);
+  const away = teamShortName(match.away);
+
   return `
-    <div class="teletextMobile">
-      <div class="teleHeader">
-        <span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>|</span><span>Y</span>
-      </div>
+    <div class="inningsCompact">
+      <div class="periodTitle period1">1. jakso</div>
+      <div class="periodTitle period2">2. jakso</div>
 
-      <div class="teleSection">1. jakso</div>
+      <div class="teamCell"></div>
+      <div class="headCell">1</div>
+      <div class="headCell">2</div>
+      <div class="headCell">3</div>
+      <div class="headCell">4</div>
+      <div class="headCell total">Y</div>
 
-      <div class="teleLine">
-        <b>${match.home.shorthand}</b>
-        ${p1Home.map(v => `<span>${v}</span>`).join("")}
-        <span>|</span><b>${homeP1}</b>
-      </div>
+      <div class="headCell">1</div>
+      <div class="headCell">2</div>
+      <div class="headCell">3</div>
+      <div class="headCell">4</div>
+      <div class="headCell total">Y</div>
 
-      <div class="teleLine">
-        <b>${match.away.shorthand}</b>
-        ${p1Away.map(v => `<span>${v}</span>`).join("")}
-        <span>|</span><b>${awayP1}</b>
-      </div>
+      <div class="teamCell">${home}</div>
+      ${p1Home.map(v => `<div>${v}</div>`).join("")}
+      <div class="total">${homeP1}</div>
+      ${p2Home.map(v => `<div>${v}</div>`).join("")}
+      <div class="total">${homeP2}</div>
 
-      <div class="teleSection">2. jakso</div>
-
-      <div class="teleLine">
-        <b>${match.home.shorthand}</b>
-        ${p2Home.map(v => `<span>${v}</span>`).join("")}
-        <span>|</span><b>${homeP2}</b>
-      </div>
-
-      <div class="teleLine">
-        <b>${match.away.shorthand}</b>
-        ${p2Away.map(v => `<span>${v}</span>`).join("")}
-        <span>|</span><b>${awayP2}</b>
-      </div>
-
-      <div class="teleSection">
-        ${((lr.lastPeriod ?? 0) + 1)}. jakso • ${lr.lastInning ?? "-"} vp • ${lr.outs ?? 0} paloa
-      </div>
+      <div class="teamCell">${away}</div>
+      ${p1Away.map(v => `<div>${v}</div>`).join("")}
+      <div class="total">${awayP1}</div>
+      ${p2Away.map(v => `<div>${v}</div>`).join("")}
+      <div class="total">${awayP2}</div>
     </div>
   `;
 }
