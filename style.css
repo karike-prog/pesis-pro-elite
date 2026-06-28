@@ -516,3 +516,26 @@ footer{
   color: #14532d;
   text-align: left;
 }
+/* Mobiili */
+@media (max-width: 600px) {
+
+  .innings-table{
+    font-size:14px;
+    line-height:1.15;
+  }
+
+  .innings-table td,
+  .innings-table th{
+    padding:2px 4px;
+  }
+
+  .innings-table .team{
+    font-size:15px;
+    font-weight:600;
+    white-space:nowrap;
+  }
+
+}
+.live-box{
+    padding:10px;
+}
