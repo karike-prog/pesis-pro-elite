@@ -521,3 +521,56 @@ footer{
 .live-box{
     padding:10px;
 }
+.inningsCompact {
+  display: grid;
+  grid-template-columns: 72px repeat(5, 1fr) repeat(5, 1fr);
+  gap: 4px;
+  align-items: center;
+  margin-top: 12px;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.periodTitle {
+  color: #14532d;
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+
+.period1 {
+  grid-column: 2 / 7;
+}
+
+.period2 {
+  grid-column: 7 / 12;
+}
+
+.teamCell {
+  text-align: left;
+  white-space: nowrap;
+  font-size: 15px;
+}
+
+.headCell {
+  color: #111827;
+}
+
+.total {
+  color: #14532d;
+}
+
+@media (max-width: 600px) {
+  .inningsCompact {
+    grid-template-columns: 58px repeat(5, 1fr) repeat(5, 1fr);
+    gap: 2px;
+    font-size: 13px;
+  }
+
+  .periodTitle {
+    font-size: 14px;
+  }
+
+  .teamCell {
+    font-size: 13px;
+  }
+}
