@@ -561,16 +561,16 @@ footer{
 
 @media (max-width: 600px) {
   .inningsCompact {
-    grid-template-columns: 58px repeat(5, 1fr) repeat(5, 1fr);
-    gap: 2px;
+    padding: 10px 6px;
+    font-size: 12px;
+    gap: 1px;
+  }
+
+  .inningsCompact .teamCell {
     font-size: 13px;
   }
 
   .periodTitle {
     font-size: 14px;
-  }
-
-  .teamCell {
-    font-size: 13px;
   }
 }
