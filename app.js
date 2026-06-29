@@ -551,11 +551,11 @@ function renderPowerTable(stats) {
 
 async function renderMatches(matches, stats, selectedSeries) {
   if (!matches.length) {
-    $("matches").innerHTML = "<p>Otteluita ei löytynyt valitulle päivälle.</p>";
+    $("matches-men").innerHTML = "<p>Otteluita ei löytynyt valitulle päivälle.</p>";
     return;
   }
 
-  $("matches").innerHTML = "<p>Haetaan säätietoja...</p>";
+  $("matches-men").innerHTML = "<p>Haetaan säätietoja...</p>";
 
   const cards = [];
 
@@ -638,7 +638,7 @@ ${lineupHtml(lineup)}
  $("matches-men").innerHTML = cards.join("");
 }
 
-async function load() 
+async function load() {
   const level = "Superpesis";
   const series = "Miehet";
   const selectedDate = $("date").value || today();
