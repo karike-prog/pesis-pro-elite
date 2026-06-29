@@ -53,7 +53,54 @@ function fmtDate(iso) {
     minute: "2-digit"
   });
 }
+const STANDINGS_MEN = [
+  { team: "ViVe", o: 17, v: 14, h: 3, p: 42 },
+  { team: "Tahko", o: 16, v: 13, h: 3, p: 32 },
+  { team: "Manse", o: 17, v: 10, h: 7, p: 32 },
+  { team: "JoMa", o: 16, v: 10, h: 6, p: 31 },
+  { team: "SoJy", o: 13, v: 11, h: 2, p: 28 },
+  { team: "KPL", o: 15, v: 10, h: 5, p: 26 },
+  { team: "IPV", o: 15, v: 7, h: 8, p: 21 },
+  { team: "KiPa", o: 14, v: 7, h: 7, p: 19 },
+  { team: "PattU", o: 17, v: 6, h: 11, p: 17 },
+  { team: "KeKi", o: 16, v: 6, h: 10, p: 15 },
+  { team: "AA", o: 18, v: 1, h: 17, p: 7 },
+  { team: "KoU", o: 18, v: 1, h: 17, p: 2 },
+];
 
+const STANDINGS_WOMEN = [
+  { team: "Manse N", o: 14, v: 13, h: 1, p: 38 },
+  { team: "JoMa N", o: 15, v: 11, h: 4, p: 33 },
+  { team: "Jussittaret", o: 13, v: 12, h: 1, p: 32 },
+  { team: "Pesäkarhut", o: 14, v: 10, h: 4, p: 26 },
+  { team: "Virkiä", o: 13, v: 7, h: 6, p: 21 },
+  { team: "Kirittäret", o: 14, v: 6, h: 8, p: 18 },
+  { team: "Lippo Naiset", o: 13, v: 5, h: 8, p: 13 },
+  { team: "Roihuttaret", o: 12, v: 3, h: 9, p: 12 },
+  { team: "Fera", o: 12, v: 4, h: 8, p: 11 },
+  { team: "Mailattaret", o: 15, v: 4, h: 11, p: 9 },
+  { team: "PöU Pesis", o: 13, v: 3, h: 10, p: 9 },
+  { team: "Jyske", o: 12, v: 2, h: 10, p: 5 },
+];
+
+function renderOfficialStandings(rows, targetId) {
+  $(targetId).innerHTML = rows.map(row => {
+    const logo = TEAM_LOGOS[row.team] || "images/logos/default.png";
+
+    return `
+      <tr>
+        <td>
+          <img src="${logo}" class="standings-logo" alt="${row.team}">
+        </td>
+        <td><strong>${row.team}</strong></td>
+        <td>${row.o}</td>
+        <td>${row.v}</td>
+        <td>${row.h}</td>
+        <td>${row.p}</td>
+      </tr>
+    `;
+  }).join("");
+}
 function getRuns(result, side) {
   if (!result) return 0;
   const p = side === "home" ? "home" : "away";
@@ -634,7 +681,8 @@ ${lineupHtml(lineup)}
 
 async function load() {
   const selectedDate = $("date").value || today();
-
+renderOfficialStandings(STANDINGS_MEN, "standings-men");
+renderOfficialStandings(STANDINGS_WOMEN, "standings-women");
   $("status").textContent = "Ladataan Miesten ja Naisten Superpesis...";
 
   try {
