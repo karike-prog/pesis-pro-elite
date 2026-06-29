@@ -638,8 +638,9 @@ ${lineupHtml(lineup)}
   $("matches").innerHTML = cards.join("");
 }
 
-async function load() {
-  const [level, series] = $("series").value.split("|");
+async function load() 
+  const level = "Superpesis";
+  const series = "Miehet";
   const selectedDate = $("date").value || today();
 
   $("status").textContent = `Ladataan ${level} ${series}...`;
@@ -680,7 +681,6 @@ await renderMatches(dayMatches, stats, series);
 
 $("date").value = today();
 $("btn").onclick = load;
-$("series").onchange = load;
 $("date").onchange = load;
 
 load();
