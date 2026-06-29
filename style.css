@@ -401,4 +401,10 @@ footer{
   .runs {
     font-size:26px;
   }
+  .standings-logo {
+  width:22px;
+  height:22px;
+  object-fit:contain;
+  vertical-align:middle;
+}
 }
