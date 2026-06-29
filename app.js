@@ -546,7 +546,7 @@ function renderPowerTable(stats) {
     })
     .join("");
 
-  $("power").innerHTML = rows;
+ $("power-men").innerHTML = rows;
 }
 
 async function renderMatches(matches, stats, selectedSeries) {
@@ -635,7 +635,7 @@ ${lineupHtml(lineup)}
     `);
   }
 
-  $("matches").innerHTML = cards.join("");
+ $("matches-men").innerHTML = cards.join("");
 }
 
 async function load() 
