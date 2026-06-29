@@ -518,7 +518,7 @@ if (!match.result && match.liveResult && !match.liveResult.finished) {
     </div>
   `;
 }
-function renderPowerTable(stats) {
+function renderPowerTable(stats, targetId) {
   const rows = Object.values(stats)
     .filter(t => t.played > 0)
     .sort((a, b) => {
@@ -546,7 +546,7 @@ function renderPowerTable(stats) {
     })
     .join("");
 
- $("power-men").innerHTML = rows;
+ $(targetId).innerHTML = rows;
 }
 
 async function renderMatches(matches, stats, selectedSeries, targetId, cardClass) {
@@ -639,40 +639,48 @@ ${lineupHtml(lineup)}
 }
 
 async function load() {
-  const level = "Superpesis";
-  const series = "Miehet";
+async function load() {
   const selectedDate = $("date").value || today();
 
-  $("status").textContent = `Ladataan ${level} ${series}...`;
+  $("status").textContent = "Ladataan Miesten ja Naisten Superpesis...";
 
   try {
-    const res = await fetch(
-      `/.netlify/functions/matches?level=${encodeURIComponent(level)}&series=${encodeURIComponent(series)}`
-    );
+    async function loadSeries(series, matchesTarget, powerTarget, cardClass) {
+      const level = "Superpesis";
 
-    const json = await res.json();
-    const matches = Array.isArray(json.data) ? json.data : [];
+      const res = await fetch(
+        `/.netlify/functions/matches?level=${encodeURIComponent(level)}&series=${encodeURIComponent(series)}`
+      );
 
-    const stats = buildStats(matches);
+      const json = await res.json();
+      const matches = Array.isArray(json.data) ? json.data : [];
+      const stats = buildStats(matches);
 
-    let dayMatches = matches.filter(m => (m.date || "").slice(0, 10) === selectedDate);
+      let dayMatches = matches.filter(
+        m => (m.date || "").slice(0, 10) === selectedDate
+      );
 
-    if (!dayMatches.length) {
-      const now = new Date();
-      dayMatches = matches
-        .filter(m => new Date(m.date) >= now && !m.result)
-        .sort((a, b) => new Date(a.date) - new Date(b.date))
-        .slice(0, 8);
+      if (!dayMatches.length) {
+        const now = new Date();
+        dayMatches = matches
+          .filter(m => new Date(m.date) >= now && !m.result)
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .slice(0, 8);
+      }
+
+      renderPowerTable(stats, powerTarget);
+      await renderMatches(dayMatches, stats, series, matchesTarget, cardClass);
     }
 
+    await loadSeries("Miehet", "matches-men", "power-men", "men");
+    await loadSeries("Naiset", "matches-women", "power-women", "women");
 
-renderPowerTable(stats);
-await renderMatches(dayMatches, stats, series);
-
-    $("status").textContent = `Päivitetty ${new Date().toLocaleTimeString("fi-FI")}`;
+    $("status").textContent =
+      `Päivitetty ${new Date().toLocaleTimeString("fi-FI")}`;
   } catch (e) {
     console.error(e);
-    $("status").textContent = "Datan haku epäonnistui. Tarkista Netlify Functions.";
+    $("status").textContent =
+      "Datan haku epäonnistui. Tarkista Netlify Functions.";
   }
 }
 
