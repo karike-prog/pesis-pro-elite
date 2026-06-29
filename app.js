@@ -709,7 +709,7 @@ async function load() {
       $(matchesTarget).innerHTML = `<p>${series}: datan haku epäonnistui.</p>`;
       return false;
     }
-  }
+  
 
   renderOfficialStandings(STANDINGS_MEN, "standings-men");
   renderOfficialStandings(STANDINGS_WOMEN, "standings-women");
