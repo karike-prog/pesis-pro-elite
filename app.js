@@ -529,8 +529,6 @@ function renderPowerTable(stats, targetId) {
     .map(t => {
       const f = t.for / t.played;
       const a = t.against / t.played;
-      const rf = recentAvg(t, "for");
-      const ra = recentAvg(t, "against");
 
       return `
         <tr>
@@ -539,16 +537,13 @@ function renderPowerTable(stats, targetId) {
           <td>${f.toFixed(2)}</td>
           <td>${a.toFixed(2)}</td>
           <td>${(f - a).toFixed(2)}</td>
-          <td>${rf === null ? "–" : rf.toFixed(2)}</td>
-          <td>${ra === null ? "–" : ra.toFixed(2)}</td>
         </tr>
       `;
     })
     .join("");
 
- $(targetId).innerHTML = rows;
+  $(targetId).innerHTML = rows;
 }
-
 async function renderMatches(matches, stats, selectedSeries, targetId, cardClass) {
   if (!matches.length) {
     $(targetId).innerHTML = "<p>Otteluita ei löytynyt valitulle päivälle.</p>";
@@ -638,7 +633,6 @@ ${lineupHtml(lineup)}
  $(targetId).innerHTML = cards.join("");
 }
 
-async function load() {
 async function load() {
   const selectedDate = $("date").value || today();
 
