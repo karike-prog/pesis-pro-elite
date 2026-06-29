@@ -89,9 +89,9 @@ function renderOfficialStandings(rows, targetId) {
 
     return `
       <tr>
-        <td>
-          <img src="${logo}" class="standings-logo" alt="${row.team}">
-        </td>
+     <td class="logoCell">
+  <img src="${logo}" class="standings-logo" alt="${row.team}">
+</td>
         <td><strong>${row.team}</strong></td>
         <td>${row.o}</td>
         <td>${row.v}</td>
