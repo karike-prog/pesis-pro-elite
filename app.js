@@ -722,7 +722,7 @@ async function load() {
       ? `Päivitetty ${new Date().toLocaleTimeString("fi-FI")}`
       : "Datan haku epäonnistui. Tarkista Netlify Functions.";
 }
-}
+
 
 $("date").value = today();
 $("btn").onclick = load;
