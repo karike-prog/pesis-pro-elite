@@ -681,14 +681,13 @@ ${lineupHtml(lineup)}
 
 async function load() {
   const selectedDate = $("date").value || today();
-renderOfficialStandings(STANDINGS_MEN, "standings-men");
-renderOfficialStandings(STANDINGS_WOMEN, "standings-women");
+
   $("status").textContent = "Ladataan Miesten ja Naisten Superpesis...";
 
-  try {
-    async function loadSeries(series, matchesTarget, powerTarget, cardClass) {
-      const level = "Superpesis";
+  async function loadSeries(series, matchesTarget, powerTarget, cardClass) {
+    const level = "Superpesis";
 
+    try {
       const res = await fetch(
         `/.netlify/functions/matches?level=${encodeURIComponent(level)}&series=${encodeURIComponent(series)}`
       );
@@ -697,25 +696,32 @@ renderOfficialStandings(STANDINGS_WOMEN, "standings-women");
       const matches = Array.isArray(json.data) ? json.data : [];
       const stats = buildStats(matches);
 
-      let dayMatches = matches.filter(
+      const dayMatches = matches.filter(
         m => (m.date || "").slice(0, 10) === selectedDate
       );
 
-
       renderPowerTable(stats, powerTarget);
       await renderMatches(dayMatches, stats, series, matchesTarget, cardClass);
+
+      return true;
+    } catch (e) {
+      console.error(`${series} haku epäonnistui`, e);
+      $(matchesTarget).innerHTML = `<p>${series}: datan haku epäonnistui.</p>`;
+      return false;
     }
-
-    await loadSeries("Miehet", "matches-men", "power-men", "men");
-    await loadSeries("Naiset", "matches-women", "power-women", "women");
-
-    $("status").textContent =
-      `Päivitetty ${new Date().toLocaleTimeString("fi-FI")}`;
-  } catch (e) {
-    console.error(e);
-    $("status").textContent =
-      "Datan haku epäonnistui. Tarkista Netlify Functions.";
   }
+
+  renderOfficialStandings(STANDINGS_MEN, "standings-men");
+  renderOfficialStandings(STANDINGS_WOMEN, "standings-women");
+
+  const menOk = await loadSeries("Miehet", "matches-men", "power-men", "men");
+  const womenOk = await loadSeries("Naiset", "matches-women", "power-women", "women");
+
+  $("status").textContent =
+    menOk || womenOk
+      ? `Päivitetty ${new Date().toLocaleTimeString("fi-FI")}`
+      : "Datan haku epäonnistui. Tarkista Netlify Functions.";
+}
 }
 
 $("date").value = today();
