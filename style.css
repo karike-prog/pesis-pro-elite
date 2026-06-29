@@ -407,7 +407,9 @@ footer{
   object-fit:contain;
   vertical-align:middle;
 }
-  .logoCell{
+  
+}
+.logoCell{
   width:34px;
   max-width:34px;
   text-align:center;
@@ -423,4 +425,3 @@ footer{
   display:block;
   margin:auto;
 }
-
