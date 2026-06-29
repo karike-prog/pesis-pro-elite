@@ -441,3 +441,7 @@ footer{
   overflow:hidden !important;
   padding:6px 4px !important;
 }
+.standings-men table,
+.standings-women table{
+    font-size:14px;
+}
