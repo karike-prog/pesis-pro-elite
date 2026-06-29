@@ -653,13 +653,6 @@ async function load() {
         m => (m.date || "").slice(0, 10) === selectedDate
       );
 
-      if (!dayMatches.length) {
-        const now = new Date();
-        dayMatches = matches
-          .filter(m => new Date(m.date) >= now && !m.result)
-          .sort((a, b) => new Date(a.date) - new Date(b.date))
-          .slice(0, 8);
-      }
 
       renderPowerTable(stats, powerTarget);
       await renderMatches(dayMatches, stats, series, matchesTarget, cardClass);
