@@ -78,16 +78,6 @@ button:hover{
   background:#1d4ed8;
 }
 
-.cards{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-}
-
-.cards h2{
-  font-size:38px;
-  margin:10px 0 0;
-}
 
 .match{
   border:1px solid #e5e7eb;
@@ -219,9 +209,6 @@ footer{
     align-items:flex-start;
   }
 
-  .cards{
-    grid-template-columns:1fr;
-  }
 
   .teams{
     grid-template-columns:1fr;
