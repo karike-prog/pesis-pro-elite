@@ -614,9 +614,8 @@ const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
           Juoksuarvio: ${prediction.homeRuns.toFixed(1)} – ${prediction.awayRuns.toFixed(1)}
         </div>
 
-        <span class="pill ${tagClass}">${tag}</span>
-        <span class="pill blue">Total ${total.toFixed(1)}</span>
-        <span class="pill orange">ID ${match.id}</span>
+<span class="pill ${tagClass}">${tag}</span>
+<span class="pill blue">Total ${total.toFixed(1)}</span>
         
 ${resultHtml(match, prediction)}
 ${(match.result || match.liveResult?.finished)
