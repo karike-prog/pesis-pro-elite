@@ -549,13 +549,13 @@ function renderPowerTable(stats) {
  $("power-men").innerHTML = rows;
 }
 
-async function renderMatches(matches, stats, selectedSeries) {
+async function renderMatches(matches, stats, selectedSeries, targetId, cardClass) {
   if (!matches.length) {
-    $("matches-men").innerHTML = "<p>Otteluita ei löytynyt valitulle päivälle.</p>";
+    $(targetId).innerHTML = "<p>Otteluita ei löytynyt valitulle päivälle.</p>";
     return;
   }
 
-  $("matches-men").innerHTML = "<p>Haetaan säätietoja...</p>";
+ $(targetId).innerHTML = "<p>Haetaan säätietoja...</p>";
 
   const cards = [];
 
@@ -589,7 +589,7 @@ const homeLogo = TEAM_LOGOS[homeName] || "images/logos/default.png";
 const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
     
     cards.push(`
-      <div class="match">
+      <div class="match ${cardClass}">
         <div class="top">
           <div>${fmtDate(match.date)}</div>
           <div>${match.stadium?.name || ""}</div>
@@ -635,7 +635,7 @@ ${lineupHtml(lineup)}
     `);
   }
 
- $("matches-men").innerHTML = cards.join("");
+ $(targetId).innerHTML = cards.join("");
 }
 
 async function load() {
