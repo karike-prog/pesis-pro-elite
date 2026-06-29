@@ -579,7 +579,7 @@ function renderPowerTable(stats, targetId) {
 
       return `
         <tr>
-          <td><strong>${t.name}</strong></td>
+         <td>${t.name}</td>
           <td>${t.played}</td>
           <td>${f.toFixed(2)}</td>
           <td>${a.toFixed(2)}</td>
