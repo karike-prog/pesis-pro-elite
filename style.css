@@ -445,3 +445,7 @@ footer{
 .standings-women table{
     font-size:12px;
 }
+.standings-men th,
+.standings-women th{
+    font-size:11px;
+}
