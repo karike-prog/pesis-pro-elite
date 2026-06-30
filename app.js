@@ -238,7 +238,30 @@ function predict(homeTeam, awayTeam, stats, weather) {
     note: "Koti/vieras, viimeiset 5, kotietu ja sää."
   };
 }
+function shootoutProbability(prediction) {
+  const diff = Math.abs(prediction.homePct - prediction.awayPct);
+  const total = prediction.homeRuns + prediction.awayRuns;
 
+  let p = 18;
+
+  // Mitä tasaisempi peli, sitä suurempi kotiutuskisan riski
+  if (diff <= 4) p += 12;
+  else if (diff <= 8) p += 9;
+  else if (diff <= 14) p += 6;
+  else if (diff <= 22) p += 3;
+  else p -= 3;
+
+  // Vähäjuoksinen peli lisää tasurimahdollisuutta
+  if (total < 9) p += 6;
+  else if (total < 11) p += 4;
+  else if (total < 13) p += 2;
+  else p -= 2;
+
+  // Rajat
+  p = Math.max(8, Math.min(42, p));
+
+  return Math.round(p);
+}
 function weatherHtml(weather) {
   if (!weather || weather.error) {
     return `<div class="weather">🌦️ Sää: ei saatavilla</div>`;
@@ -608,7 +631,9 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
   const weather = await fetchWeather(match);
   const lineup = await fetchLineup(match);
   const prediction = predict(match.home, match.away, stats, weather);
-
+  const total = prediction.homeRuns + prediction.awayRuns;
+  const shootoutPct = shootoutProbability(prediction);
+   
     const homeFav = prediction.homePct >= prediction.awayPct;
     const total = prediction.homeRuns + prediction.awayRuns;
     const confidence = Math.abs(prediction.homePct - 50);
@@ -663,7 +688,8 @@ const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
 
 <span class="pill ${tagClass}">${tag}</span>
 <span class="pill blue">Total ${total.toFixed(1)}</span>
-        
+<span class="pill orange">Kotiutuskisa ${shootoutPct} %</span>
+
 ${resultHtml(match, prediction)}
 ${(match.result || match.liveResult?.finished)
     ? ""
