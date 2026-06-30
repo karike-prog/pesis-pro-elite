@@ -635,7 +635,6 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
   const shootoutPct = shootoutProbability(prediction);
    
     const homeFav = prediction.homePct >= prediction.awayPct;
-    const total = prediction.homeRuns + prediction.awayRuns;
     const confidence = Math.abs(prediction.homePct - 50);
 
     let tag = "Tasainen";
