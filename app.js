@@ -262,6 +262,33 @@ function shootoutProbability(prediction) {
 
   return Math.round(p);
 }
+function getWeatherAdjustment(weather) {
+  if (!weather) return 0;
+
+  const temp = Number(weather.temp ?? weather.temperature ?? 0);
+  const wind = Number(weather.wind ?? weather.windSpeed ?? 0);
+  const rain = Number(weather.rain ?? weather.precipitation ?? 0);
+
+  let adj = 0;
+
+  // Sade
+  if (rain >= 3) adj -= 0.8;
+  else if (rain >= 1) adj -= 0.5;
+  else if (rain >= 0.2) adj -= 0.2;
+
+  // Tuuli
+  if (wind >= 12) adj -= 0.4;
+  else if (wind >= 8) adj -= 0.2;
+
+  // Lämpö
+  if (temp >= 24 && temp <= 30) adj += 0.2;
+  if (temp <= 10 && temp > -50) adj -= 0.3;
+
+  // Rajataan järkeväksi
+  adj = Math.max(-1.0, Math.min(0.5, adj));
+
+  return Number(adj.toFixed(1));
+}
 function weatherHtml(weather) {
   if (!weather || weather.error) {
     return `<div class="weather">🌦️ Sää: ei saatavilla</div>`;
@@ -631,6 +658,14 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
   const weather = await fetchWeather(match);
   const lineup = await fetchLineup(match);
   const prediction = predict(match.home, match.away, stats, weather);
+  const weatherAdjustment = getWeatherAdjustment(weather);
+
+prediction.homeRuns += weatherAdjustment / 2;
+prediction.awayRuns += weatherAdjustment / 2;
+
+prediction.homeRuns = Math.max(0, prediction.homeRuns);
+prediction.awayRuns = Math.max(0, prediction.awayRuns);
+   
   const total = prediction.homeRuns + prediction.awayRuns;
   const shootoutPct = shootoutProbability(prediction);
    
@@ -687,6 +722,7 @@ const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
 
 <span class="pill ${tagClass}">${tag}</span>
 <span class="pill blue">Total ${total.toFixed(1)}</span>
+<span class="pill orange">Sääkorjaus ${weatherAdjustment.toFixed(1)}</span>
 <span class="pill orange">Kotiutuskisa ${shootoutPct} %</span>
 
 ${resultHtml(match, prediction)}
