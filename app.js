@@ -263,6 +263,7 @@ function shootoutProbability(prediction) {
   return Math.round(p);
 }
 function getWeatherAdjustment(weather) {
+  console.log(weather);
   if (!weather) return 0;
 
   const temp = Number(weather.temp ?? weather.temperature ?? 0);
@@ -298,6 +299,8 @@ function weatherHtml(weather) {
   const start = weather.start || weather;
 
   const adj = getWeatherAdjustment(start);
+  console.log("START WEATHER", start);
+console.log("WEATHER ADJ", adj);
   const sign = adj > 0 ? "+" : "";
 
   return `
