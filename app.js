@@ -299,10 +299,6 @@ function weatherHtml(weather) {
   const start = weather.start || weather;
 
 
-console.log("START WEATHER", start);
-console.log("WEATHER ADJ", adj);
-
-
   return `
     <div class="weather">
       <strong>🌦️ Sää nyt:</strong>
