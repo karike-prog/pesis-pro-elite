@@ -449,3 +449,20 @@ footer{
 .standings-women th{
     font-size:9px;
 }
+/* Juoksutase-taulukot tiiviimmäksi ja isommaksi */
+#power-men,
+#power-women {
+  font-size:16px;
+}
+
+#power-men th,
+#power-men td,
+#power-women th,
+#power-women td {
+  padding:8px 6px;
+}
+
+#power-men td,
+#power-women td {
+  white-space:nowrap;
+}
