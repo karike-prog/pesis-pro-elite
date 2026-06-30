@@ -297,7 +297,7 @@ function weatherHtml(weather) {
   const now = weather.now || weather;
   const start = weather.start || weather;
 
-  const adj = weatherAdjustment(start);
+  const adj = getWeatherAdjustment(start);
   const sign = adj > 0 ? "+" : "";
 
   return `
@@ -312,7 +312,7 @@ function weatherHtml(weather) {
       tuuli ${start.windSpeed ?? "-"} m/s,
       sade ${start.precipitation ?? "-"} mm/h
       <br>
-      <strong>Sääkorjaus:</strong> ${sign}${adj.toFixed(2)} juoksua
+      <strong>Sääkorjaus:</strong> ${sign}${adj.toFixed(1)} juoksua
     </div>
   `;
 }
