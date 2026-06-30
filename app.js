@@ -661,7 +661,7 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
   const weather = await fetchWeather(match);
   const lineup = await fetchLineup(match);
   const prediction = predict(match.home, match.away, stats, weather);
-  const weatherAdjustment = getWeatherAdjustment(weather);
+  const weatherAdjustment = getWeatherAdjustment(weather.start || weather);
 
 prediction.homeRuns += weatherAdjustment / 2;
 prediction.awayRuns += weatherAdjustment / 2;
