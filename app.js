@@ -298,8 +298,8 @@ function weatherHtml(weather) {
   const now = weather.now || weather;
   const start = weather.start || weather;
 
-  const adj = getWeatherAdjustment(start);
-  console.log("START WEATHER", start);
+const adj = getWeatherAdjustment(start);
+console.log("START WEATHER", start);
 console.log("WEATHER ADJ", adj);
   const sign = adj > 0 ? "+" : "";
 
