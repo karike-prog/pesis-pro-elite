@@ -500,14 +500,28 @@ footer{
   animation:ballFly .75s ease-out both;
 }
 
-@keyframes ballFly{
-  0%{
-    transform:translateX(-80px) rotate(-220deg);
-    opacity:0;
+@keyframes ballFly {
+  0% {
+    transform: translateX(-120px) rotate(-720deg);
+    opacity: 0;
   }
-  100%{
-    transform:translateX(0) rotate(0deg);
-    opacity:1;
+
+  65% {
+    transform: translateX(12px) rotate(40deg);
+    opacity: 1;
+  }
+
+  80% {
+    transform: translateX(-4px) rotate(-10deg);
+  }
+
+  92% {
+    transform: translateX(2px) rotate(4deg);
+  }
+
+  100% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
   }
 }
 
@@ -526,7 +540,9 @@ footer{
     font-size:36px;
   }
 
-  .hero-ball{
-    font-size:38px;
+.hero-ball{
+    font-size:46px;
+    animation:ballFly .9s cubic-bezier(.22,.61,.36,1) both;
+}
   }
 }
