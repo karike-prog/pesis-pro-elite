@@ -562,7 +562,7 @@ footer{
 
     .hero-brand{
         flex-direction:column;
-        gap:8px;
+        gap:4px;
     }
 
     .hero-ball{
@@ -578,14 +578,14 @@ footer{
 
     .hero-subtitle{
         text-align:center;
-        margin-top:6px;
+        margin-top:2px;
         font-size:22px;
     }
 
     .hero b{
         top:12px;
         right:12px;
-        font-size:15px;
-        padding:6px 12px;
-    }
+    font-size:14px;
+    padding:5px 10px;
+}
 }}
