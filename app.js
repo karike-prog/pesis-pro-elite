@@ -69,7 +69,7 @@ const FIRST_CATCHERS = {
   "Fera": "",
   "Mailattaret": "",
   "PöU Pesis": "",
-  "Jyske": ""
+  "Jyske": "",
 };
 function fmtDate(iso) {
   return new Date(iso).toLocaleString("fi-FI", {
