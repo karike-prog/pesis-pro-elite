@@ -534,41 +534,58 @@ footer{
   border-radius:999px;
 }
 
-@media(max-width:700px){
-  .hero-text h1{
-    font-size:36px;
-  }
-
-  .hero-ball{
-    font-size:38px;
-  }
-}
 .hero-brand{
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:8px;
+    gap:10px;
 }
 
 .hero-title{
-
     font-family:Montserrat,sans-serif;
-
     font-size:54px;
-
     font-weight:900;
-
     color:#d8f13b;
-
     -webkit-text-stroke:3px #111;
-
-    text-shadow:
-      0 4px 10px rgba(0,0,0,.18);
-
+    text-shadow:0 4px 10px rgba(0,0,0,.18);
+    line-height:1;
 }
+
 .hero-ball{
-  width:110px;
-  height:auto;
-  margin-right:18px;
-  animation:ballRoll 2.2s ease-out forwards;
+    width:105px;
+    height:auto;
+    margin-right:0;
+    animation:ballRoll 2.2s ease-out forwards;
 }
+
+@media (max-width:700px){
+
+    .hero-brand{
+        flex-direction:column;
+        gap:8px;
+    }
+
+    .hero-ball{
+        width:90px;
+        margin:0;
+    }
+
+    .hero-title{
+        font-size:44px;
+        text-align:center;
+        line-height:1;
+    }
+
+    .hero-subtitle{
+        text-align:center;
+        margin-top:6px;
+        font-size:22px;
+    }
+
+    .hero b{
+        top:12px;
+        right:12px;
+        font-size:15px;
+        padding:6px 12px;
+    }
+}}
