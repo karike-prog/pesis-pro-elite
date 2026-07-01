@@ -501,15 +501,17 @@ footer{
 }
 
 @keyframes ballRoll{
+
   0%{
-    transform:translateX(-140px) rotate(-720deg);
-    opacity:0;
+      transform:translateX(-350px) rotate(-1080deg);
+      opacity:0;
   }
 
   100%{
-    transform:translateX(0) rotate(0deg);
-    opacity:1;
+      transform:translateX(0) rotate(0deg);
+      opacity:1;
   }
+
 }
 
 .hero-ball{
