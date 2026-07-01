@@ -515,7 +515,7 @@ footer{
 .hero-ball{
   font-size:46px;
   margin-right:18px;
-  animation:ballRoll 1.8s ease-out forwards;
+  animation:ballRoll 2.2s cubic-bezier(.22,.61,.36,1) forwards;
 }
 
 .hero b{
