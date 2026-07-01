@@ -501,17 +501,21 @@ footer{
 }
 
 @keyframes ballRoll{
+  0%{
+    transform:translateX(-140px) rotate(-720deg);
+    opacity:0;
+  }
 
-    0%{
-        transform:translateX(-140px) rotate(-720deg);
-        opacity:0;
-    }
+  100%{
+    transform:translateX(0) rotate(0deg);
+    opacity:1;
+  }
+}
 
-    100%{
-        transform:translateX(0) rotate(0deg);
-        opacity:1;
-    }
-
+.hero-ball{
+  font-size:46px;
+  margin-right:18px;
+  animation:ballRoll .9s ease-out forwards;
 }
 
 .hero b{
@@ -529,10 +533,7 @@ footer{
     font-size:36px;
   }
 
-.hero-ball{
-    font-size:46px;
-    margin-right:18px;
-    animation:ballRoll .9s ease-out forwards;
-}
+  .hero-ball{
+    font-size:38px;
   }
 }
