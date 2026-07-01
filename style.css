@@ -500,10 +500,10 @@ footer{
   animation:ballFly .75s ease-out both;
 }
 
-@keyframes ballRoll{
+@keyframes ballRoll {
 
   0%{
-      transform:translateX(-350px) rotate(-1080deg);
+      transform:translateX(-1400px) rotate(-2880deg);
       opacity:0;
   }
 
