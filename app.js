@@ -262,6 +262,22 @@ function shootoutProbability(prediction) {
 
   return Math.round(p);
 }
+function getLineupAdjustment(match, lineup) {
+
+  let homeRuns = 0;
+  let awayRuns = 0;
+  let applied = false;
+
+  // TODO:
+  // Tarkista puuttuuko ykköslukkari
+  // Tarkista puuttuuko Top20-lyöjä
+
+  return {
+    homeRuns,
+    awayRuns,
+    applied
+  };
+}
 function getWeatherAdjustment(weather) {
   console.log(weather);
   if (!weather) return 0;
@@ -458,7 +474,47 @@ const TOP20_LYOJAT = [
   { name: "Anni Laakso", team: "Jussittaret" },
   { name: "Essi Ilmanen", team: "PöU Pesis" },
 ];
+function getLineupAdjustment(match, lineup) {
+  const data = lineup?.data || lineup?.match || lineup;
 
+  const homePlayers = data?.home?.players || [];
+  const awayPlayers = data?.away?.players || [];
+
+  const homeName = match.home.shorthand || match.home.name;
+  const awayName = match.away.shorthand || match.away.name;
+
+  let applied = false;
+
+  const hasPlayer = (players, playerName) =>
+    players.some(p => (p.name || "").toLowerCase() === playerName.toLowerCase());
+
+  const homeMissingTop20 = TOP20_LYOJAT.some(p =>
+    p.team === homeName && !hasPlayer(homePlayers, p.name)
+  );
+
+  const awayMissingTop20 = TOP20_LYOJAT.some(p =>
+    p.team === awayName && !hasPlayer(awayPlayers, p.name)
+  );
+
+  let homeRuns = 0;
+  let awayRuns = 0;
+
+  if (homeMissingTop20) {
+    homeRuns -= 0.3;
+    applied = true;
+  }
+
+  if (awayMissingTop20) {
+    awayRuns -= 0.3;
+    applied = true;
+  }
+
+  return {
+    homeRuns,
+    awayRuns,
+    applied
+  };
+}
 function keyPlayerAbsenceHtml(match, lineup, selectedSeries) {
   const data = lineup?.data || lineup?.match || lineup;
 
@@ -655,7 +711,11 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
 
   const weather = await fetchWeather(match);
   const lineup = await fetchLineup(match);
+  const lineupAdjustment = getLineupAdjustment(match, lineup);
   const prediction = predict(match.home, match.away, stats, weather);
+  prediction.homeRuns += lineupAdjustment.homeRuns;
+prediction.awayRuns += lineupAdjustment.awayRuns;
+prediction.lineupAdjusted = lineupAdjustment.applied; 
   const weatherAdjustment = getWeatherAdjustment(weather.start || weather);
 
 prediction.homeRuns += weatherAdjustment / 2;
@@ -720,7 +780,10 @@ const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
 
 <span class="pill ${tagClass}">${tag}</span>
 <span class="pill blue">Total ${total.toFixed(1)}</span>
-<span class="pill orange">Sääkorjaus ${weatherAdjustment.toFixed(1)}</span>
+${prediction.lineupAdjusted ? `<span class="pill orange">Kokoonpanomuutos huomioitu</span>` : ""}
+${weatherAdjustment !== 0
+  ? `<span class="pill orange">Sääkorjaus ${weatherAdjustment.toFixed(1)}</span>`
+  : ""}
 <span class="pill orange">Kotiutuskisa ${shootoutPct} %</span>
 
 ${resultHtml(match, prediction)}
