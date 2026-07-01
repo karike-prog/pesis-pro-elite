@@ -44,6 +44,33 @@ const TEAM_LOGOS = {
 "Ura": "images/logos/ura.png",
 "SiiPe": "images/logos/siipe.png",
 };
+const FIRST_CATCHERS = {
+const FIRST_CATCHERS = {
+  "AA": "Seeti Surakka",
+  "Tahko": "Petteri Alanen",
+  "JoMa": "Ukko Schroderus",
+  "KeKi": "Topi Still",
+  "KiPa": "Joona Lehtinen",
+  "KoU": "Aku Kettunen",
+  "KPL": "Elias Pitkänen",
+  "Manse": "Juha Puhtimäki",
+  "PattU": "Topi Kosonen",
+  "SoJy": "Aapo Komulainen",
+  "ViVe": "Ville Soini",
+
+  "Jussittaret": "",
+  "JoMa N": "",
+  "Manse N": "",
+  "Pesäkarhut": "",
+  "Virkiä": "",
+  "Kirittäret": "",
+  "Lippo Naiset": "",
+  "Roihuttaret": "",
+  "Fera": "",
+  "Mailattaret": "",
+  "PöU Pesis": "",
+  "Jyske": ""
+};
 function fmtDate(iso) {
   return new Date(iso).toLocaleString("fi-FI", {
     weekday: "short",
@@ -53,35 +80,7 @@ function fmtDate(iso) {
     minute: "2-digit"
   });
 }
-const STANDINGS_MEN = [
-  { team: "ViVe", o: 17, v: 14, h: 3, p: 42 },
-  { team: "Tahko", o: 16, v: 13, h: 3, p: 32 },
-  { team: "Manse", o: 17, v: 10, h: 7, p: 32 },
-  { team: "JoMa", o: 16, v: 10, h: 6, p: 31 },
-  { team: "SoJy", o: 13, v: 11, h: 2, p: 28 },
-  { team: "KPL", o: 15, v: 10, h: 5, p: 26 },
-  { team: "IPV", o: 15, v: 7, h: 8, p: 21 },
-  { team: "KiPa", o: 14, v: 7, h: 7, p: 19 },
-  { team: "PattU", o: 17, v: 6, h: 11, p: 17 },
-  { team: "KeKi", o: 16, v: 6, h: 10, p: 15 },
-  { team: "AA", o: 18, v: 1, h: 17, p: 7 },
-  { team: "KoU", o: 18, v: 1, h: 17, p: 2 },
-];
 
-const STANDINGS_WOMEN = [
-  { team: "Manse N", o: 14, v: 13, h: 1, p: 38 },
-  { team: "JoMa N", o: 15, v: 11, h: 4, p: 33 },
-  { team: "Jussittaret", o: 13, v: 12, h: 1, p: 32 },
-  { team: "Pesäkarhut", o: 14, v: 10, h: 4, p: 26 },
-  { team: "Virkiä", o: 13, v: 7, h: 6, p: 21 },
-  { team: "Kirittäret", o: 14, v: 6, h: 8, p: 18 },
-  { team: "Lippo Naiset", o: 13, v: 5, h: 8, p: 13 },
-  { team: "Roihuttaret", o: 12, v: 3, h: 9, p: 12 },
-  { team: "Fera", o: 12, v: 4, h: 8, p: 11 },
-  { team: "Mailattaret", o: 15, v: 4, h: 11, p: 9 },
-  { team: "PöU Pesis", o: 13, v: 3, h: 10, p: 9 },
-  { team: "Jyske", o: 12, v: 2, h: 10, p: 5 },
-];
 
 function renderOfficialStandings(rows, targetId) {
   $(targetId).innerHTML = rows.map(row => {
@@ -164,7 +163,67 @@ function buildStats(matches) {
 
   return stats;
 }
+function buildStandings(matches) {
+  const table = {};
 
+  function ensure(team) {
+    const name = team.shorthand || team.name;
+    if (!table[team.id]) {
+      table[team.id] = {
+        team: name,
+        o: 0,
+        v: 0,
+        h: 0,
+        p: 0
+      };
+    }
+    return table[team.id];
+  }
+
+  matches
+    .filter(m => m.result && m.result.details)
+    .forEach(m => {
+      const home = ensure(m.home);
+      const away = ensure(m.away);
+      const d = m.result.details;
+
+      const hp = Number(d.periods_home || 0);
+      const ap = Number(d.periods_away || 0);
+
+      home.o++;
+      away.o++;
+
+      if (hp > ap) {
+        home.v++;
+        away.h++;
+
+        if (hp === 2 && ap === 0) {
+          home.p += 3;
+        } else {
+          home.p += 2;
+          away.p += 1;
+        }
+      }
+
+      if (ap > hp) {
+        away.v++;
+        home.h++;
+
+        if (ap === 2 && hp === 0) {
+          away.p += 3;
+        } else {
+          away.p += 2;
+          home.p += 1;
+        }
+      }
+    });
+
+  return Object.values(table).sort((a, b) => {
+    if (b.p !== a.p) return b.p - a.p;
+    if (b.v !== a.v) return b.v - a.v;
+    return a.team.localeCompare(b.team);
+  });
+}
 function recentAvg(team, field) {
   const games = team.recent.slice(0, 5);
   if (!games.length) return null;
@@ -264,9 +323,27 @@ function shootoutProbability(prediction) {
 }
 function getLineupAdjustment(match, lineup) {
 
-  let homeRuns = 0;
-  let awayRuns = 0;
-  let applied = false;
+const hasPlayer = (players, name) =>
+  players.some(p => (p.name || "").trim().toLowerCase() === name.trim().toLowerCase());
+
+let homeRuns = 0;
+let awayRuns = 0;
+let applied = false;
+
+const homeCatcher = FIRST_CATCHERS[match.home.shorthand];
+const awayCatcher = FIRST_CATCHERS[match.away.shorthand];
+
+if (homeCatcher && !hasPlayer(homePlayers, homeCatcher)) {
+  homeRuns -= 0.5;
+  awayRuns += 0.5;
+  applied = true;
+}
+
+if (awayCatcher && !hasPlayer(awayPlayers, awayCatcher)) {
+  awayRuns -= 0.5;
+  homeRuns += 0.5;
+  applied = true;
+}
 
   // TODO:
   // Tarkista puuttuuko ykköslukkari
@@ -785,7 +862,7 @@ async function load() {
 
   $("status").textContent = "Ladataan Miesten ja Naisten Superpesis...";
 
-  async function loadSeries(series, matchesTarget, powerTarget, cardClass) {
+  async function loadSeries(series, matchesTarget, powerTarget, cardClass, standingsTarget) {
     const level = "Superpesis";
 
     try {
@@ -796,6 +873,8 @@ async function load() {
       const json = await res.json();
       const matches = Array.isArray(json.data) ? json.data : [];
       const stats = buildStats(matches);
+      const standings = buildStandings(matches);
+renderOfficialStandings(standings, standingsTarget);
 
       const dayMatches = matches.filter(
         m => (m.date || "").slice(0, 10) === selectedDate
@@ -812,11 +891,8 @@ async function load() {
     }
   }
 
-  renderOfficialStandings(STANDINGS_MEN, "standings-men");
-  renderOfficialStandings(STANDINGS_WOMEN, "standings-women");
-
-  const menOk = await loadSeries("Miehet", "matches-men", "power-men", "men");
-  const womenOk = await loadSeries("Naiset", "matches-women", "power-women", "women");
+ const menOk = await loadSeries("Miehet", "matches-men", "power-men", "men", "standings-men");
+ const womenOk = await loadSeries("Naiset", "matches-women", "power-women", "women", "standings-women");
 
   $("status").textContent =
     menOk || womenOk
