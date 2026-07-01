@@ -475,44 +475,23 @@ const TOP20_LYOJAT = [
   { name: "Essi Ilmanen", team: "PöU Pesis" },
 ];
 function getLineupAdjustment(match, lineup) {
+  if (!lineup) {
+    return { homeRuns: 0, awayRuns: 0, applied: false };
+  }
+
   const data = lineup?.data || lineup?.match || lineup;
 
   const homePlayers = data?.home?.players || [];
   const awayPlayers = data?.away?.players || [];
 
-  const homeName = match.home.shorthand || match.home.name;
-  const awayName = match.away.shorthand || match.away.name;
-
-  let applied = false;
-
-  const hasPlayer = (players, playerName) =>
-    players.some(p => (p.name || "").toLowerCase() === playerName.toLowerCase());
-
-  const homeMissingTop20 = TOP20_LYOJAT.some(p =>
-    p.team === homeName && !hasPlayer(homePlayers, p.name)
-  );
-
-  const awayMissingTop20 = TOP20_LYOJAT.some(p =>
-    p.team === awayName && !hasPlayer(awayPlayers, p.name)
-  );
-
-  let homeRuns = 0;
-  let awayRuns = 0;
-
-  if (homeMissingTop20) {
-    homeRuns -= 0.3;
-    applied = true;
-  }
-
-  if (awayMissingTop20) {
-    awayRuns -= 0.3;
-    applied = true;
+  if (!homePlayers.length || !awayPlayers.length) {
+    return { homeRuns: 0, awayRuns: 0, applied: false };
   }
 
   return {
-    homeRuns,
-    awayRuns,
-    applied
+    homeRuns: 0,
+    awayRuns: 0,
+    applied: false
   };
 }
 function keyPlayerAbsenceHtml(match, lineup, selectedSeries) {
