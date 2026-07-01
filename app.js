@@ -45,7 +45,6 @@ const TEAM_LOGOS = {
 "SiiPe": "images/logos/siipe.png",
 };
 const FIRST_CATCHERS = {
-const FIRST_CATCHERS = {
   "AA": "Seeti Surakka",
   "Tahko": "Petteri Alanen",
   "JoMa": "Ukko Schroderus",
@@ -78,7 +77,7 @@ function fmtDate(iso) {
     month: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  };
+  });
 }
 
 
