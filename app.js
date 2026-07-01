@@ -77,7 +77,7 @@ function fmtDate(iso) {
     day: "numeric",
     month: "numeric",
     hour: "2-digit",
-    minute: "2-digit"
+    minute: "2-digit",
   });
 }
 
