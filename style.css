@@ -553,3 +553,26 @@ footer{
     font-size:38px;
   }
 }
+.hero-brand{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+}
+
+.hero-title{
+
+    font-family:Montserrat,sans-serif;
+
+    font-size:54px;
+
+    font-weight:900;
+
+    color:#d8f13b;
+
+    -webkit-text-stroke:3px #111;
+
+    text-shadow:
+      0 4px 10px rgba(0,0,0,.18);
+
+}
