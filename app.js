@@ -872,8 +872,11 @@ async function load() {
 
       const json = await res.json();
       const matches = Array.isArray(json.data) ? json.data : [];
+      console.log("OTTELUT:", series, matches.length);
       const stats = buildStats(matches);
+      console.log("STATS OK:", series);
       const standings = buildStandings(matches);
+      console.log("STANDINGS OK:", series, standings);
 renderOfficialStandings(standings, standingsTarget);
 
       const dayMatches = matches.filter(
