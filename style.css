@@ -503,13 +503,21 @@ footer{
 @keyframes ballRoll {
 
   0%{
-      transform:translateX(-1400px) rotate(-2880deg);
-      opacity:0;
+    transform:translateX(-100vw) rotate(-2880deg);
+    opacity:0;
+  }
+
+  15%{
+    opacity:1;
+  }
+
+  85%{
+    transform:translateX(12px) rotate(-60deg);
   }
 
   100%{
-      transform:translateX(0) rotate(0deg);
-      opacity:1;
+    transform:translateX(0) rotate(0deg);
+    opacity:1;
   }
 
 }
