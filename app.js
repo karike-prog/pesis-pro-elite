@@ -814,7 +814,7 @@ function renderPowerTable(stats, targetId) {
 
   $(targetId).innerHTML = rows;
 }
-async function renderMatches(matches, stats, selectedSeries, targetId, cardClass) {
+async function renderMatches(matches, stats, selectedSeries, targetId, cardClass, playerStats) {
   if (!matches.length) {
     $(targetId).innerHTML = "<p>Otteluita ei löytynyt valitulle päivälle.</p>";
     return;
@@ -832,6 +832,9 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
   const lineup = await fetchLineup(match);
   const lineupAdjustment = getLineupAdjustment(match, lineup);
   const prediction = predict(match.home, match.away, stats, weather);
+   const homePlayerPower = playerStats?.teams?.[match.home.id]?.totalRating || 0;
+const awayPlayerPower = playerStats?.teams?.[match.away.id]?.totalRating || 0;
+const playerPowerDiff = homePlayerPower - awayPlayerPower;
   prediction.homeRuns += lineupAdjustment.homeRuns;
 prediction.awayRuns += lineupAdjustment.awayRuns;
 prediction.lineupAdjusted = lineupAdjustment.applied; 
@@ -905,6 +908,13 @@ ${weatherAdjustment !== 0
   : ""}
 <span class="pill orange">Kotiutuskisa ${shootoutPct} %</span>
 
+<div class="weather">
+  <b>⭐ Pelaajavoima</b><br>
+  ${match.home.shorthand}: ${homePlayerPower.toFixed(1)}<br>
+  ${match.away.shorthand}: ${awayPlayerPower.toFixed(1)}<br>
+  Ero: ${playerPowerDiff > 0 ? "+" : ""}${playerPowerDiff.toFixed(1)}
+</div>
+
 ${resultHtml(match, prediction)}
 ${(match.result || match.liveResult?.finished)
     ? ""
@@ -950,7 +960,7 @@ renderOfficialStandings(standings, standingsTarget);
       );
 
       renderPowerTable(stats, powerTarget);
-      await renderMatches(dayMatches, stats, series, matchesTarget, cardClass);
+      await renderMatches(dayMatches, stats, series, matchesTarget, cardClass, playerStats);
 
       return true;
     } catch (e) {
