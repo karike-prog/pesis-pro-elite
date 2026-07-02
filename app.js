@@ -168,13 +168,7 @@ function buildStandings(matches) {
   function ensure(team) {
     const name = team.shorthand || team.name;
     if (!table[team.id]) {
-      table[team.id] = {
-        team: name,
-        o: 0,
-        v: 0,
-        h: 0,
-        p: 0
-      };
+      table[team.id] = { team: name, o: 0, v: 0, h: 0, p: 0 };
     }
     return table[team.id];
   }
@@ -188,50 +182,31 @@ function buildStandings(matches) {
 
       const hp = Number(d.periods_home || 0);
       const ap = Number(d.periods_away || 0);
-      console.log(d.home, d.away, hp, ap, d);
 
       home.o++;
       away.o++;
 
-  if (hp === 2 && ap === 0) {
-  home.v++;
-  away.h++;
-  home.p += 3;
-}
-
-else if (ap === 2 && hp === 0) {
-  away.v++;
-  home.h++;
-  away.p += 3;
-}
-
-else if (hp === 2 && ap === 1) {
-  home.v++;
-  away.h++;
-  home.p += 2;
-  away.p += 1;
-}
-
-else if (ap === 2 && hp === 1) {
-  away.v++;
-  home.h++;
-  away.p += 2;
-  home.p += 1;
-}
-
-else if (hp === 1 && ap === 0) {
-  home.v++;
-  away.h++;
-  home.p += 2;
-}
-
-else if (ap === 1 && hp === 0) {
-  away.v++;
-  home.h++;
-  away.p += 2;
-}
+      if (hp === 2 && ap === 0) {
+        home.v++; away.h++; home.p += 3;
+      } else if (ap === 2 && hp === 0) {
+        away.v++; home.h++; away.p += 3;
+      } else if (hp === 2 && ap === 1) {
+        home.v++; away.h++; home.p += 2; away.p += 1;
+      } else if (ap === 2 && hp === 1) {
+        away.v++; home.h++; away.p += 2; home.p += 1;
+      } else if (hp === 1 && ap === 0) {
+        home.v++; away.h++; home.p += 2;
+      } else if (ap === 1 && hp === 0) {
+        away.v++; home.h++; away.p += 2;
       }
     });
+
+  return Object.values(table).sort((a, b) => {
+    if (b.p !== a.p) return b.p - a.p;
+    if (b.v !== a.v) return b.v - a.v;
+    return a.team.localeCompare(b.team);
+  });
+}
 
   return Object.values(table).sort((a, b) => {
     if (b.p !== a.p) return b.p - a.p;
