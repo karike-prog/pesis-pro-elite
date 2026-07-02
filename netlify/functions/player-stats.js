@@ -1,26 +1,38 @@
-
 exports.handler = async function () {
   try {
+    const apiKey = process.env.PESIS_API_KEY;
+
     const url =
-      "https://www.pesistulokset.fi/api/players?seasonSeriesId=2945";
+      `https://api.pesistulokset.fi/api/v1/stats-tool/players` +
+      `?seasonSeries=2945` +
+      `&season=110` +
+      `&phase=1` +
+      `&level=1` +
+      `&series=1` +
+      `&sum=true` +
+      `&statfilter=lyodyt` +
+      `&apikey=${apiKey}`;
 
     const res = await fetch(url);
+    const text = await res.text();
 
     if (!res.ok) {
       return {
         statusCode: res.status,
-        body: JSON.stringify({ error: "Player stats fetch failed" })
+        body: JSON.stringify({
+          error: "Player stats fetch failed",
+          status: res.status,
+          response: text
+        })
       };
     }
-
-    const data = await res.json();
 
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(data)
+      body: text
     };
   } catch (e) {
     return {
