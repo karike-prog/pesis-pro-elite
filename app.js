@@ -173,12 +173,7 @@ function buildStandings(matches) {
   });
 }
 
-  return Object.values(table).sort((a, b) => {
-    if (b.p !== a.p) return b.p - a.p;
-    if (b.v !== a.v) return b.v - a.v;
-    return a.team.localeCompare(b.team);
-  });
-}
+
 function recentAvg(team, field) {
   const games = team.recent.slice(0, 5);
   if (!games.length) return null;
