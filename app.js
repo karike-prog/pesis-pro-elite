@@ -461,6 +461,40 @@ function buildPlayerRatings(players) {
     })
     .sort((a, b) => b.eliteRating - a.eliteRating);
 }
+function buildTeamPlayerRatings(players) {
+  const teams = {};
+
+  players.forEach(p => {
+    const teamId = p.team_ids?.[0];
+    if (!teamId) return;
+
+    if (!teams[teamId]) {
+      teams[teamId] = [];
+    }
+
+    teams[teamId].push(p);
+  });
+
+  const result = {};
+
+  Object.keys(teams).forEach(teamId => {
+    const top5 = teams[teamId]
+      .sort((a, b) => b.eliteRating - a.eliteRating)
+      .slice(0, 5);
+
+    const totalRating = top5.reduce(
+      (sum, p) => sum + p.eliteRating,
+      0
+    );
+
+    result[teamId] = {
+      top5,
+      totalRating
+    };
+  });
+
+  return result;
+}
 async function fetchPlayerStats() {
   try {
     const res = await fetch("/.netlify/functions/player-stats");
@@ -474,11 +508,16 @@ async function fetchPlayerStats() {
 const players = Array.isArray(json.data) ? json.data : [];
 
 const ratedPlayers = buildPlayerRatings(players);
+const teamPlayerRatings = buildTeamPlayerRatings(ratedPlayers);
 
 console.log("PLAYER STATS:", ratedPlayers.length);
 console.log("TOP 5:", ratedPlayers.slice(0, 5));
+console.log("TEAM PLAYER RATINGS:", teamPlayerRatings);
 
-return ratedPlayers;
+return {
+  players: ratedPlayers,
+  teams: teamPlayerRatings
+};
   } catch (e) {
     console.log("PLAYER STATS VIRHE:", e);
     return [];
@@ -883,8 +922,9 @@ ${lineupHtml(lineup)}
 
 async function load() {
   const selectedDate = $("date").value || today();
-  const playerStats = await fetchPlayerStats();
-console.log("PELAAJAT LADATTU:", playerStats.length);
+const playerStats = await fetchPlayerStats();
+console.log("PELAAJAT LADATTU:", playerStats.players.length);
+console.log("JOUKKUE TOP5:", playerStats.teams);
 
   $("status").textContent = "Ladataan Miesten ja Naisten Superpesis...";
 
