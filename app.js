@@ -44,6 +44,9 @@ const TEAM_LOGOS = {
 "Ura": "images/logos/ura.png",
 "SiiPe": "images/logos/siipe.png",
 };
+const PLAYER_STATS_URL =
+  "https://www.pesistulokset.fi/api/players?seasonSeriesId=2945";
+
 const FIRST_CATCHERS = {
   "AA": "Seeti Surakka",
   "Tahko": "Petteri Alanen",
@@ -444,6 +447,26 @@ try {
   return { error: e.message };
 }
 }
+async function fetchPlayerStats() {
+  try {
+    const res = await fetch("/.netlify/functions/player-stats");
+
+    if (!res.ok) {
+      console.log("PLAYER STATS EI OK:", res.status);
+      return [];
+    }
+
+    const json = await res.json();
+    const players = Array.isArray(json.data) ? json.data : [];
+
+    console.log("PLAYER STATS:", players.length, players.slice(0, 5));
+
+    return players;
+  } catch (e) {
+    console.log("PLAYER STATS VIRHE:", e);
+    return [];
+  }
+}
 async function fetchLineup(match) {
   try {
     const url = `/.netlify/functions/lineup?id=${match.id}`;
@@ -843,6 +866,8 @@ ${lineupHtml(lineup)}
 
 async function load() {
   const selectedDate = $("date").value || today();
+  const playerStats = await fetchPlayerStats();
+console.log("PELAAJAT LADATTU:", playerStats.length);
 
   $("status").textContent = "Ladataan Miesten ja Naisten Superpesis...";
 
