@@ -478,30 +478,49 @@ footer{
   overflow:hidden;
 }
 
-.hero-text{
-  text-align:center;
-}
-
-.hero-text h1{
-  margin:0;
-  font-size:46px;
-  font-weight:900;
-  letter-spacing:-1px;
-}
-
-.hero-text p{
-  margin:6px 0 0;
-  color:#64748b;
-  font-weight:700;
+.hero-brand{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
 }
 
 .hero-ball{
-  font-size:46px;
-  animation:ballFly .75s ease-out both;
+  width:80px;
+  height:auto;
+  margin:0;
+  animation:ballRoll 2.2s ease-out forwards;
+}
+
+.hero-logo{
+  height:auto;
+}
+
+.desktop-logo{
+  display:block;
+  width:460px;
+}
+
+.mobile-logo{
+  display:none;
+}
+
+.hero-subtitle{
+  font-size:20px;
+  font-weight:500;
+}
+
+.hero b{
+  position:absolute;
+  right:20px;
+  top:20px;
+  background:#f59e0b;
+  color:#111827;
+  padding:8px 14px;
+  border-radius:999px;
 }
 
 @keyframes ballRoll{
-
   0%{
     transform:translateX(-600px) rotate(-1080deg);
     opacity:0;
@@ -516,82 +535,44 @@ footer{
     transform:translateX(0) rotate(0deg);
     opacity:1;
   }
-
 }
 
-.hero-ball{
-  margin-right:18px;
-  animation:ballRoll 2.2s cubic-bezier(.22,.61,.36,1) forwards;
-}
+@media (max-width:768px){
+  .hero{
+    flex-direction:column;
+    padding:34px 20px 46px;
+  }
 
-.hero b{
-  position:absolute;
-  right:20px;
-  top:20px;
-  background:#f59e0b;
-  color:#111827;
-  padding:8px 14px;
-  border-radius:999px;
-}
-
-.hero-brand{
-    display:flex;
-    align-items:center;
-    justify-content:center;
+  .hero-brand{
+    flex-direction:column;
     gap:10px;
-}
+  }
 
-.hero-title{
-    font-family:Montserrat,sans-serif;
-    font-size:54px;
-    font-weight:900;
-    color:#d8f13b;
-    -webkit-text-stroke:3px #111;
-    text-shadow:0 4px 10px rgba(0,0,0,.18);
-    line-height:1;
-}
+  .hero-ball{
+    width:90px;
+  }
 
-.hero-ball{
-    width:80px;
-    height:auto;
-    margin-right:0;
-    animation:ballRoll 2.2s ease-out forwards;
-}
+  .desktop-logo{
+    display:none;
+  }
 
-@media (max-width:700px){
+  .mobile-logo{
+    display:block;
+    width:260px;
+  }
 
-    .hero-brand{
-        flex-direction:column;
-        gap:4px;
-    }
-
-    .hero-ball{
-        width:90px;
-        margin:0;
-    }
-
-  .hero-title{
-    font-size:42px;
+  .hero-subtitle{
     text-align:center;
-    line-height:1;
-    letter-spacing:1px;
-    -webkit-text-stroke:2px #111;
-    text-shadow:0 2px 6px rgba(0,0,0,.18);
-}
+    font-size:22px;
+  }
 
-    .hero-subtitle{
-        text-align:center;
-        margin-top:2px;
-        font-size:22px;
-    }
-
-    .hero b{
-        top:12px;
-        right:12px;
+  .hero b{
+    top:12px;
+    right:12px;
     font-size:14px;
     padding:5px 10px;
+  }
 }
-}}
 .desktop-logo {
   display: block;
 }
