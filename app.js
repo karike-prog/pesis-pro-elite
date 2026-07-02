@@ -457,11 +457,14 @@ async function fetchPlayerStats() {
     }
 
     const json = await res.json();
-    const players = Array.isArray(json.data) ? json.data : [];
+const players = Array.isArray(json.data) ? json.data : [];
 
-    console.log("PLAYER STATS:", players.length, players.slice(0, 5));
+const ratedPlayers = buildPlayerRatings(players);
 
-    return players;
+console.log("PLAYER STATS:", ratedPlayers.length);
+console.log("TOP 5:", ratedPlayers.slice(0, 5));
+
+return ratedPlayers;
   } catch (e) {
     console.log("PLAYER STATS VIRHE:", e);
     return [];
