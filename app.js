@@ -447,6 +447,20 @@ try {
   return { error: e.message };
 }
 }
+function buildPlayerRatings(players) {
+  return players
+    .map(p => {
+      const scorings = Number(p.scorings || 0);
+      const runs = Number(p.runs || 0);
+      const homeruns = Number(p.homeruns || 0);
+
+      return {
+        ...p,
+        eliteRating: scorings + runs * 0.6 + homeruns * 1.5
+      };
+    })
+    .sort((a, b) => b.eliteRating - a.eliteRating);
+}
 async function fetchPlayerStats() {
   try {
     const res = await fetch("/.netlify/functions/player-stats");
