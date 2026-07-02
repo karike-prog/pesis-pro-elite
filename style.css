@@ -592,3 +592,22 @@ footer{
     padding:5px 10px;
 }
 }}
+.desktop-logo {
+  display: block;
+}
+
+.mobile-logo {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-logo {
+    display: none;
+  }
+
+  .mobile-logo {
+    display: block;
+    width: 260px;
+    margin: 0 auto;
+  }
+}
