@@ -193,28 +193,43 @@ function buildStandings(matches) {
       home.o++;
       away.o++;
 
-      if (hp > ap) {
-        home.v++;
-        away.h++;
+  if (hp === 2 && ap === 0) {
+  home.v++;
+  away.h++;
+  home.p += 3;
+}
 
-        if (hp === 2 && ap === 0) {
-          home.p += 3;
-        } else {
-          home.p += 2;
-          away.p += 1;
-        }
-      }
+else if (ap === 2 && hp === 0) {
+  away.v++;
+  home.h++;
+  away.p += 3;
+}
 
-      if (ap > hp) {
-        away.v++;
-        home.h++;
+else if (hp === 2 && ap === 1) {
+  home.v++;
+  away.h++;
+  home.p += 2;
+  away.p += 1;
+}
 
-        if (ap === 2 && hp === 0) {
-          away.p += 3;
-        } else {
-          away.p += 2;
-          home.p += 1;
-        }
+else if (ap === 2 && hp === 1) {
+  away.v++;
+  home.h++;
+  away.p += 2;
+  home.p += 1;
+}
+
+else if (hp === 1 && ap === 0) {
+  home.v++;
+  away.h++;
+  home.p += 2;
+}
+
+else if (ap === 1 && hp === 0) {
+  away.v++;
+  home.h++;
+  away.p += 2;
+}
       }
     });
 
