@@ -188,6 +188,7 @@ function buildStandings(matches) {
 
       const hp = Number(d.periods_home || 0);
       const ap = Number(d.periods_away || 0);
+      console.log(d.home, d.away, hp, ap, d);
 
       home.o++;
       away.o++;
