@@ -611,3 +611,24 @@ footer{
     margin: 0 auto;
   }
 }
+.desktop-logo {
+    display: block;
+}
+
+.mobile-logo {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .desktop-logo {
+        display: none;
+    }
+
+    .mobile-logo {
+        display: block;
+    }
+
+    .hero-title {
+        display: none;
+    }
+}
