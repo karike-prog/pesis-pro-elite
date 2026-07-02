@@ -126,7 +126,41 @@ function addTeam(stats, team) {
   }
   return stats[team.id];
 }
+function buildStats(matches) {
+  const stats = {};
 
+  matches
+    .filter(m => m.result && m.liveResult && m.liveResult.finished)
+    .forEach(m => {
+      const home = addTeam(stats, m.home);
+      const away = addTeam(stats, m.away);
+
+      const homeRuns = getRuns(m.result, "home");
+      const awayRuns = getRuns(m.result, "away");
+
+      home.played++;
+      home.for += homeRuns;
+      home.against += awayRuns;
+      home.homePlayed++;
+      home.homeFor += homeRuns;
+      home.homeAgainst += awayRuns;
+      home.recent.push({ date: m.date, for: homeRuns, against: awayRuns });
+
+      away.played++;
+      away.for += awayRuns;
+      away.against += homeRuns;
+      away.awayPlayed++;
+      away.awayFor += awayRuns;
+      away.awayAgainst += homeRuns;
+      away.recent.push({ date: m.date, for: awayRuns, against: homeRuns });
+    });
+
+  Object.values(stats).forEach(t => {
+    t.recent.sort((a, b) => new Date(b.date) - new Date(a.date));
+  });
+
+  return stats;
+}
 function buildStandings(matches) {
   const table = {};
 
