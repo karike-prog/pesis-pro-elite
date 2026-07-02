@@ -552,7 +552,7 @@ footer{
 }
 
 .hero-ball{
-    width:105px;
+    width:90px;
     height:auto;
     margin-right:0;
     animation:ballRoll 2.2s ease-out forwards;
@@ -566,7 +566,7 @@ footer{
     }
 
     .hero-ball{
-        width:80px;
+        width:90px;
         margin:0;
     }
 
