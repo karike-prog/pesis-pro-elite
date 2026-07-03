@@ -814,6 +814,26 @@ function renderPowerTable(stats, targetId) {
 
   $(targetId).innerHTML = rows;
 }
+
+function getTeamPlayerPower(team, playerStats) {
+  if (!playerStats) return 0;
+
+  if (playerStats.teams?.[team.id]?.totalRating) {
+    return playerStats.teams[team.id].totalRating;
+  }
+
+  const teamName = (team.shorthand || team.name || "").toLowerCase();
+
+  const players = (playerStats.players || []).filter(p => {
+    const playerTeam =
+      (p.team?.shorthand || p.team?.name || p.team || "").toLowerCase();
+
+    return playerTeam === teamName;
+  });
+
+  return players.reduce((sum, p) => sum + (Number(p.rating) || 0), 0);
+}
+
 async function renderMatches(matches, stats, selectedSeries, targetId, cardClass, playerStats) {
   if (!matches.length) {
     $(targetId).innerHTML = "<p>Otteluita ei löytynyt valitulle päivälle.</p>";
@@ -853,18 +873,9 @@ const lineupData = lineup?.data || lineup?.match || lineup;
 const homePowerId = lineupData?.home?.id || match.home.id;
 const awayPowerId = lineupData?.away?.id || match.away.id;
 
-   console.log("HOME ID =", match.home.id, match.home);
-console.log("AWAY ID =", match.away.id, match.away);
-const homePlayerPower =
-  playerStats?.teams?.[homePowerId]?.totalRating || 0;
-   console.log("HOME POWER =", playerStats.teams[match.home.id]);
-console.log("AWAY POWER =", playerStats.teams[match.away.id]);
-
-const awayPlayerPower =
-  playerStats?.teams?.[awayPowerId]?.totalRating || 0;
-
+const homePlayerPower = getTeamPlayerPower(match.home, playerStats);
+const awayPlayerPower = getTeamPlayerPower(match.away, playerStats);
 const playerPowerDiff = homePlayerPower - awayPlayerPower;
-   console.log("TEAM IDS =", Object.keys(playerStats.teams));
    
   prediction.homeRuns += lineupAdjustment.homeRuns;
 prediction.awayRuns += lineupAdjustment.awayRuns;
