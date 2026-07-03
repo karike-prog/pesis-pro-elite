@@ -874,14 +874,7 @@ console.log("MATCH HOME =", match.home);
 console.log("MATCH AWAY =", match.away);
   const prediction = predict(match.home, match.away, stats, weather);
    
-  const getTeamPower = (team) => {
-  return (
-    playerStats?.teams?.[team.id]?.totalRating ??
-    playerStats?.teams?.[team.shorthand]?.totalRating ??
-    playerStats?.teams?.[team.name]?.totalRating ??
-    0
-  );
-};
+
    console.log("MATCH HOME =", match.home.name, match.home.id);
 console.log("MATCH AWAY =", match.away.name, match.away.id);
 console.log("PLAYERSTATS TEAM 16805 =", playerStats.teams["16805"]);
@@ -1024,6 +1017,7 @@ console.log("JOUKKUE TOP5:", playerStats.teams);
       const stats = buildStats(matches);
       console.log("STATS OK:", series);
       const standings = buildStandings(matches);
+      const playerStats = await fetchPlayerStats(series);
       console.log("STANDINGS OK:", series, standings);
 renderOfficialStandings(standings, standingsTarget);
 
