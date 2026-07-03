@@ -853,6 +853,8 @@ const lineupData = lineup?.data || lineup?.match || lineup;
 const homePowerId = lineupData?.home?.id || match.home.id;
 const awayPowerId = lineupData?.away?.id || match.away.id;
 
+   console.log("HOME ID =", match.home.id, match.home);
+console.log("AWAY ID =", match.away.id, match.away);
 const homePlayerPower =
   playerStats?.teams?.[homePowerId]?.totalRating || 0;
 
@@ -860,6 +862,7 @@ const awayPlayerPower =
   playerStats?.teams?.[awayPowerId]?.totalRating || 0;
 
 const playerPowerDiff = homePlayerPower - awayPlayerPower;
+   console.log("TEAM IDS =", Object.keys(playerStats.teams));
    
   prediction.homeRuns += lineupAdjustment.homeRuns;
 prediction.awayRuns += lineupAdjustment.awayRuns;
