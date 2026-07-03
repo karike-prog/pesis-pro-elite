@@ -830,6 +830,9 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
 
   const weather = await fetchWeather(match);
   const lineup = await fetchLineup(match);
+  console.log("PLAYERSTATS TEAMS:", playerStats?.teams);
+  console.log("HOME TEAM:", match.home);
+  console.log("AWAY TEAM:", match.away);
   const lineupAdjustment = getLineupAdjustment(match, lineup);
   const prediction = predict(match.home, match.away, stats, weather);
    
