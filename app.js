@@ -854,6 +854,10 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
   console.log("HOME TEAM:", match.home);
   console.log("AWAY TEAM:", match.away);
   const lineupAdjustment = getLineupAdjustment(match, lineup);
+   console.log("PLAYER FIRST =", playerStats?.players?.[0]);
+console.log("PLAYER TEAMS KEYS =", Object.keys(playerStats?.teams || {}));
+console.log("MATCH HOME =", match.home);
+console.log("MATCH AWAY =", match.away);
   const prediction = predict(match.home, match.away, stats, weather);
    
   const getTeamPower = (team) => {
