@@ -490,7 +490,7 @@ async function fetchPlayerStats() {
     const json = await res.json();
 const players = Array.isArray(json.data) ? json.data : [];
 
-const ratedPlayers = buildPlayerRatings(players);
+const ratedPlayers = buildTeamPlayerRatings(players);
 const teamPlayerRatings = buildTeamPlayerRatings(ratedPlayers);
 
 console.log("PLAYER STATS:", ratedPlayers.length);
