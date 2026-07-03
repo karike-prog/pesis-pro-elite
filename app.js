@@ -873,6 +873,19 @@ console.log("PLAYER TEAMS KEYS =", Object.keys(playerStats?.teams || {}));
 console.log("MATCH HOME =", match.home);
 console.log("MATCH AWAY =", match.away);
   const prediction = predict(match.home, match.away, stats, weather);
+
+   console.log(
+  "PLAYER SAMPLE",
+  playerStats.players.slice(0, 5).map(p => ({
+    id: p.player_id,
+    name: p.name,
+    first: p.first_name,
+    last: p.last_name,
+    team_ids: p.team_ids,
+    rating: p.rating,
+    totalRating: p.totalRating
+  }))
+);
    
 
    console.log("MATCH HOME =", match.home.name, match.home.id);
