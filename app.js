@@ -814,27 +814,38 @@ function renderPowerTable(stats, targetId) {
 
   $(targetId).innerHTML = rows;
 }
-
+function normalizeTeamKey(name) {
+  return (name || "")
+    .toLowerCase()
+    .replace("jyväskylän ", "")
+    .replace("joensuun maila", "joma")
+    .replace("fera, rauma", "fera")
+    .replace("laitilan jyske", "jyske")
+    .replace("oulun lippo", "lippo naiset")
+    .replace("pöytyän urheilijat", "pöu pesis")
+    .replace("seinäjoen maila-jussit", "jussittaret")
+    .replace("lapuan virkiä", "virkiä")
+    .trim();
+}
 function getTeamPlayerPower(team, playerStats) {
   if (!playerStats) return 0;
 
-  // Jos joukkueen totalRating löytyy valmiina
   if (playerStats.teams?.[team.id]?.totalRating) {
     return playerStats.teams[team.id].totalRating;
   }
 
-  // Muuten lasketaan pelaajista
-  let total = 0;
+  const wanted = normalizeTeamKey(team.shorthand || team.name);
 
-  for (const p of playerStats.players || []) {
+  for (const id of Object.keys(playerStats.teams || {})) {
+    const top = playerStats.teams[id]?.top5?.[0];
+    const key = normalizeTeamKey(top?.team_name || top?.team?.name || top?.team?.shorthand);
 
-    if (p.team_ids?.includes(String(team.id))) {
-      total += Number(p.rating || p.totalRating || 0);
+    if (key && key === wanted) {
+      return playerStats.teams[id].totalRating || 0;
     }
-
   }
 
-  return total;
+  return 0;
 }
 
 async function renderMatches(matches, stats, selectedSeries, targetId, cardClass, playerStats) {
