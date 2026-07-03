@@ -857,6 +857,8 @@ const awayPowerId = lineupData?.away?.id || match.away.id;
 console.log("AWAY ID =", match.away.id, match.away);
 const homePlayerPower =
   playerStats?.teams?.[homePowerId]?.totalRating || 0;
+   console.log("HOME POWER =", playerStats.teams[match.home.id]);
+console.log("AWAY POWER =", playerStats.teams[match.away.id]);
 
 const awayPlayerPower =
   playerStats?.teams?.[awayPowerId]?.totalRating || 0;
