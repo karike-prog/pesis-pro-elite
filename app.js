@@ -281,7 +281,7 @@ function predict(homeTeam, awayTeam, stats, weather) {
     awayRuns,
     homePct,
     awayPct: 100 - homePct,
-    note: "Koti/vieras, viimeiset 5, kotietu ja sää."
+    note: ""
   };
 }
 function shootoutProbability(prediction) {
