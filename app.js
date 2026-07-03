@@ -844,7 +844,10 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
     0
   );
 };
-
+console.log("PLAYERSTATS =", playerStats);
+console.log("PLAYERSTATS.TEAMS =", playerStats?.teams);
+console.log("HOME =", match.home);
+console.log("AWAY =", match.away);
 const homePlayerPower = getTeamPower(match.home);
 const awayPlayerPower = getTeamPower(match.away);
 const playerPowerDiff = homePlayerPower - awayPlayerPower;
