@@ -447,32 +447,15 @@ try {
   return { error: e.message };
 }
 }
-function buildPlayerRatings(players) {
-  return players
-    .map(p => {
-      const scorings = Number(p.scorings || 0);
-      const runs = Number(p.runs || 0);
-      const homeruns = Number(p.homeruns || 0);
-
-      return {
-        ...p,
-        eliteRating: scorings + runs * 0.6 + homeruns * 1.5
-      };
-    })
-    .sort((a, b) => b.eliteRating - a.eliteRating);
-}
 function buildTeamPlayerRatings(players) {
   const teams = {};
 
   players.forEach(p => {
-    const teamId = p.team_ids?.[0];
-    if (!teamId) return;
-
-    if (!teams[teamId]) {
-      teams[teamId] = [];
-    }
-
-    teams[teamId].push(p);
+    const ids = p.team_ids || [];
+    ids.forEach(teamId => {
+      if (!teams[teamId]) teams[teamId] = [];
+      teams[teamId].push(p);
+    });
   });
 
   const result = {};
@@ -483,7 +466,7 @@ function buildTeamPlayerRatings(players) {
       .slice(0, 5);
 
     const totalRating = top5.reduce(
-      (sum, p) => sum + p.eliteRating,
+      (sum, p) => sum + (Number(p.eliteRating) || 0),
       0
     );
 
