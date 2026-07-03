@@ -922,7 +922,7 @@ ${(match.result || match.liveResult?.finished)
 ${keyPlayerAbsenceHtml(match, lineup, selectedSeries)}
 ${lineupHtml(lineup)}
 
-        <div class="reason">${prediction.note}</div>
+       ${prediction.note ? `<div class="reason">${prediction.note}</div>` : ""}
       </div>
     `);
   }
