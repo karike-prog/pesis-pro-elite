@@ -613,7 +613,6 @@ footer{
         display: none;
     }
 }
-main > .panel:first-child{
+.panel{
   box-shadow:none;
-  border-bottom:none;
 }
