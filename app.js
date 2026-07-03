@@ -832,9 +832,20 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
   const lineup = await fetchLineup(match);
   const lineupAdjustment = getLineupAdjustment(match, lineup);
   const prediction = predict(match.home, match.away, stats, weather);
-   const homePlayerPower = playerStats?.teams?.[match.home.id]?.totalRating || 0;
-const awayPlayerPower = playerStats?.teams?.[match.away.id]?.totalRating || 0;
+   
+  const getTeamPower = (team) => {
+  return (
+    playerStats?.teams?.[team.id]?.totalRating ??
+    playerStats?.teams?.[team.shorthand]?.totalRating ??
+    playerStats?.teams?.[team.name]?.totalRating ??
+    0
+  );
+};
+
+const homePlayerPower = getTeamPower(match.home);
+const awayPlayerPower = getTeamPower(match.away);
 const playerPowerDiff = homePlayerPower - awayPlayerPower;
+   
   prediction.homeRuns += lineupAdjustment.homeRuns;
 prediction.awayRuns += lineupAdjustment.awayRuns;
 prediction.lineupAdjusted = lineupAdjustment.applied; 
