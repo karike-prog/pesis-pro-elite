@@ -818,20 +818,23 @@ function renderPowerTable(stats, targetId) {
 function getTeamPlayerPower(team, playerStats) {
   if (!playerStats) return 0;
 
+  // Jos joukkueen totalRating löytyy valmiina
   if (playerStats.teams?.[team.id]?.totalRating) {
     return playerStats.teams[team.id].totalRating;
   }
 
-  const teamName = (team.shorthand || team.name || "").toLowerCase();
+  // Muuten lasketaan pelaajista
+  let total = 0;
 
-  const players = (playerStats.players || []).filter(p => {
-    const playerTeam =
-      (p.team?.shorthand || p.team?.name || p.team || "").toLowerCase();
+  for (const p of playerStats.players || []) {
 
-    return playerTeam === teamName;
-  });
+    if (p.team_ids?.includes(String(team.id))) {
+      total += Number(p.rating || p.totalRating || 0);
+    }
 
-  return players.reduce((sum, p) => sum + (Number(p.rating) || 0), 0);
+  }
+
+  return total;
 }
 
 async function renderMatches(matches, stats, selectedSeries, targetId, cardClass, playerStats) {
@@ -868,6 +871,14 @@ console.log("MATCH AWAY =", match.away);
     0
   );
 };
+   console.log("MATCH HOME =", match.home.name, match.home.id);
+console.log("MATCH AWAY =", match.away.name, match.away.id);
+
+for (const p of playerStats.players) {
+    if (p.team_ids?.includes(String(match.home.id))) {
+        console.log("HOME PLAYER", p.name, p.team_ids);
+    }
+}
 console.log("PLAYERSTATS =", playerStats);
 console.log("PLAYERSTATS.TEAMS =", playerStats?.teams);
 console.log("HOME =", match.home);
