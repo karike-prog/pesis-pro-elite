@@ -613,3 +613,6 @@ footer{
         display: none;
     }
 }
+.elite-main{
+  border-top:none;
+}
