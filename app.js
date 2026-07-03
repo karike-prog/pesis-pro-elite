@@ -873,7 +873,11 @@ console.log("MATCH AWAY =", match.away);
 };
    console.log("MATCH HOME =", match.home.name, match.home.id);
 console.log("MATCH AWAY =", match.away.name, match.away.id);
-
+console.log("PLAYERSTATS TEAM 16805 =", playerStats.teams["16805"]);
+console.log("PLAYERSTATS TEAM 16806 =", playerStats.teams["16806"]);
+console.log("PLAYERSTATS TEAM 16807 =", playerStats.teams["16807"]);
+   console.log("HOME SPORT CLUB =", match.home.sport_club.id);
+console.log("AWAY SPORT CLUB =", match.away.sport_club.id);
 for (const p of playerStats.players) {
     if (p.team_ids?.includes(String(match.home.id))) {
         console.log("HOME PLAYER", p.name, p.team_ids);
