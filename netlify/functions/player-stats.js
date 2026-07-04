@@ -4,6 +4,7 @@ exports.handler = async function (event) {
     const series = event.queryStringParameters?.series || "Miehet";
 
     const seasonSeries = series === "Naiset" ? 2946 : 2945;
+    const seriesId = series === "Naiset" ? 2 : 1;
 
     const url =
       "https://api.pesistulokset.fi/api/v1/stats-tool/players" +
@@ -11,7 +12,7 @@ exports.handler = async function (event) {
       "&season=110" +
       "&phase=1" +
       "&level=1" +
-      "&series=1" +
+      `&series=${seriesId}` +
       "&sum=true" +
       "&statFilter=layout" +
       `&apiKey=${apiKey}`;
