@@ -7,45 +7,43 @@ function today() {
 
 const TEAM_LOGOS = {
   "AA": "images/logos/aa.png",
-"HP": "images/logos/hp.png",
-"Tahko": "images/logos/tahko.png",
-"IPV": "images/logos/ipv.png",
-"JoMa": "images/logos/joma.png",
-"KeKi": "images/logos/keki.png",
-"KPL": "images/logos/kpl.png",
-"KoU": "images/logos/kou.png",
-"Manse": "images/logos/manse.png",
-"PattU": "images/logos/pattu.png",
-"SoJy": "images/logos/sojy.png",
-"KiPa": "images/logos/kipa.png",
-"ViVe": "images/logos/veto.png",
-  "Jussittaret": "images/logos/jussittaret.png",
-"JoMa N": "images/logos/joma_n.png",
-"JoMa": "images/logos/joma_n.png",
-"Manse N": "images/logos/manse_n.png",
-"Pesäkarhut": "images/logos/pesakarhut.png",
-"Virkiä": "images/logos/virkia.png",
-"Kirittäret": "images/logos/kirittaret.png",
-"Lippo Naiset": "images/logos/lippo.png",
-"PöU Pesis": "images/logos/poytya.png",
-"Roihuttaret": "images/logos/roihu.png",
-"Fera": "images/logos/fera.png",
-"Jyske": "images/logos/jyske.png",
-"Mailattaret": "images/logos/mailattaret.png",
   "HP": "images/logos/hp.png",
-"KaMa": "images/logos/kama.png",
-"Jkl Kiri": "images/logos/kiri.png",
-"NJ": "images/logos/nj.png",
-"PuMu": "images/logos/pumu.png",
-"PuPe": "images/logos/pupe.png",
-"SiKi": "images/logos/siki.png",
-"SMJ": "images/logos/smj.png",
-"UPV": "images/logos/upv.png",
-"Ura": "images/logos/ura.png",
-"SiiPe": "images/logos/siipe.png",
+  "Tahko": "images/logos/tahko.png",
+  "IPV": "images/logos/ipv.png",
+  "JoMa": "images/logos/joma.png",
+  "KeKi": "images/logos/keki.png",
+  "KPL": "images/logos/kpl.png",
+  "KoU": "images/logos/kou.png",
+  "Manse": "images/logos/manse.png",
+  "PattU": "images/logos/pattu.png",
+  "SoJy": "images/logos/sojy.png",
+  "KiPa": "images/logos/kipa.png",
+  "ViVe": "images/logos/veto.png",
+
+  "Jussittaret": "images/logos/jussittaret.png",
+  "JoMa N": "images/logos/joma_n.png",
+  "Manse N": "images/logos/manse_n.png",
+  "Pesäkarhut": "images/logos/pesakarhut.png",
+  "Virkiä": "images/logos/virkia.png",
+  "Kirittäret": "images/logos/kirittaret.png",
+  "Lippo Naiset": "images/logos/lippo.png",
+  "PöU Pesis": "images/logos/poytya.png",
+  "Roihuttaret": "images/logos/roihu.png",
+  "Fera": "images/logos/fera.png",
+  "Jyske": "images/logos/jyske.png",
+  "Mailattaret": "images/logos/mailattaret.png",
+
+  "KaMa": "images/logos/kama.png",
+  "Jkl Kiri": "images/logos/kiri.png",
+  "NJ": "images/logos/nj.png",
+  "PuMu": "images/logos/pumu.png",
+  "PuPe": "images/logos/pupe.png",
+  "SiKi": "images/logos/siki.png",
+  "SMJ": "images/logos/smj.png",
+  "UPV": "images/logos/upv.png",
+  "Ura": "images/logos/ura.png",
+  "SiiPe": "images/logos/siipe.png"
 };
-const PLAYER_STATS_URL =
-  "https://www.pesistulokset.fi/api/players?seasonSeriesId=2945";
 
 const FIRST_CATCHERS = {
   "AA": "Seeti Surakka",
@@ -71,28 +69,48 @@ const FIRST_CATCHERS = {
   "Fera": "",
   "Mailattaret": "",
   "PöU Pesis": "",
-  "Jyske": "",
+  "Jyske": ""
 };
+
+const FALLBACK_STADIUMS = {
+  "Kyrön Sähkö Center, Pöytyä": { lat: 60.764, lng: 22.697 },
+  "K Power Stadion, Lapua": { lat: 62.970, lng: 23.009 },
+  "Hehku Areena, Nurmo (Seinäjoki)": { lat: 62.870, lng: 22.883 },
+  "Pihkalan pesäpallostadion, Hyvinkää": { lat: 60.635, lng: 24.859 },
+  "Hietalahden Pesäpallostadion, Vaasa": { lat: 63.094, lng: 21.604 },
+  "Osuma Arena, Kuopio": { lat: 62.893, lng: 27.677 },
+  "Unico Arena, Seinäjoki": { lat: 62.792, lng: 22.841 },
+  "Saltex Arena, Alajärvi": { lat: 63.001, lng: 23.816 },
+  "KSS Energia Areena, Kouvola": { lat: 60.868, lng: 26.704 },
+  "Rantakenttä, Kitee": { lat: 62.101, lng: 30.138 },
+  "Huikoo Areena, Pori": { lat: 61.485, lng: 21.797 },
+  "Saarikenttä, Vimpeli": { lat: 63.1605, lng: 23.8220 },
+  "Mantun kenttä, Siilinjärvi": { lat: 63.076, lng: 27.661 }
+};
+
+const PLAYER_STATS_CACHE = {};
+
 function fmtDate(iso) {
   return new Date(iso).toLocaleString("fi-FI", {
     weekday: "short",
     day: "numeric",
     month: "numeric",
     hour: "2-digit",
-    minute: "2-digit",
+    minute: "2-digit"
   });
 }
 
-
 function renderOfficialStandings(rows, targetId) {
-  $(targetId).innerHTML = rows.map(row => {
-    const logo = TEAM_LOGOS[row.team] || "images/logos/default.png";
+  const target = $(targetId);
+  if (!target) return;
 
+  target.innerHTML = rows.map(row => {
+    const logo = TEAM_LOGOS[row.team] || "images/logos/default.png";
     return `
       <tr>
-     <td class="logoCell">
-  <img src="${logo}" class="standings-logo" alt="${row.team}">
-</td>
+        <td class="logoCell">
+          <img src="${logo}" class="standings-logo" alt="${row.team}">
+        </td>
         <td><strong>${row.team}</strong></td>
         <td>${row.o}</td>
         <td>${row.v}</td>
@@ -102,6 +120,7 @@ function renderOfficialStandings(rows, targetId) {
     `;
   }).join("");
 }
+
 function getRuns(result, side) {
   if (!result) return 0;
   const p = side === "home" ? "home" : "away";
@@ -129,6 +148,7 @@ function addTeam(stats, team) {
   }
   return stats[team.id];
 }
+
 function buildStats(matches) {
   const stats = {};
 
@@ -164,6 +184,7 @@ function buildStats(matches) {
 
   return stats;
 }
+
 function buildStandings(matches) {
   const table = {};
 
@@ -210,7 +231,6 @@ function buildStandings(matches) {
   });
 }
 
-
 function recentAvg(team, field) {
   const games = team.recent.slice(0, 5);
   if (!games.length) return null;
@@ -223,12 +243,7 @@ function average(a, b, fallback) {
   return values.reduce((sum, v) => sum + v, 0) / values.length;
 }
 
-function weatherAdjustment(weather) {
-  return 0;
-}
-
-
-function predict(homeTeam, awayTeam, stats, weather) {
+function predict(homeTeam, awayTeam, stats) {
   const home = stats[homeTeam.id];
   const away = stats[awayTeam.id];
 
@@ -269,10 +284,6 @@ function predict(homeTeam, awayTeam, stats, weather) {
 
   homeRuns += 0.25;
 
- const wAdj = weatherAdjustment(weather?.start || weather);
-  homeRuns += wAdj / 2;
-  awayRuns += wAdj / 2;
-
   const diff = homeRuns - awayRuns;
   const homePct = Math.max(25, Math.min(75, 50 + diff * 6));
 
@@ -284,66 +295,28 @@ function predict(homeTeam, awayTeam, stats, weather) {
     note: ""
   };
 }
+
 function shootoutProbability(prediction) {
   const diff = Math.abs(prediction.homePct - prediction.awayPct);
   const total = prediction.homeRuns + prediction.awayRuns;
 
   let p = 18;
 
-  // Mitä tasaisempi peli, sitä suurempi kotiutuskisan riski
   if (diff <= 4) p += 12;
   else if (diff <= 8) p += 9;
   else if (diff <= 14) p += 6;
   else if (diff <= 22) p += 3;
   else p -= 3;
 
-  // Vähäjuoksinen peli lisää tasurimahdollisuutta
   if (total < 9) p += 6;
   else if (total < 11) p += 4;
   else if (total < 13) p += 2;
   else p -= 2;
 
-  // Rajat
-  p = Math.max(8, Math.min(42, p));
-
-  return Math.round(p);
-}
-function getLineupAdjustment(match, lineup) {
-
-const hasPlayer = (players, name) =>
-  players.some(p => (p.name || "").trim().toLowerCase() === name.trim().toLowerCase());
-
-let homeRuns = 0;
-let awayRuns = 0;
-let applied = false;
-
-const homeCatcher = FIRST_CATCHERS[match.home.shorthand];
-const awayCatcher = FIRST_CATCHERS[match.away.shorthand];
-
-if (homeCatcher && !hasPlayer(homePlayers, homeCatcher)) {
-  homeRuns -= 0.5;
-  awayRuns += 0.5;
-  applied = true;
+  return Math.round(Math.max(8, Math.min(42, p)));
 }
 
-if (awayCatcher && !hasPlayer(awayPlayers, awayCatcher)) {
-  awayRuns -= 0.5;
-  homeRuns += 0.5;
-  applied = true;
-}
-
-  // TODO:
-  // Tarkista puuttuuko ykköslukkari
-  // Tarkista puuttuuko Top20-lyöjä
-
-  return {
-    homeRuns,
-    awayRuns,
-    applied
-  };
-}
 function getWeatherAdjustment(weather) {
-  console.log(weather);
   if (!weather) return 0;
 
   const temp = Number(weather.temp ?? weather.temperature ?? 0);
@@ -352,24 +325,20 @@ function getWeatherAdjustment(weather) {
 
   let adj = 0;
 
-  // Sade
   if (rain >= 3) adj -= 0.8;
   else if (rain >= 1) adj -= 0.5;
   else if (rain >= 0.2) adj -= 0.2;
 
-  // Tuuli
   if (wind >= 12) adj -= 0.4;
   else if (wind >= 8) adj -= 0.2;
 
-  // Lämpö
   if (temp >= 24 && temp <= 30) adj += 0.2;
   if (temp <= 10 && temp > -50) adj -= 0.3;
 
-  // Rajataan järkeväksi
   adj = Math.max(-1.0, Math.min(0.5, adj));
-
   return Number(adj.toFixed(1));
 }
+
 function weatherHtml(weather) {
   if (!weather || weather.error) {
     return `<div class="weather">🌦️ Sää: ei saatavilla</div>`;
@@ -377,7 +346,6 @@ function weatherHtml(weather) {
 
   const now = weather.now || weather;
   const start = weather.start || weather;
-
 
   return `
     <div class="weather">
@@ -390,31 +358,12 @@ function weatherHtml(weather) {
       ${start.temperature ?? "-"} °C,
       tuuli ${start.windSpeed ?? "-"} m/s,
       sade ${start.precipitation ?? "-"} mm/h
-
     </div>
   `;
 }
-const FALLBACK_STADIUMS = {
-  "Kyrön Sähkö Center, Pöytyä": { lat: 60.764, lng: 22.697 },
-  "K Power Stadion, Lapua": { lat: 62.970, lng: 23.009 },
-  "Hehku Areena, Nurmo (Seinäjoki)": { lat: 62.870, lng: 22.883 },
-  "Pihkalan pesäpallostadion, Hyvinkää": { lat: 60.635, lng: 24.859 },
-  "Hietalahden Pesäpallostadion, Vaasa": { lat: 63.094, lng: 21.604 },
-  "Osuma Arena, Kuopio": { lat: 62.893, lng: 27.677 },
-  "Unico Arena, Seinäjoki": { lat: 62.792, lng: 22.841 },
-  "Saltex Arena, Alajärvi": { lat: 63.001, lng: 23.816 },
-  "KSS Energia Areena, Kouvola": { lat: 60.868, lng: 26.704 },
-  "Rantakenttä, Kitee": { lat: 62.101, lng: 30.138 },
-  "Huikoo Areena, Pori": {lat: 61.485,lng: 21.797},
-  "Saarikenttä, Vimpeli": { lat: 63.1605, lng: 23.8220 },
-  "Mantun kenttä, Siilinjärvi": { lat: 63.076, lng: 27.661 },
-};
 
 async function fetchWeather(match) {
-  console.log("WEATHER MATCH:", match.stadium);
-    let geometry = match.stadium?.details?.place?.geometry;
-
-
+  let geometry = match.stadium?.details?.place?.geometry;
   const stadiumName = match.stadium?.name?.trim();
 
   if ((!geometry?.lat || !geometry?.lng) && FALLBACK_STADIUMS[stadiumName]) {
@@ -425,161 +374,109 @@ async function fetchWeather(match) {
     return { error: "Ei stadionin koordinaatteja" };
   }
 
-const startUrl =
-  `/.netlify/functions/weather?lat=${geometry.lat}&lon=${geometry.lng}&time=${encodeURIComponent(match.date)}`;
+  const startUrl =
+    `/.netlify/functions/weather?lat=${geometry.lat}&lon=${geometry.lng}&time=${encodeURIComponent(match.date)}`;
 
-const nowUrl =
-  `/.netlify/functions/weather?lat=${geometry.lat}&lon=${geometry.lng}&time=${encodeURIComponent(new Date().toISOString())}`;
+  const nowUrl =
+    `/.netlify/functions/weather?lat=${geometry.lat}&lon=${geometry.lng}&time=${encodeURIComponent(new Date().toISOString())}`;
 
-try {
-  const startRes = await fetch(startUrl);
-  const nowRes = await fetch(nowUrl);
-
-  if (!startRes.ok || !nowRes.ok) {
-    return { error: "Säähaku epäonnistui" };
-  }
-
-  return {
-    start: await startRes.json(),
-    now: await nowRes.json()
-  };
-} catch (e) {
-  return { error: e.message };
-}
-}
-function buildTeamPlayerRatings(players) {
-  const teams = {};
-
-  players.forEach(p => {
-    const ids = p.team_ids || [];
-    ids.forEach(teamId => {
-      if (!teams[teamId]) teams[teamId] = [];
-      teams[teamId].push(p);
-    });
-  });
-
-  const result = {};
-
-  Object.keys(teams).forEach(teamId => {
-    const top5 = teams[teamId]
-      .sort((a, b) => b.eliteRating - a.eliteRating)
-      .slice(0, 5);
-
-    const totalRating = top5.reduce(
-      (sum, p) => sum + (Number(p.eliteRating) || 0),
-      0
-    );
-
-    result[teamId] = {
-      top5,
-      totalRating
-    };
-  });
-
-  return result;
-}
-function buildPlayerRatings(players) {
-  return players.map(p => {
-    const lyodyt = Number(p.scorings || 0);
-    const kotiutukset = Number(p.batadv_succeeded || 0);
-    const karkilyonnit = Number(p.batpe_succeeded_3 || 0);
-    const onnistumisPct = Number(p.batadv_percent || 0);
-    const ottelut = Number(p.matches || 1);
-
-    const eliteRating =
-      lyodyt * 1.4 +
-      kotiutukset * 0.35 +
-      karkilyonnit * 0.25 +
-      onnistumisPct * 20 +
-      Math.min(ottelut, 20) * 0.5;
-
-    return {
-      ...p,
-      eliteRating
-    };
-  });
-}
-function buildPlayerRatings(players) {
-  return players.map(p => {
-    const lyodyt = Number(p.scorings || 0);
-    const kotiutukset = Number(p.batadv_succeeded || 0);
-    const karkilyonnit = Number(p.batpe_succeeded_3 || 0);
-    const onnistumisPct = Number(p.batadv_percent || 0);
-    const ottelut = Number(p.matches || 1);
-
-    const eliteRating =
-      lyodyt * 1.4 +
-      kotiutukset * 0.35 +
-      karkilyonnit * 0.25 +
-      onnistumisPct * 20 +
-      Math.min(ottelut, 20) * 0.5;
-
-    return {
-      ...p,
-      eliteRating
-    };
-  });
-}
-
-function buildTeamPlayerRatings(players) {
-  const teams = {};
-
-  players.forEach(p => {
-    const ids = p.team_ids || [];
-
-    ids.forEach(teamId => {
-      if (!teams[teamId]) teams[teamId] = [];
-      teams[teamId].push(p);
-    });
-  });
-
-  const result = {};
-
-  Object.keys(teams).forEach(teamId => {
-    const top5 = teams[teamId]
-      .sort((a, b) => b.eliteRating - a.eliteRating)
-      .slice(0, 5);
-
-    const totalRating = top5.reduce(
-      (sum, p) => sum + (Number(p.eliteRating) || 0),
-      0
-    );
-
-    result[teamId] = {
-      top5,
-      totalRating
-    };
-  });
-
-  return result;
-}
-async function fetchPlayerStats() {
   try {
-    const res = await fetch("/.netlify/functions/player-stats");
+    const startRes = await fetch(startUrl);
+    const nowRes = await fetch(nowUrl);
+
+    if (!startRes.ok || !nowRes.ok) {
+      return { error: "Säähaku epäonnistui" };
+    }
+
+    return {
+      start: await startRes.json(),
+      now: await nowRes.json()
+    };
+  } catch (e) {
+    return { error: e.message };
+  }
+}
+
+function buildPlayerRatings(players) {
+  return players.map(p => {
+    const lyodyt = Number(p.scorings || 0);
+    const kotiutukset = Number(p.batadv_succeeded || 0);
+    const karkilyonnit = Number(p.batpe_succeeded_3 || 0);
+    const onnistumisPct = Number(p.batadv_percent || 0);
+    const ottelut = Number(p.matches || 1);
+
+    const eliteRating =
+      lyodyt * 1.4 +
+      kotiutukset * 0.35 +
+      karkilyonnit * 0.25 +
+      onnistumisPct * 20 +
+      Math.min(ottelut, 20) * 0.5;
+
+    return { ...p, eliteRating };
+  });
+}
+
+function buildTeamPlayerRatings(players) {
+  const teams = {};
+
+  players.forEach(p => {
+    const ids = p.team_ids || [];
+    ids.forEach(teamId => {
+      if (!teams[teamId]) teams[teamId] = [];
+      teams[teamId].push(p);
+    });
+  });
+
+  const result = {};
+
+  Object.keys(teams).forEach(teamId => {
+    const top5 = teams[teamId]
+      .sort((a, b) => b.eliteRating - a.eliteRating)
+      .slice(0, 5);
+
+    const totalRating = top5.reduce(
+      (sum, p) => sum + (Number(p.eliteRating) || 0),
+      0
+    );
+
+    result[teamId] = { top5, totalRating };
+  });
+
+  return result;
+}
+
+async function fetchPlayerStats(series) {
+  const cacheKey = series || "all";
+  if (PLAYER_STATS_CACHE[cacheKey]) return PLAYER_STATS_CACHE[cacheKey];
+
+  try {
+    const res = await fetch(`/.netlify/functions/player-stats?series=${encodeURIComponent(series || "")}`);
 
     if (!res.ok) {
       console.log("PLAYER STATS EI OK:", res.status);
-      return { players: [], teams: {} };
+      PLAYER_STATS_CACHE[cacheKey] = { players: [], teams: {} };
+      return PLAYER_STATS_CACHE[cacheKey];
     }
 
     const json = await res.json();
     const players = Array.isArray(json.data) ? json.data : [];
 
-const players = Array.isArray(json.data) ? json.data : [];
-
-const ratedPlayers = buildPlayerRatings(players);
-const teamPlayerRatings = buildTeamPlayerRatings(ratedPlayers);
+    const ratedPlayers = buildPlayerRatings(players);
     const teamPlayerRatings = buildTeamPlayerRatings(ratedPlayers);
 
-    return {
+    PLAYER_STATS_CACHE[cacheKey] = {
       players: ratedPlayers,
       teams: teamPlayerRatings
     };
+
+    return PLAYER_STATS_CACHE[cacheKey];
   } catch (e) {
     console.log("PLAYER STATS VIRHE:", e);
-    return { players: [], teams: {} };
+    PLAYER_STATS_CACHE[cacheKey] = { players: [], teams: {} };
+    return PLAYER_STATS_CACHE[cacheKey];
   }
 }
+
 async function fetchLineup(match) {
   try {
     const url = `/.netlify/functions/lineup?id=${match.id}`;
@@ -587,14 +484,13 @@ async function fetchLineup(match) {
     const res = await fetch(url);
     if (!res.ok) return null;
 
-    const json = await res.json();
-    console.log("LINEUP JSON:", json);
-    return json;
+    return await res.json();
   } catch (e) {
     console.log("LINEUP VIRHE:", e);
     return null;
   }
 }
+
 function lineupHtml(lineup) {
   const data = lineup?.data || lineup?.match || lineup;
 
@@ -602,14 +498,11 @@ function lineupHtml(lineup) {
   const awayPlayers = data?.away?.players || [];
 
   if (!homePlayers.length || !awayPlayers.length) {
-    console.log("LINEUP EI LÖYTYNYT:", lineup);
     return `<div class="lineup">📋 Kokoonpanot eivät vielä saatavilla</div>`;
   }
 
   const playerRows = (players) =>
-    players
-      .map(p => `<div>${p.number}. ${p.name}</div>`)
-      .join("");
+    players.map(p => `<div>${p.number}. ${p.name}</div>`).join("");
 
   return `
     <div class="lineup">
@@ -628,56 +521,36 @@ function lineupHtml(lineup) {
   `;
 }
 
-
 const TOP20_LYOJAT = [
-  { name: "Juho Toivola", team: "JoMa" },
-  { name: "Jukka-Pekka Vainionpää", team: "Manse" },
-  { name: "Perttu Ruuska", team: "Manse" },
-  { name: "Henri Puputti", team: "ViVe" },
-  { name: "Patrik Wahlsten", team: "KPL" },
-  { name: "Roope Korhonen", team: "SoJy" },
-  { name: "Martti Viitasalo", team: "PattU" },
-  { name: "Matias Rinta-aho", team: "ViVe" },
-  { name: "Rasmus Teppo", team: "KoU" },
-  { name: "Ville-Veikko Olli", team: "IPV" },
-  { name: "Juha Niemi", team: "Tahko" },
-  { name: "Antti Korhonen", team: "Manse" },
-  { name: "Janne Mäkelä", team: "KiPa" },
-  { name: "Santtu Patova", team: "Tahko" },
-  { name: "Ossi Meriläinen", team: "KeKi" },
-  { name: "Tuukka Sarkkinen", team: "KeKi" },
-  { name: "Aappo Savikoski", team: "IPV" },
-  { name: "Petteri Kortelainen", team: "AA" },
-  { name: "Samuel Huotari", team: "SoJy" },
-  { name: "Aaro Ojanperä", team: "KeKi" },
-  { name: "Aino-Kaisa Mantere", team: "Jussittaret" },
-  { name: "Janette Lepistö", team: "Virkiä" },
-  { name: "Siri Eskola", team: "Manse" },
-  { name: "Nelli Huotari", team: "JoMa" },
-  { name: "Maija Vastamäki", team: "Manse" },
-  { name: "Taru Toikka", team: "Pesäkarhut" },
-  { name: "Maria Kaakinen", team: "JoMa" },
-  { name: "Lotta Nummikari", team: "Pesäkarhut" },
-  { name: "Hanna Toivanen", team: "JoMa" },
-  { name: "Anna Ala-Kauhaluoma", team: "Manse" },
-  { name: "Sara Kujanen", team: "Kirittäret" },
-  { name: "Sohvi Korhonen", team: "Roihuttaret" },
-  { name: "Emilia Linna", team: "JoMa" },
-  { name: "Tiia Valtanen", team: "Virkiä" },
-  { name: "Tiia Peltonen", team: "Jussittaret" },
-  { name: "Nea Tuikka", team: "Lippo Naiset" },
-  { name: "Tinja Töyrylä", team: "Kirittäret" },
-  { name: "Iina Valkeejärvi", team: "Fera" },
-  { name: "Anni Laakso", team: "Jussittaret" },
-  { name: "Essi Ilmanen", team: "PöU Pesis" },
+  { name: "Juho Toivola", team: "JoMa", series: "Miehet" },
+  { name: "Jukka-Pekka Vainionpää", team: "Manse", series: "Miehet" },
+  { name: "Perttu Ruuska", team: "Manse", series: "Miehet" },
+  { name: "Henri Puputti", team: "ViVe", series: "Miehet" },
+  { name: "Patrik Wahlsten", team: "KPL", series: "Miehet" },
+  { name: "Roope Korhonen", team: "SoJy", series: "Miehet" },
+  { name: "Martti Viitasalo", team: "PattU", series: "Miehet" },
+  { name: "Matias Rinta-aho", team: "ViVe", series: "Miehet" },
+  { name: "Rasmus Teppo", team: "KoU", series: "Miehet" },
+  { name: "Ville-Veikko Olli", team: "IPV", series: "Miehet" },
+
+  { name: "Aino-Kaisa Mantere", team: "Jussittaret", series: "Naiset" },
+  { name: "Janette Lepistö", team: "Virkiä", series: "Naiset" },
+  { name: "Siri Eskola", team: "Manse", series: "Naiset" },
+  { name: "Nelli Huotari", team: "JoMa", series: "Naiset" },
+  { name: "Maija Vastamäki", team: "Manse", series: "Naiset" },
+  { name: "Taru Toikka", team: "Pesäkarhut", series: "Naiset" },
+  { name: "Maria Kaakinen", team: "JoMa", series: "Naiset" },
+  { name: "Lotta Nummikari", team: "Pesäkarhut", series: "Naiset" },
+  { name: "Hanna Toivanen", team: "JoMa", series: "Naiset" },
+  { name: "Anna Ala-Kauhaluoma", team: "Manse", series: "Naiset" }
 ];
+
 function getLineupAdjustment(match, lineup) {
   if (!lineup) {
     return { homeRuns: 0, awayRuns: 0, applied: false };
   }
 
   const data = lineup?.data || lineup?.match || lineup;
-
   const homePlayers = data?.home?.players || [];
   const awayPlayers = data?.away?.players || [];
 
@@ -691,6 +564,7 @@ function getLineupAdjustment(match, lineup) {
     applied: false
   };
 }
+
 function keyPlayerAbsenceHtml(match, lineup, selectedSeries) {
   const data = lineup?.data || lineup?.match || lineup;
 
@@ -707,20 +581,17 @@ function keyPlayerAbsenceHtml(match, lineup, selectedSeries) {
 
   const missing = [];
 
-TOP20_LYOJAT.forEach(player => {
+  TOP20_LYOJAT.forEach(player => {
+    if (player.series !== selectedSeries) return;
 
-if (player.series !== selectedSeries) return;
+    if (player.team === homeName && !homeLineupNames.includes(player.name)) {
+      missing.push(`${player.name} (${player.team}) pois kokoonpanosta`);
+    }
 
-  if (player.team === homeName) {
-    const found = homeLineupNames.includes(player.name);
-    if (!found) missing.push(`${player.name} (${player.team}) pois kokoonpanosta`);
-  }
-
-  if (player.team === awayName) {
-    const found = awayLineupNames.includes(player.name);
-    if (!found) missing.push(`${player.name} (${player.team}) pois kokoonpanosta`);
-  }
-});
+    if (player.team === awayName && !awayLineupNames.includes(player.name)) {
+      missing.push(`${player.name} (${player.team}) pois kokoonpanosta`);
+    }
+  });
 
   if (!missing.length) return "";
 
@@ -731,20 +602,15 @@ if (player.series !== selectedSeries) return;
     </div>
   `;
 }
-function sumRuns(arr) {
-  return (arr || []).reduce((s, v) => s + (Number(v) || 0), 0);
-}
 
 function sumRuns(arr) {
   return (arr || []).reduce((s, v) => s + (Number(v) || 0), 0);
 }
 
-function sumRuns(arr) {
-  return (arr || []).reduce((s, v) => s + (Number(v) || 0), 0);
-}
 function teamShortName(team) {
   return team?.shorthand || team?.name || "";
 }
+
 function liveScoreboardHtml(match, lr) {
   const p1 = lr.runs?.[0] || { home: [], away: [] };
   const p2 = lr.runs?.[1] || { home: [], away: [] };
@@ -796,32 +662,31 @@ function liveScoreboardHtml(match, lr) {
     </div>
   `;
 }
-function resultHtml(match, prediction) {
-if (!match.result && match.liveResult && !match.liveResult.finished) {
-  const lr = match.liveResult;
-  const live = liveScoreboardHtml(match, lr);
 
-  return `
-  <div class="resultBox live">
-    ${live}
-  </div>
-`;
-}
+function resultHtml(match, prediction) {
+  if (!match.result && match.liveResult && !match.liveResult.finished) {
+    return `
+      <div class="resultBox live">
+        ${liveScoreboardHtml(match, match.liveResult)}
+      </div>
+    `;
+  }
+
   if (!match.result) return "";
 
   const r = match.result;
   const d = r.details;
 
-  const homeWon = d.periods_home > d.periods_away;
-  const awayWon = d.periods_away > d.periods_home;
-
+  const homeWon = Number(d.periods_home) > Number(d.periods_away);
+  const awayWon = Number(d.periods_away) > Number(d.periods_home);
   const elitePickedHome = prediction.homePct > prediction.awayPct;
+
   const eliteHit =
     (elitePickedHome && homeWon) ||
     (!elitePickedHome && awayWon);
 
   return `
-<div class="resultBox ${eliteHit ? "hit" : "miss"}">
+    <div class="resultBox ${eliteHit ? "hit" : "miss"}">
       <div><strong>🏁 Lopputulos</strong></div>
       <div><strong>${match.home.shorthand} – ${match.away.shorthand} ${r.result_string}</strong></div>
 
@@ -845,7 +710,11 @@ if (!match.result && match.liveResult && !match.liveResult.finished) {
     </div>
   `;
 }
+
 function renderPowerTable(stats, targetId) {
+  const target = $(targetId);
+  if (!target) return;
+
   const rows = Object.values(stats)
     .filter(t => t.played > 0)
     .sort((a, b) => {
@@ -859,7 +728,7 @@ function renderPowerTable(stats, targetId) {
 
       return `
         <tr>
-         <td>${t.name}</td>
+          <td>${t.name}</td>
           <td>${t.played}</td>
           <td>${f.toFixed(2)}</td>
           <td>${a.toFixed(2)}</td>
@@ -869,8 +738,9 @@ function renderPowerTable(stats, targetId) {
     })
     .join("");
 
-  $(targetId).innerHTML = rows;
+  target.innerHTML = rows;
 }
+
 function normalizeTeamKey(name) {
   return (name || "")
     .toLowerCase()
@@ -884,21 +754,21 @@ function normalizeTeamKey(name) {
     .replace("lapuan virkiä", "virkiä")
     .trim();
 }
+
 function getTeamPlayerPower(team, playerStats) {
   if (!playerStats) return 0;
 
-  if (playerStats.teams?.[team.id]?.totalRating) {
-    return playerStats.teams[team.id].totalRating;
-  }
+  const idsToTry = [
+    team.id,
+    team.sport_club_id,
+    team.sport_club?.id
+  ]
+    .filter(Boolean)
+    .map(String);
 
-  const wanted = normalizeTeamKey(team.shorthand || team.name);
-
-  for (const id of Object.keys(playerStats.teams || {})) {
-    const top = playerStats.teams[id]?.top5?.[0];
-    const key = normalizeTeamKey(top?.team_name || top?.team?.name || top?.team?.shorthand);
-
-    if (key && key === wanted) {
-      return playerStats.teams[id].totalRating || 0;
+  for (const id of idsToTry) {
+    if (playerStats.teams?.[id]?.totalRating) {
+      return playerStats.teams[id].totalRating;
     }
   }
 
@@ -911,79 +781,35 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
     return;
   }
 
- $(targetId).innerHTML = "<p>Haetaan säätietoja...</p>";
+  $(targetId).innerHTML = "<p>Haetaan säätietoja...</p>";
 
   const cards = [];
 
- for (const match of matches) {
+  for (const match of matches) {
+    const weather = await fetchWeather(match);
+    const lineup = await fetchLineup(match);
+    const lineupAdjustment = getLineupAdjustment(match, lineup);
+    const prediction = predict(match.home, match.away, stats);
 
-  console.log("MATCH:", match);
+    prediction.homeRuns += lineupAdjustment.homeRuns;
+    prediction.awayRuns += lineupAdjustment.awayRuns;
+    prediction.lineupAdjusted = lineupAdjustment.applied;
 
-  const weather = await fetchWeather(match);
-  const lineup = await fetchLineup(match);
-  console.log("PLAYERSTATS TEAMS:", playerStats?.teams);
-  console.log("HOME TEAM:", match.home);
-  console.log("AWAY TEAM:", match.away);
-  const lineupAdjustment = getLineupAdjustment(match, lineup);
-   console.log("PLAYER FIRST =", playerStats?.players?.[0]);
-console.log("PLAYER TEAMS KEYS =", Object.keys(playerStats?.teams || {}));
-console.log("MATCH HOME =", match.home);
-console.log("MATCH AWAY =", match.away);
-  const prediction = predict(match.home, match.away, stats, weather);
+    const weatherAdj = getWeatherAdjustment(weather.start || weather);
 
-   console.log(
-  "PLAYER SAMPLE",
-  playerStats.players.slice(0, 5).map(p => ({
-    id: p.player_id,
-    name: p.name,
-    first: p.first_name,
-    last: p.last_name,
-    team_ids: p.team_ids,
-    rating: p.rating,
-    totalRating: p.totalRating
-  }))
-);
-   
+    prediction.homeRuns += weatherAdj / 2;
+    prediction.awayRuns += weatherAdj / 2;
 
-   console.log("MATCH HOME =", match.home.name, match.home.id);
-console.log("MATCH AWAY =", match.away.name, match.away.id);
-console.log("PLAYERSTATS TEAM 16805 =", playerStats.teams["16805"]);
-console.log("PLAYERSTATS TEAM 16806 =", playerStats.teams["16806"]);
-console.log("PLAYERSTATS TEAM 16807 =", playerStats.teams["16807"]);
-   console.log("HOME SPORT CLUB =", match.home.sport_club.id);
-console.log("AWAY SPORT CLUB =", match.away.sport_club.id);
-for (const p of playerStats.players) {
-    if (p.team_ids?.includes(String(match.home.id))) {
-        console.log("HOME PLAYER", p.name, p.team_ids);
-    }
-}
-console.log("PLAYERSTATS =", playerStats);
-console.log("PLAYERSTATS.TEAMS =", playerStats?.teams);
-console.log("HOME =", match.home);
-console.log("AWAY =", match.away);
-const lineupData = lineup?.data || lineup?.match || lineup;
+    prediction.homeRuns = Math.max(0, prediction.homeRuns);
+    prediction.awayRuns = Math.max(0, prediction.awayRuns);
 
-const homePowerId = lineupData?.home?.id || match.home.id;
-const awayPowerId = lineupData?.away?.id || match.away.id;
+    const homePlayerPower = getTeamPlayerPower(match.home, playerStats);
+    const awayPlayerPower = getTeamPlayerPower(match.away, playerStats);
+    const playerPowerDiff = homePlayerPower - awayPlayerPower;
 
-const homePlayerPower = getTeamPlayerPower(match.home, playerStats);
-const awayPlayerPower = getTeamPlayerPower(match.away, playerStats);
-const playerPowerDiff = homePlayerPower - awayPlayerPower;
-   
-  prediction.homeRuns += lineupAdjustment.homeRuns;
-prediction.awayRuns += lineupAdjustment.awayRuns;
-prediction.lineupAdjusted = lineupAdjustment.applied; 
-  const weatherAdjustment = getWeatherAdjustment(weather.start || weather);
+    const total = prediction.homeRuns + prediction.awayRuns;
+    const shootoutPct = shootoutProbability(prediction);
 
-prediction.homeRuns += weatherAdjustment / 2;
-prediction.awayRuns += weatherAdjustment / 2;
-
-prediction.homeRuns = Math.max(0, prediction.homeRuns);
-prediction.awayRuns = Math.max(0, prediction.awayRuns);
-   
-  const total = prediction.homeRuns + prediction.awayRuns;
-  const shootoutPct = shootoutProbability(prediction);
-   
     const homeFav = prediction.homePct >= prediction.awayPct;
     const confidence = Math.abs(prediction.homePct - 50);
 
@@ -998,12 +824,24 @@ prediction.awayRuns = Math.max(0, prediction.awayRuns);
       tagClass = "blue";
     }
 
-const homeName = match.home.shorthand || match.home.name;
-const awayName = match.away.shorthand || match.away.name;
+    const homeName = match.home.shorthand || match.home.name;
+    const awayName = match.away.shorthand || match.away.name;
 
-const homeLogo = TEAM_LOGOS[homeName] || "images/logos/default.png";
-const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
-    
+    const homeLogo = TEAM_LOGOS[homeName] || "images/logos/default.png";
+    const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
+
+    const playerPowerHtml =
+      homePlayerPower || awayPlayerPower
+        ? `
+          <div class="weather">
+            <b>⭐ Pelaajavoima</b><br>
+            ${match.home.shorthand}: ${homePlayerPower.toFixed(1)}<br>
+            ${match.away.shorthand}: ${awayPlayerPower.toFixed(1)}<br>
+            Ero: ${playerPowerDiff > 0 ? "+" : ""}${playerPowerDiff.toFixed(1)}
+          </div>
+        `
+        : "";
+
     cards.push(`
       <div class="match ${cardClass}">
         <div class="top">
@@ -1014,19 +852,19 @@ const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
         <div class="teams">
           <div class="team">
             <div class="name">
-  <img src="${homeLogo}" class="team-logo" alt="${homeName}">
-  <span>${homeName}</span>
-</div>
+              <img src="${homeLogo}" class="team-logo" alt="${homeName}">
+              <span>${homeName}</span>
+            </div>
             <div class="pct ${homeFav ? "fav" : ""}">${prediction.homePct.toFixed(0)} %</div>
           </div>
 
           <div class="vs">vs</div>
 
           <div class="team">
-<div class="name">
-  <img src="${awayLogo}" class="team-logo" alt="${awayName}">
-  <span>${awayName}</span>
-</div>
+            <div class="name">
+              <img src="${awayLogo}" class="team-logo" alt="${awayName}">
+              <span>${awayName}</span>
+            </div>
             <div class="pct ${!homeFav ? "fav" : ""}">${prediction.awayPct.toFixed(0)} %</div>
           </div>
         </div>
@@ -1035,41 +873,27 @@ const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
           Juoksuarvio: ${prediction.homeRuns.toFixed(1)} – ${prediction.awayRuns.toFixed(1)}
         </div>
 
-<span class="pill ${tagClass}">${tag}</span>
-<span class="pill blue">Total ${total.toFixed(1)}</span>
-${prediction.lineupAdjusted ? `<span class="pill orange">Kokoonpanomuutos huomioitu</span>` : ""}
-${weatherAdjustment !== 0
-  ? `<span class="pill orange">Sääkorjaus ${weatherAdjustment.toFixed(1)}</span>`
-  : ""}
-<span class="pill orange">Kotiutuskisa ${shootoutPct} %</span>
+        <span class="pill ${tagClass}">${tag}</span>
+        <span class="pill blue">Total ${total.toFixed(1)}</span>
+        ${prediction.lineupAdjusted ? `<span class="pill orange">Kokoonpanomuutos huomioitu</span>` : ""}
+        <span class="pill orange">Sääkorjaus ${weatherAdj.toFixed(1)}</span>
+        <span class="pill orange">Kotiutuskisa ${shootoutPct} %</span>
 
-<div class="weather">
-  <b>⭐ Pelaajavoima</b><br>
-  ${match.home.shorthand}: ${homePlayerPower.toFixed(1)}<br>
-  ${match.away.shorthand}: ${awayPlayerPower.toFixed(1)}<br>
-  Ero: ${playerPowerDiff > 0 ? "+" : ""}${playerPowerDiff.toFixed(1)}
-</div>
-
-${resultHtml(match, prediction)}
-${(match.result || match.liveResult?.finished)
-    ? ""
-    : weatherHtml(weather)}
-${keyPlayerAbsenceHtml(match, lineup, selectedSeries)}
-${lineupHtml(lineup)}
-
-       ${prediction.note ? `<div class="reason">${prediction.note}</div>` : ""}
+        ${playerPowerHtml}
+        ${resultHtml(match, prediction)}
+        ${(match.result || match.liveResult?.finished) ? "" : weatherHtml(weather)}
+        ${keyPlayerAbsenceHtml(match, lineup, selectedSeries)}
+        ${lineupHtml(lineup)}
+        ${prediction.note ? `<div class="reason">${prediction.note}</div>` : ""}
       </div>
     `);
   }
 
- $(targetId).innerHTML = cards.join("");
+  $(targetId).innerHTML = cards.join("");
 }
 
 async function load() {
   const selectedDate = $("date").value || today();
-const playerStats = await fetchPlayerStats();
-console.log("PELAAJAT LADATTU:", playerStats.players.length);
-console.log("JOUKKUE TOP5:", playerStats.teams);
 
   $("status").textContent = "Ladataan Miesten ja Naisten Superpesis...";
 
@@ -1081,15 +905,15 @@ console.log("JOUKKUE TOP5:", playerStats.teams);
         `/.netlify/functions/matches?level=${encodeURIComponent(level)}&series=${encodeURIComponent(series)}`
       );
 
+      if (!res.ok) throw new Error(`Otteluhaku epäonnistui: ${res.status}`);
+
       const json = await res.json();
       const matches = Array.isArray(json.data) ? json.data : [];
-      console.log("OTTELUT:", series, matches.length);
       const stats = buildStats(matches);
-      console.log("STATS OK:", series);
       const standings = buildStandings(matches);
       const playerStats = await fetchPlayerStats(series);
-      console.log("STANDINGS OK:", series, standings);
-renderOfficialStandings(standings, standingsTarget);
+
+      renderOfficialStandings(standings, standingsTarget);
 
       const dayMatches = matches.filter(
         m => (m.date || "").slice(0, 10) === selectedDate
@@ -1106,15 +930,14 @@ renderOfficialStandings(standings, standingsTarget);
     }
   }
 
- const menOk = await loadSeries("Miehet", "matches-men", "power-men", "men", "standings-men");
- const womenOk = await loadSeries("Naiset", "matches-women", "power-women", "women", "standings-women");
+  const menOk = await loadSeries("Miehet", "matches-men", "power-men", "men", "standings-men");
+  const womenOk = await loadSeries("Naiset", "matches-women", "power-women", "women", "standings-women");
 
   $("status").textContent =
     menOk || womenOk
       ? `Päivitetty ${new Date().toLocaleTimeString("fi-FI")}`
       : "Datan haku epäonnistui. Tarkista Netlify Functions.";
 }
-
 
 $("date").value = today();
 $("btn").onclick = load;
