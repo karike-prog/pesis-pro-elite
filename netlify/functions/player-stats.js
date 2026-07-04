@@ -1,17 +1,24 @@
-exports.handler = async function () {
+exports.handler = async function (event) {
   try {
     const apiKey = process.env.PESIS_API_KEY;
 
+    const series = event.queryStringParameters?.series || "Miehet";
+
+    const seasonSeries =
+      series === "Naiset"
+        ? "NAISTEN_SARJA_ID_TÄHÄN"
+        : "2945";
+
     const url =
-      `https://api.pesistulokset.fi/api/v1/stats-tool/players` +
-      `?seasonSeries=2945` +
-      `&season=110` +
-      `&phase=1` +
-      `&level=1` +
-      `&series=1` +
-      `&sum=true` +
-      `&statfilter=lyodyt` +
-      `&apikey=${apiKey}`;
+      "https://api.pesistulokset.fi/api/v1/stats-tool/players" +
+      `?seasonSeries=${seasonSeries}` +
+      "&season=110" +
+      "&phase=1" +
+      "&level=1" +
+      "&series=1" +
+      "&sum=true" +
+      "&statFilter=layout" +
+      `&apiKey=${apiKey}`;
 
     const res = await fetch(url);
     const text = await res.text();
