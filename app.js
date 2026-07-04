@@ -478,32 +478,106 @@ function buildTeamPlayerRatings(players) {
 
   return result;
 }
+function buildPlayerRatings(players) {
+  return players.map(p => {
+    const lyodyt = Number(p.scorings || 0);
+    const kotiutukset = Number(p.batadv_succeeded || 0);
+    const karkilyonnit = Number(p.batpe_succeeded_3 || 0);
+    const onnistumisPct = Number(p.batadv_percent || 0);
+    const ottelut = Number(p.matches || 1);
+
+    const eliteRating =
+      lyodyt * 1.4 +
+      kotiutukset * 0.35 +
+      karkilyonnit * 0.25 +
+      onnistumisPct * 20 +
+      Math.min(ottelut, 20) * 0.5;
+
+    return {
+      ...p,
+      eliteRating
+    };
+  });
+}
+function buildPlayerRatings(players) {
+  return players.map(p => {
+    const lyodyt = Number(p.scorings || 0);
+    const kotiutukset = Number(p.batadv_succeeded || 0);
+    const karkilyonnit = Number(p.batpe_succeeded_3 || 0);
+    const onnistumisPct = Number(p.batadv_percent || 0);
+    const ottelut = Number(p.matches || 1);
+
+    const eliteRating =
+      lyodyt * 1.4 +
+      kotiutukset * 0.35 +
+      karkilyonnit * 0.25 +
+      onnistumisPct * 20 +
+      Math.min(ottelut, 20) * 0.5;
+
+    return {
+      ...p,
+      eliteRating
+    };
+  });
+}
+
+function buildTeamPlayerRatings(players) {
+  const teams = {};
+
+  players.forEach(p => {
+    const ids = p.team_ids || [];
+
+    ids.forEach(teamId => {
+      if (!teams[teamId]) teams[teamId] = [];
+      teams[teamId].push(p);
+    });
+  });
+
+  const result = {};
+
+  Object.keys(teams).forEach(teamId => {
+    const top5 = teams[teamId]
+      .sort((a, b) => b.eliteRating - a.eliteRating)
+      .slice(0, 5);
+
+    const totalRating = top5.reduce(
+      (sum, p) => sum + (Number(p.eliteRating) || 0),
+      0
+    );
+
+    result[teamId] = {
+      top5,
+      totalRating
+    };
+  });
+
+  return result;
+}
 async function fetchPlayerStats() {
   try {
     const res = await fetch("/.netlify/functions/player-stats");
 
     if (!res.ok) {
       console.log("PLAYER STATS EI OK:", res.status);
-      return [];
+      return { players: [], teams: {} };
     }
 
     const json = await res.json();
+    const players = Array.isArray(json.data) ? json.data : [];
+
 const players = Array.isArray(json.data) ? json.data : [];
 
-const ratedPlayers = buildTeamPlayerRatings(players);
+const ratedPlayers = buildPlayerRatings(players);
 const teamPlayerRatings = buildTeamPlayerRatings(ratedPlayers);
+    const teamPlayerRatings = buildTeamPlayerRatings(ratedPlayers);
 
-console.log("PLAYER STATS:", ratedPlayers.length);
-console.log("TOP 5:", ratedPlayers.slice(0, 5));
-console.log("TEAM PLAYER RATINGS:", teamPlayerRatings);
-
-return {
-  players: ratedPlayers,
-  teams: teamPlayerRatings
-};
+    return {
+      players: ratedPlayers,
+      teams: teamPlayerRatings
+    };
   } catch (e) {
     console.log("PLAYER STATS VIRHE:", e);
-    return [];
+    return { players: [], teams: {} };
   }
 }
 async function fetchLineup(match) {
