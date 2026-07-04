@@ -1,13 +1,9 @@
 exports.handler = async function (event) {
   try {
     const apiKey = process.env.PESIS_API_KEY;
-
     const series = event.queryStringParameters?.series || "Miehet";
 
-    const seasonSeries =
-      series === "Naiset"
-        ? "NAISTEN_SARJA_ID_TÄHÄN"
-        : "2945";
+    const seasonSeries = series === "Naiset" ? 2946 : 2945;
 
     const url =
       "https://api.pesistulokset.fi/api/v1/stats-tool/players" +
