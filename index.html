@@ -5,41 +5,38 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Pesis Pro Elite</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="standings-fix.css">
 </head>
 
 <body>
 <header class="hero">
-
-    <div class="hero-brand">
-
-   <img src="images/logos/pesis-ball.png"
-     class="hero-ball"
-     alt="Pesis Elite">
+  <div class="hero-brand">
+    <img src="images/logos/pesis-ball.png"
+         class="hero-ball"
+         alt="Pesis Elite">
 
     <img src="images/logos/logo-pesis-elite.png"
-     class="hero-logo desktop-logo"
-     alt="Pesis Elite">
+         class="hero-logo desktop-logo"
+         alt="Pesis Elite">
 
-<img src="images/logos/logo-mobile.png"
-     class="hero-logo mobile-logo"
-     alt="Pesis Elite">
+    <img src="images/logos/logo-mobile.png"
+         class="hero-logo mobile-logo"
+         alt="Pesis Elite">
+  </div>
 
+  <div class="hero-subtitle">
+    Älykäs pesäpalloanalyysi
+  </div>
 
-    </div>
-
-    <div class="hero-subtitle">
-        Älykäs pesäpalloanalyysi
-    </div>
-
-    <b>v1.2</b>
-
+  <b>v1.2</b>
 </header>
 
 <main>
   <section class="panel">
     <h2>Päivän Superpesis-ottelut</h2>
     <p>
-Elite kokoaa Miesten ja Naisten Superpesiksen ottelut yhdelle sivulle. Ennusteissa huomioidaan juoksutase, koti-/vierasvahvuus, kokoonpanot ja sää. 
+      Elite kokoaa Miesten ja Naisten Superpesiksen ottelut yhdelle sivulle.
+      Ennusteissa huomioidaan juoksutase, koti-/vierasvahvuus, kokoonpanot ja sää.
       Otteluiden käynnistyttyä näkymä päivittyy reaaliaikaiseksi tulospalveluksi.
     </p>
 
@@ -51,10 +48,7 @@ Elite kokoaa Miesten ja Naisten Superpesiksen ottelut yhdelle sivulle. Ennusteis
     <p id="status">Ladataan...</p>
   </section>
 
- 
-
   <div class="elite-layout">
-
     <section class="panel elite-main">
       <h2>Ottelut ja ennusteet</h2>
 
@@ -65,129 +59,157 @@ Elite kokoaa Miesten ja Naisten Superpesiksen ottelut yhdelle sivulle. Ennusteis
       <div id="matches-women"></div>
     </section>
 
-   <aside class="desktop-only elite-side">
+    <aside class="desktop-only elite-side">
+      <section class="panel standings-men">
+        <h2>Miesten sarjataulukko</h2>
 
-  <section class="panel standings-men">
-    <h2>Miesten sarjataulukko</h2>
-    <div class="table">
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Joukkue</th>
-            <th>O</th>
-            <th>V</th>
-            <th>H</th>
-            <th>P</th>
-          </tr>
-        </thead>
-        <tbody id="standings-men"></tbody>
-      </table>
-    </div>
-  </section>
+        <div class="standings-tabs">
+          <button onclick="showStandings('all')">Kaikki</button>
+          <button onclick="showStandings('home')">Koti</button>
+          <button onclick="showStandings('away')">Vieras</button>
+        </div>
 
-  <section class="panel standings-men">
-    <h2>Miesten juoksutase</h2>
-    <div class="table">
-      <table>
-        <thead>
-          <tr>
-           <th>Joukkue</th>
-<th>O</th>
-<th>T</th>
-<th>P</th>
-<th>JT</th>
-          </tr>
-        </thead>
-        <tbody id="power-men"></tbody>
-      </table>
-    </div>
-  </section>
+        <div class="table">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Joukkue</th>
+                <th>O</th>
+                <th>V</th>
+                <th>H</th>
+                <th>P</th>
+                <th>Jaksot</th>
+                <th>Juoksut</th>
+              </tr>
+            </thead>
+            <tbody id="standings-men"></tbody>
+          </table>
+        </div>
+      </section>
 
-  <section class="panel standings-women">
-    <h2>Naisten sarjataulukko</h2>
-    <div class="table">
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Joukkue</th>
-            <th>O</th>
-            <th>V</th>
-            <th>H</th>
-            <th>P</th>
-          </tr>
-        </thead>
-        <tbody id="standings-women"></tbody>
-      </table>
-    </div>
-  </section>
+      <section class="panel standings-men">
+        <h2>Miesten juoksutase</h2>
+        <div class="table">
+          <table>
+            <thead>
+              <tr>
+                <th>Joukkue</th>
+                <th>O</th>
+                <th>T</th>
+                <th>P</th>
+                <th>JT</th>
+              </tr>
+            </thead>
+            <tbody id="power-men"></tbody>
+          </table>
+        </div>
+      </section>
 
-  <section class="panel standings-women">
-    <h2>Naisten juoksutase</h2>
-    <div class="table">
-      <table>
-        <thead>
-          <tr>
-           <th>Joukkue</th>
-<th>O</th>
-<th>T</th>
-<th>P</th>
-<th>JT</th>
-          </tr>
-        </thead>
-        <tbody id="power-women"></tbody>
-      </table>
-    </div>
-  </section>
+      <section class="panel standings-women">
+        <h2>Naisten sarjataulukko</h2>
 
-</aside>
+        <div class="standings-tabs">
+          <button onclick="showStandings('all')">Kaikki</button>
+          <button onclick="showStandings('home')">Koti</button>
+          <button onclick="showStandings('away')">Vieras</button>
+        </div>
+
+        <div class="table">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Joukkue</th>
+                <th>O</th>
+                <th>V</th>
+                <th>H</th>
+                <th>P</th>
+                <th>Jaksot</th>
+                <th>Juoksut</th>
+              </tr>
+            </thead>
+            <tbody id="standings-women"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel standings-women">
+        <h2>Naisten juoksutase</h2>
+        <div class="table">
+          <table>
+            <thead>
+              <tr>
+                <th>Joukkue</th>
+                <th>O</th>
+                <th>T</th>
+                <th>P</th>
+                <th>JT</th>
+              </tr>
+            </thead>
+            <tbody id="power-women"></tbody>
+          </table>
+        </div>
+      </section>
+    </aside>
   </div>
 
-  <div class="standings-tabs">
-  <button onclick="showStandings('all')">Kaikki</button>
-  <button onclick="showStandings('home')">Koti</button>
-  <button onclick="showStandings('away')">Vieras</button>
-</div>
+  <section class="panel mobile-standings standings-men-mobile-panel">
+    <h2>Miesten sarjataulukko</h2>
 
-<table class="standings-table">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Joukkue</th>
-      <th>O</th>
-      <th>V</th>
-      <th>H</th>
-      <th>P</th>
-      <th>Jaksot</th>
-      <th>Juoksut</th>
-    </tr>
-  </thead>
-  <tbody id="standings-men"></tbody>
-</table>
+    <div class="standings-tabs">
+      <button onclick="showStandings('all')">Kaikki</button>
+      <button onclick="showStandings('home')">Koti</button>
+      <button onclick="showStandings('away')">Vieras</button>
+    </div>
 
-  <div class="standings-tabs">
-  <button onclick="showStandings('all')">Kaikki</button>
-  <button onclick="showStandings('home')">Koti</button>
-  <button onclick="showStandings('away')">Vieras</button>
-</div>
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Joukkue</th>
+            <th>O</th>
+            <th>V</th>
+            <th>H</th>
+            <th>P</th>
+            <th>Jaksot</th>
+            <th>Juoksut</th>
+          </tr>
+        </thead>
+        <tbody id="standings-men-mobile"></tbody>
+      </table>
+    </div>
+  </section>
 
-<table class="standings-table">
-  <thead>
-    <tr>
-      <th></th>
-      <th>Joukkue</th>
-      <th>O</th>
-      <th>V</th>
-      <th>H</th>
-      <th>P</th>
-      <th>Jaksot</th>
-      <th>Juoksut</th>
-    </tr>
-  </thead>
-  <tbody id="standings-women"></tbody>
-</table>
- 
+  <section class="panel mobile-standings standings-women-mobile-panel">
+    <h2>Naisten sarjataulukko</h2>
+
+    <div class="standings-tabs">
+      <button onclick="showStandings('all')">Kaikki</button>
+      <button onclick="showStandings('home')">Koti</button>
+      <button onclick="showStandings('away')">Vieras</button>
+    </div>
+
+    <div class="table">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Joukkue</th>
+            <th>O</th>
+            <th>V</th>
+            <th>H</th>
+            <th>P</th>
+            <th>Jaksot</th>
+            <th>Juoksut</th>
+          </tr>
+        </thead>
+        <tbody id="standings-women-mobile"></tbody>
+      </table>
+    </div>
+  </section>
+
 </main>
 
 <footer>Testiversio – ei vedonlyöntisuositus.</footer>
@@ -195,4 +217,3 @@ Elite kokoaa Miesten ja Naisten Superpesiksen ottelut yhdelle sivulle. Ennusteis
 <script src="app.js"></script>
 </body>
 </html>
-
