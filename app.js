@@ -877,17 +877,7 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
     const homeLogo = TEAM_LOGOS[homeName] || "images/logos/default.png";
     const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
 
-    const playerPowerHtml =
-      homePlayerPower || awayPlayerPower
-        ? `
-          <div class="weather">
-            <b>⭐ Pelaajavoima</b><br>
-            ${match.home.shorthand}: ${homePlayerPower.toFixed(1)}<br>
-            ${match.away.shorthand}: ${awayPlayerPower.toFixed(1)}<br>
-            Ero: ${playerPowerDiff > 0 ? "+" : ""}${playerPowerDiff.toFixed(1)}
-          </div>
-        `
-        : "";
+    const playerPowerHtml = "";
 
     cards.push(`
       <div class="match ${cardClass}">
