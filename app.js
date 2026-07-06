@@ -182,6 +182,22 @@ function buildStats(matches) {
     t.recent.sort((a, b) => new Date(b.date) - new Date(a.date));
   });
 
+  Object.values(stats).forEach(t => {
+
+  t.homeAttack =
+    t.homePlayed ? t.homeFor / t.homePlayed : t.avgFor;
+
+  t.homeDefense =
+    t.homePlayed ? t.homeAgainst / t.homePlayed : t.avgAgainst;
+
+  t.awayAttack =
+    t.awayPlayed ? t.awayFor / t.awayPlayed : t.avgFor;
+
+  t.awayDefense =
+    t.awayPlayed ? t.awayAgainst / t.awayPlayed : t.avgAgainst;
+
+});
+  
   return stats;
 }
 
@@ -261,10 +277,41 @@ function predict(homeTeam, awayTeam, stats) {
     Object.values(stats).reduce((sum, t) => sum + t.for, 0) /
     Math.max(1, Object.values(stats).reduce((sum, t) => sum + t.played, 0));
 
-  const homeAttack = home.homePlayed ? home.homeFor / home.homePlayed : home.for / home.played;
-  const homeDefense = home.homePlayed ? home.homeAgainst / home.homePlayed : home.against / home.played;
-  const awayAttack = away.awayPlayed ? away.awayFor / away.awayPlayed : away.for / away.played;
-  const awayDefense = away.awayPlayed ? away.awayAgainst / away.awayPlayed : away.against / away.played;
+ const HOME_AWAY_WEIGHT = 0.20;
+const BASE_WEIGHT = 0.80;
+
+const homeAttackBase = home.for / home.played;
+const homeDefenseBase = home.against / home.played;
+const awayAttackBase = away.for / away.played;
+const awayDefenseBase = away.against / away.played;
+
+const homeAttackField = home.homePlayed
+  ? home.homeFor / home.homePlayed
+  : homeAttackBase;
+
+const homeDefenseField = home.homePlayed
+  ? home.homeAgainst / home.homePlayed
+  : homeDefenseBase;
+
+const awayAttackField = away.awayPlayed
+  ? away.awayFor / away.awayPlayed
+  : awayAttackBase;
+
+const awayDefenseField = away.awayPlayed
+  ? away.awayAgainst / away.awayPlayed
+  : awayDefenseBase;
+
+const homeAttack =
+  homeAttackBase * BASE_WEIGHT + homeAttackField * HOME_AWAY_WEIGHT;
+
+const homeDefense =
+  homeDefenseBase * BASE_WEIGHT + homeDefenseField * HOME_AWAY_WEIGHT;
+
+const awayAttack =
+  awayAttackBase * BASE_WEIGHT + awayAttackField * HOME_AWAY_WEIGHT;
+
+const awayDefense =
+  awayDefenseBase * BASE_WEIGHT + awayDefenseField * HOME_AWAY_WEIGHT;
 
   let homeRuns = average(homeAttack, awayDefense, leagueAvg);
   let awayRuns = average(awayAttack, homeDefense, leagueAvg);
