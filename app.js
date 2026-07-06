@@ -808,7 +808,7 @@ function resultHtml(match, prediction) {
   if (!match.result) return "";
 
   const r = match.result;
-  const d = r.details;
+  const d = r.details || r;
 
   const homeWon = Number(d.periods_home) > Number(d.periods_away);
   const awayWon = Number(d.periods_away) > Number(d.periods_home);
