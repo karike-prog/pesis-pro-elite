@@ -1027,6 +1027,7 @@ async function load() {
 
       const json = await res.json();
       const matches = Array.isArray(json.data) ? json.data : [];
+      console.log(series, matches.find(m => m.result)?.result);
       const stats = buildStats(matches);
       const playerStats = await fetchPlayerStats(series);
 
