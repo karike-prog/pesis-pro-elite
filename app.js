@@ -161,6 +161,10 @@ function buildStats(matches) {
       const homeRuns = getRuns(m.result, "home");
       const awayRuns = getRuns(m.result, "away");
 
+      const d = m.result.details || {};
+      const hp = Number(d.periods_home || 0);
+      const ap = Number(d.periods_away || 0);
+
       home.played++;
       home.for += homeRuns;
       home.against += awayRuns;
@@ -176,28 +180,38 @@ function buildStats(matches) {
       away.awayFor += awayRuns;
       away.awayAgainst += homeRuns;
       away.recent.push({ date: m.date, for: awayRuns, against: homeRuns });
+
+      if (hp > ap) {
+        home.homeWins = (home.homeWins || 0) + 1;
+      }
+
+      if (ap > hp) {
+        away.awayWins = (away.awayWins || 0) + 1;
+      }
     });
 
   Object.values(stats).forEach(t => {
     t.recent.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    t.homeAttack =
+      t.homePlayed ? t.homeFor / t.homePlayed : t.for / Math.max(1, t.played);
+
+    t.homeDefense =
+      t.homePlayed ? t.homeAgainst / t.homePlayed : t.against / Math.max(1, t.played);
+
+    t.awayAttack =
+      t.awayPlayed ? t.awayFor / t.awayPlayed : t.for / Math.max(1, t.played);
+
+    t.awayDefense =
+      t.awayPlayed ? t.awayAgainst / t.awayPlayed : t.against / Math.max(1, t.played);
+
+    t.homeWinPct =
+      t.homePlayed ? (t.homeWins || 0) / t.homePlayed : 0.5;
+
+    t.awayWinPct =
+      t.awayPlayed ? (t.awayWins || 0) / t.awayPlayed : 0.5;
   });
 
-  Object.values(stats).forEach(t => {
-
-  t.homeAttack =
-    t.homePlayed ? t.homeFor / t.homePlayed : t.avgFor;
-
-  t.homeDefense =
-    t.homePlayed ? t.homeAgainst / t.homePlayed : t.avgAgainst;
-
-  t.awayAttack =
-    t.awayPlayed ? t.awayFor / t.awayPlayed : t.avgFor;
-
-  t.awayDefense =
-    t.awayPlayed ? t.awayAgainst / t.awayPlayed : t.avgAgainst;
-
-});
-  
   return stats;
 }
 
@@ -315,6 +329,22 @@ const awayDefense =
 
   let homeRuns = average(homeAttack, awayDefense, leagueAvg);
   let awayRuns = average(awayAttack, homeDefense, leagueAvg);
+  // Koti-/vierasvoittoprosentin kevyt vaikutus
+const homeHomeWinPct = home.homePlayed
+  ? (home.homeWins || 0) / home.homePlayed
+  : home.wins / home.played;
+
+const awayAwayWinPct = away.awayPlayed
+  ? (away.awayWins || 0) / away.awayPlayed
+  : away.wins / away.played;
+
+const fieldWinDiff = homeHomeWinPct - awayAwayWinPct;
+
+// Maltillinen vaikutus: max noin +/-0.3 juoksua
+const fieldWinAdj = Math.max(-0.3, Math.min(0.3, fieldWinDiff * 0.6));
+
+homeRuns += fieldWinAdj;
+awayRuns -= fieldWinAdj;
 
   const hRecentFor = recentAvg(home, "for");
   const hRecentAgainst = recentAvg(home, "against");
