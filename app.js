@@ -143,10 +143,15 @@ function showStandings(mode) {
 
 function getRuns(result, side) {
   if (!result) return 0;
-  const p = side === "home" ? "home" : "away";
+
   const d = result.details || result;
-  return Number(d[`runs_${p}_first_period`] || 0) +
-         Number(d[`runs_${p}_second_period`] || 0);
+
+  const first = Number(d[`runs_${side}_first_period`] || 0);
+  const second = Number(d[`runs_${side}_second_period`] || 0);
+  const contest = Number(d[`runs_${side}_scoring_contest`] || 0);
+  const superInning = Number(d[`runs_${side}_super_inning`] || 0);
+
+  return first + second + contest + superInning;
 }
 
 function addTeam(stats, team) {
@@ -261,13 +266,13 @@ function buildStandings(matches, mode = "all") {
 matches
   .filter(m => m.result)
   .forEach(m => {
-    const d = m.result.details || m.result;
+const d = m.result.details || m.result;
 
-      const hp = Number(d.periods_home || 0);
-      const ap = Number(d.periods_away || 0);
+const hp = Number(d.periods_home || 0);
+const ap = Number(d.periods_away || 0);
 
-      const hr = getRuns(m.result, "home");
-      const ar = getRuns(m.result, "away");
+const hr = getRuns(m.result, "home");
+const ar = getRuns(m.result, "away");
 
       if (!Number.isFinite(hr) || !Number.isFinite(ar)) return;
 
