@@ -913,7 +913,9 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
         <span class="pill ${tagClass}">${tag}</span>
         <span class="pill blue">Total ${total.toFixed(1)}</span>
         ${prediction.lineupAdjusted ? `<span class="pill orange">Kokoonpanomuutos huomioitu</span>` : ""}
-        <span class="pill orange">Sääkorjaus ${weatherAdj.toFixed(1)}</span>
+        ${Math.abs(weatherAdj) >= 0.1
+  ? `<span class="pill orange">Sääkorjaus ${weatherAdj.toFixed(1)}</span>`
+  : ""}
         <span class="pill orange">Kotiutuskisa ${shootoutPct} %</span>
 
         ${playerPowerHtml}
