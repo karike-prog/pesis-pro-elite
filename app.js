@@ -101,25 +101,45 @@ function fmtDate(iso) {
 }
 
 function renderOfficialStandings(rows, targetId) {
-  const target = $(targetId);
-  if (!target) return;
-
-  target.innerHTML = rows.map(row => {
+  $(targetId).innerHTML = rows.map((row, i) => {
     const logo = TEAM_LOGOS[row.team] || "images/logos/default.png";
+
     return `
       <tr>
-        <td class="logoCell">
+        <td>${i + 1}.</td>
+        <td class="teamCell">
           <img src="${logo}" class="standings-logo" alt="${row.team}">
+          <strong>${row.team}</strong>
         </td>
-        <td><strong>${row.team}</strong></td>
         <td>${row.o}</td>
         <td>${row.v}</td>
         <td>${row.h}</td>
-        <td>${row.p}</td>
+        <td><strong>${row.p}</strong></td>
+        <td>${row.jaksoFor}-${row.jaksoAgainst}</td>
+        <td>${row.runsFor}-${row.runsAgainst}</td>
       </tr>
     `;
   }).join("");
 }
+
+let currentMenMatches = [];
+let currentWomenMatches = [];
+let currentStandingsMode = "all";
+
+function showStandings(mode) {
+  currentStandingsMode = mode;
+
+  renderOfficialStandings(
+    buildStandings(currentMenMatches, mode),
+    "standings-men"
+  );
+
+  renderOfficialStandings(
+    buildStandings(currentWomenMatches, mode),
+    "standings-women"
+  );
+}
+
 
 function getRuns(result, side) {
   if (!result) return 0;
@@ -215,52 +235,91 @@ function buildStats(matches) {
   return stats;
 }
 
-function buildStandings(matches) {
+function buildStandings(matches, mode = "all") {
   const table = {};
 
   function ensure(team) {
     const name = team.shorthand || team.name;
+
     if (!table[team.id]) {
-      table[team.id] = { team: name, o: 0, v: 0, h: 0, p: 0 };
+      table[team.id] = {
+        team: name,
+        o: 0,
+        v: 0,
+        h: 0,
+        p: 0,
+        jaksoFor: 0,
+        jaksoAgainst: 0,
+        runsFor: 0,
+        runsAgainst: 0
+      };
     }
+
     return table[team.id];
   }
 
   matches
     .filter(m => m.result && m.result.details)
     .forEach(m => {
-      const home = ensure(m.home);
-      const away = ensure(m.away);
       const d = m.result.details;
 
       const hp = Number(d.periods_home || 0);
       const ap = Number(d.periods_away || 0);
 
-      home.o++;
-      away.o++;
+      const hr = getRuns(m.result, "home");
+      const ar = getRuns(m.result, "away");
 
-      if (hp === 2 && ap === 0) {
-        home.v++; away.h++; home.p += 3;
-      } else if (ap === 2 && hp === 0) {
-        away.v++; home.h++; away.p += 3;
-      } else if (hp === 2 && ap === 1) {
-        home.v++; away.h++; home.p += 2; away.p += 1;
-      } else if (ap === 2 && hp === 1) {
-        away.v++; home.h++; away.p += 2; home.p += 1;
-      } else if (hp === 1 && ap === 0) {
-        home.v++; away.h++; home.p += 2;
-      } else if (ap === 1 && hp === 0) {
-        away.v++; home.h++; away.p += 2;
+      if (!Number.isFinite(hr) || !Number.isFinite(ar)) return;
+
+      const includeHome = mode === "all" || mode === "home";
+      const includeAway = mode === "all" || mode === "away";
+
+      if (includeHome) {
+        const home = ensure(m.home);
+
+        home.o++;
+        home.jaksoFor += hp;
+        home.jaksoAgainst += ap;
+        home.runsFor += hr;
+        home.runsAgainst += ar;
+
+        if (hp > ap) {
+          home.v++;
+          home.p += hp === 2 && ap === 0 ? 3 : 2;
+        } else if (ap > hp) {
+          home.h++;
+          home.p += hp === 1 ? 1 : 0;
+        }
+      }
+
+      if (includeAway) {
+        const away = ensure(m.away);
+
+        away.o++;
+        away.jaksoFor += ap;
+        away.jaksoAgainst += hp;
+        away.runsFor += ar;
+        away.runsAgainst += hr;
+
+        if (ap > hp) {
+          away.v++;
+          away.p += ap === 2 && hp === 0 ? 3 : 2;
+        } else if (hp > ap) {
+          away.h++;
+          away.p += ap === 1 ? 1 : 0;
+        }
       }
     });
 
   return Object.values(table).sort((a, b) => {
     if (b.p !== a.p) return b.p - a.p;
     if (b.v !== a.v) return b.v - a.v;
+    if ((b.runsFor - b.runsAgainst) !== (a.runsFor - a.runsAgainst)) {
+      return (b.runsFor - b.runsAgainst) - (a.runsFor - a.runsAgainst);
+    }
     return a.team.localeCompare(b.team);
   });
 }
-
 function recentAvg(team, field) {
   const games = team.recent.slice(0, 5);
   if (!games.length) return null;
@@ -969,9 +1028,12 @@ async function load() {
       const json = await res.json();
       const matches = Array.isArray(json.data) ? json.data : [];
       const stats = buildStats(matches);
-      const standings = buildStandings(matches);
       const playerStats = await fetchPlayerStats(series);
 
+      if (series === "Miehet") currentMenMatches = matches;
+      if (series === "Naiset") currentWomenMatches = matches;
+
+      const standings = buildStandings(matches, currentStandingsMode);
       renderOfficialStandings(standings, standingsTarget);
 
       const dayMatches = matches.filter(
