@@ -101,7 +101,10 @@ function fmtDate(iso) {
 }
 
 function renderOfficialStandings(rows, targetId) {
-  $(targetId).innerHTML = rows.map((row, i) => {
+  const target = $(targetId);
+  if (!target) return;
+
+  target.innerHTML = rows.map((row, i) => {
     const logo = TEAM_LOGOS[row.team] || "images/logos/default.png";
 
     return `
@@ -129,15 +132,14 @@ let currentStandingsMode = "all";
 function showStandings(mode) {
   currentStandingsMode = mode;
 
-  renderOfficialStandings(
-    buildStandings(currentMenMatches, mode),
-    "standings-men"
-  );
+  const men = buildStandings(currentMenMatches, mode);
+  const women = buildStandings(currentWomenMatches, mode);
 
-  renderOfficialStandings(
-    buildStandings(currentWomenMatches, mode),
-    "standings-women"
-  );
+  renderOfficialStandings(men, "standings-men");
+  renderOfficialStandings(men, "standings-men-mobile");
+
+  renderOfficialStandings(women, "standings-women");
+  renderOfficialStandings(women, "standings-women-mobile");
 }
 
 
@@ -1032,7 +1034,6 @@ async function load() {
 
       const json = await res.json();
       const matches = Array.isArray(json.data) ? json.data : [];
-      console.log(series, matches.find(m => m.result)?.result);
       const stats = buildStats(matches);
       const playerStats = await fetchPlayerStats(series);
 
@@ -1041,6 +1042,14 @@ async function load() {
 
       const standings = buildStandings(matches, currentStandingsMode);
       renderOfficialStandings(standings, standingsTarget);
+
+      if (series === "Miehet") {
+        renderOfficialStandings(standings, "standings-men-mobile");
+      }
+
+      if (series === "Naiset") {
+        renderOfficialStandings(standings, "standings-women-mobile");
+      }
 
       const dayMatches = matches.filter(
         m => (m.date || "").slice(0, 10) === selectedDate
