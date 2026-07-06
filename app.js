@@ -258,10 +258,10 @@ function buildStandings(matches, mode = "all") {
     return table[team.id];
   }
 
-  matches
-    .filter(m => m.result && m.result.details)
-    .forEach(m => {
-      const d = m.result.details;
+matches
+  .filter(m => m.result)
+  .forEach(m => {
+    const d = m.result.details || m.result;
 
       const hp = Number(d.periods_home || 0);
       const ap = Number(d.periods_away || 0);
