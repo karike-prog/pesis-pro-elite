@@ -327,19 +327,10 @@ const awayAttack =
 const awayDefense =
   awayDefenseBase * BASE_WEIGHT + awayDefenseField * HOME_AWAY_WEIGHT;
 
-  let homeRuns = average(homeAttack, awayDefense, leagueAvg);
-  let awayRuns = average(awayAttack, homeDefense, leagueAvg);
-  // Koti-/vierasvoittoprosentin kevyt vaikutus
 let homeRuns = average(homeAttack, awayDefense, leagueAvg);
 let awayRuns = average(awayAttack, homeDefense, leagueAvg);
 
 const fieldWinDiff = (home.homeWinPct || 0.5) - (away.awayWinPct || 0.5);
-const fieldWinAdj = Math.max(-0.3, Math.min(0.3, fieldWinDiff * 0.6));
-
-homeRuns += fieldWinAdj;
-awayRuns -= fieldWinAdj;
-
-// Maltillinen vaikutus: max noin +/-0.3 juoksua
 const fieldWinAdj = Math.max(-0.3, Math.min(0.3, fieldWinDiff * 0.6));
 
 homeRuns += fieldWinAdj;
