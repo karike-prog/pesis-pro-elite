@@ -5,7 +5,71 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Pesis Pro Elite</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="standings-fix.css">
+  <style>
+/* Pesis Elite: sarjataulukkojen Kaikki/Koti/Vieras -korjaus */
+
+.standings-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 8px 0 10px;
+}
+
+.standings-tabs button {
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.standings-tabs button:hover {
+  filter: brightness(0.95);
+}
+
+.standings-logo {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.teamCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 110px;
+}
+
+.mobile-standings {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .mobile-standings {
+    display: block;
+    margin-top: 22px;
+  }
+
+  .mobile-standings .table {
+    overflow-x: auto;
+  }
+
+  .mobile-standings table {
+    min-width: 620px;
+  }
+}
+
+@media (min-width: 901px) {
+  .mobile-standings {
+    display: none !important;
+  }
+}
+
+  </style>
 </head>
 
 <body>
@@ -28,7 +92,7 @@
     Älykäs pesäpalloanalyysi
   </div>
 
-  <b>v1.2</b>
+  <b>v1.3</b>
 </header>
 
 <main>
