@@ -330,15 +330,14 @@ const awayDefense =
   let homeRuns = average(homeAttack, awayDefense, leagueAvg);
   let awayRuns = average(awayAttack, homeDefense, leagueAvg);
   // Koti-/vierasvoittoprosentin kevyt vaikutus
-const homeHomeWinPct = home.homePlayed
-  ? (home.homeWins || 0) / home.homePlayed
-  : home.wins / home.played;
+let homeRuns = average(homeAttack, awayDefense, leagueAvg);
+let awayRuns = average(awayAttack, homeDefense, leagueAvg);
 
-const awayAwayWinPct = away.awayPlayed
-  ? (away.awayWins || 0) / away.awayPlayed
-  : away.wins / away.played;
+const fieldWinDiff = (home.homeWinPct || 0.5) - (away.awayWinPct || 0.5);
+const fieldWinAdj = Math.max(-0.3, Math.min(0.3, fieldWinDiff * 0.6));
 
-const fieldWinDiff = homeHomeWinPct - awayAwayWinPct;
+homeRuns += fieldWinAdj;
+awayRuns -= fieldWinAdj;
 
 // Maltillinen vaikutus: max noin +/-0.3 juoksua
 const fieldWinAdj = Math.max(-0.3, Math.min(0.3, fieldWinDiff * 0.6));
