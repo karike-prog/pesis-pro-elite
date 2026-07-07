@@ -659,19 +659,19 @@ function lineupHtml(lineup) {
   `;
 }
 
-const KEY_PITCHERS = {
-  // Miesten Superpesis
+const KEY_PITCHERS_MEN = {
   "AA": ["Seeti Surakka"],
   "Tahko": ["Petteri Alanen"],
   "JoMa": ["Ukko Schroderus"],
-  "KiPa": ["Rasmus Surakka"],
+  "KiPa": ["Joona Lehtinen"],
   "KPL": ["Elias Pitkänen"],
-  "Manse": ["Aapo Komulainen"],
+  "Manse": ["Juha Puhtimäki"],
   "PattU": ["Topi Still"],
-  "SoJy": ["Elmeri Iivonen"],
-  "ViVe": ["Ville Soini"],
+  "SoJy": ["Aapo Komulainen"],
+  "ViVe": ["Ville Soini"]
+};
 
-  // Naisten Superpesis
+const KEY_PITCHERS_WOMEN = {
   "Fera": ["Jutta Jyrkkä"],
   "Kirittäret": ["Ronja Salmela"],
   "Virkiä": ["Anni Heikkilä"],
@@ -679,16 +679,9 @@ const KEY_PITCHERS = {
   "PöU Pesis": ["Lydia Eskola"],
   "Roihuttaret": ["Riina Kallio"],
   "Mailattaret": ["Marianne Sivonen"]
-
-  // Ei korjausta:
-  // KeKi: Jani Lassila / Topi Still
-  // HaPo: Veera Toikka / Lotta Nummikari
-  // Jyske: vaihteleva lukkari
-  // Lippo Naiset: vaihteleva lukkari
-  // Jussittaret: Tea Santahuhta / Johanna Karjanlahti
 };
 
-function keyPitcherAbsenceAdjustment(match, lineup) {
+function keyPitcherAbsenceAdjustment(match, lineup, selectedSeries) {
   const data = lineup?.data || lineup?.match || lineup;
   const homePlayers = data?.home?.players || [];
   const awayPlayers = data?.away?.players || [];
@@ -707,12 +700,16 @@ function keyPitcherAbsenceAdjustment(match, lineup) {
   let awayRuns = 0;
   const notes = [];
 
-  if (KEY_PITCHERS[homeName]?.some(name => !homeNames.includes(name))) {
+  const pitchers = selectedSeries === "Miehet"
+  ? KEY_PITCHERS_MEN
+  : KEY_PITCHERS_WOMEN;
+  
+  if (pitchers[homeName]?.some(name => !homeNames.includes(name))) {
     awayRuns += 0.7;
     notes.push(`${homeName}: ykköslukkari puuttuu`);
   }
 
-  if (KEY_PITCHERS[awayName]?.some(name => !awayNames.includes(name))) {
+  if (pitchers[awayName]?.some(name => !awayNames.includes(name))) {
     homeRuns += 0.7;
     notes.push(`${awayName}: ykköslukkari puuttuu`);
   }
@@ -992,7 +989,7 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
     const weather = await fetchWeather(match);
     const lineup = await fetchLineup(match);
     const lineupAdjustment = getLineupAdjustment(match, lineup);
-    const pitcherAdj = keyPitcherAbsenceAdjustment(match, lineup);
+    const pitcherAdj = keyPitcherAbsenceAdjustment(match, lineup, selectedSeries);
     const prediction = predict(match.home, match.away, stats);
 
     prediction.homeRuns += lineupAdjustment.homeRuns;
