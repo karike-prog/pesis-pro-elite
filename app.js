@@ -678,9 +678,9 @@ const KEY_PITCHERS_WOMEN = {
   "Pesäkarhut": ["Minttu Vettenranta"],
   "PöU Pesis": ["Lydia Eskola"],
   "Roihuttaret": ["Erica Rosendahl"],
-  "Mailattaret": ["Marianne Sivonen"]
-  "Lippo Naiset": ["Venla Ronkainen"]
-  "Jyske": ["Emilia Hannuksela"]
+  "Mailattaret": ["Marianne Sivonen"],
+  "Lippo Naiset": ["Venla Ronkainen"],
+  "Jyske": ["Emilia Hannuksela"],
 };
 
 function keyPitcherAbsenceAdjustment(match, lineup, selectedSeries) {
