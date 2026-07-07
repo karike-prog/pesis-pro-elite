@@ -1081,6 +1081,7 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
         ${resultHtml(match, prediction)}
         ${(match.result || match.liveResult?.finished) ? "" : weatherHtml(weather)}
         ${keyPlayerAbsenceHtml(match, lineup, selectedSeries)}
+        ${pitcherAdj.note ? `<div class="keyAbsence">⚠️ ${pitcherAdj.note}</div>` : ""}
         ${lineupHtml(lineup)}
         ${prediction.note ? `<div class="reason">${prediction.note}</div>` : ""}
       </div>
