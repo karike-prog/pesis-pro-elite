@@ -449,7 +449,7 @@ function shootoutProbability(prediction) {
   return Math.round(Math.max(8, Math.min(42, p)));
 }
 
-function weatherAdjustment(weather) {
+function getWeatherAdjustment(weather) {
   if (!weather) return 0;
 
 const temp = Number(String(weather.gameTemp ?? weather.temperature ?? 0).replace(",", "."));
