@@ -450,6 +450,7 @@ function shootoutProbability(prediction) {
 }
 
 function getWeatherAdjustment(weather) {
+  console.log("getWeatherAdjustment", weather);
   if (!weather) return 0;
 
 const temp = Number(String(weather.gameTemp ?? weather.temperature ?? 0).replace(",", "."));
