@@ -1,13 +1,18 @@
 <!doctype html>
 <html lang="fi">
 <head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-P4S2YGGWCG"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
+  gtag('consent', 'default', {
+    analytics_storage: 'denied'
+  });
+</script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P4S2YGGWCG"></script>
+<script>
+  gtag('js', new Date());
   gtag('config', 'G-P4S2YGGWCG');
 </script>
   <meta charset="utf-8">
@@ -296,7 +301,42 @@
     </a>
   </div>
 </footer>
+<div id="cookie-banner" class="cookie-banner">
+  <div>
+    🍪 Pesis Elite käyttää Google Analyticsia palvelun kehittämiseen.
+  </div>
+  <div class="cookie-buttons">
+    <button id="accept-cookies">Hyväksy</button>
+    <button id="decline-cookies">Vain välttämättömät</button>
+  </div>
+</div>
 
+<script>
+  const cookieChoice = localStorage.getItem("cookieConsent");
+
+  if (cookieChoice === "accepted") {
+    gtag('consent', 'update', {
+      analytics_storage: 'granted'
+    });
+  }
+
+  if (!cookieChoice) {
+    document.getElementById("cookie-banner").style.display = "flex";
+  }
+
+  document.getElementById("accept-cookies").onclick = function () {
+    localStorage.setItem("cookieConsent", "accepted");
+    gtag('consent', 'update', {
+      analytics_storage: 'granted'
+    });
+    document.getElementById("cookie-banner").style.display = "none";
+  };
+
+  document.getElementById("decline-cookies").onclick = function () {
+    localStorage.setItem("cookieConsent", "declined");
+    document.getElementById("cookie-banner").style.display = "none";
+  };
+</script>
 <script src="app.js"></script>
 </body>
 </html>
