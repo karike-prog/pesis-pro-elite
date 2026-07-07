@@ -659,6 +659,72 @@ function lineupHtml(lineup) {
   `;
 }
 
+const KEY_PITCHERS = {
+  // Miesten Superpesis
+  "AA": ["Seeti Surakka"],
+  "Tahko": ["Petteri Alanen"],
+  "JoMa": ["Ukko Schroderus"],
+  "KiPa": ["Joona Lehtinen"],
+  "KPL": ["Elias Pitkänen"],
+  "Manse": ["Juha Puhtimäki"],
+  "PattU": ["Topi Kosonen"],
+  "SoJy": ["Aapo Komulainen"],
+  "ViVe": ["Ville Soini"],
+
+  // Naisten Superpesis
+  "Fera": ["Ilona Hakoniemi"],
+  "JoMa N": ["Veera Toikka"],
+  "Kirittäret": ["Mari Mantsinen"],
+  "Virkiä": ["Anni Heikkilä"],
+  "Pesäkarhut": ["Minttu Vettenranta"],
+  "PöU Pesis": ["Minttu Reunanen"],
+  "Roihuttaret": ["Riina Kallio"],
+  "Mailattaret": ["Jenna Saari"]
+
+  // Ei korjausta:
+  // KeKi: Jani Lassila / Topi Still
+  // HaPo: Veera Toikka / Lotta Nummikari
+  // Jyske: vaihteleva lukkari
+  // Lippo Naiset: vaihteleva lukkari
+  // Jussittaret: Tea Santahuhta / Johanna Karjanlahti
+};
+
+function keyPitcherAbsenceAdjustment(match, lineup) {
+  const data = lineup?.data || lineup?.match || lineup;
+  const homePlayers = data?.home?.players || [];
+  const awayPlayers = data?.away?.players || [];
+
+  if (!homePlayers.length || !awayPlayers.length) {
+    return { homeRuns: 0, awayRuns: 0, note: "" };
+  }
+
+  const homeName = match.home.shorthand || match.home.name;
+  const awayName = match.away.shorthand || match.away.name;
+
+  const homeNames = homePlayers.map(p => p.name);
+  const awayNames = awayPlayers.map(p => p.name);
+
+  let homeRuns = 0;
+  let awayRuns = 0;
+  const notes = [];
+
+  if (KEY_PITCHERS[homeName]?.some(name => !homeNames.includes(name))) {
+    awayRuns += 0.7;
+    notes.push(`${homeName}: ykköslukkari puuttuu`);
+  }
+
+  if (KEY_PITCHERS[awayName]?.some(name => !awayNames.includes(name))) {
+    homeRuns += 0.7;
+    notes.push(`${awayName}: ykköslukkari puuttuu`);
+  }
+
+  return {
+    homeRuns,
+    awayRuns,
+    note: notes.join("<br>")
+  };
+}
+
 const TOP20_LYOJAT = [
   { name: "Juho Toivola", team: "JoMa", series: "Miehet" },
   { name: "Jukka-Pekka Vainionpää", team: "Manse", series: "Miehet" },
@@ -927,10 +993,13 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
     const weather = await fetchWeather(match);
     const lineup = await fetchLineup(match);
     const lineupAdjustment = getLineupAdjustment(match, lineup);
+    const pitcherAdj = keyPitcherAbsenceAdjustment(match, lineup);
     const prediction = predict(match.home, match.away, stats);
 
     prediction.homeRuns += lineupAdjustment.homeRuns;
     prediction.awayRuns += lineupAdjustment.awayRuns;
+    prediction.homeRuns += pitcherAdj.homeRuns;
+    prediction.awayRuns += pitcherAdj.awayRuns;
     prediction.lineupAdjusted = lineupAdjustment.applied;
 
     const weatherAdj = getWeatherAdjustment(weather.start || weather);
