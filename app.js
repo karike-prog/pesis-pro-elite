@@ -933,8 +933,7 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
     prediction.awayRuns += lineupAdjustment.awayRuns;
     prediction.lineupAdjusted = lineupAdjustment.applied;
 
-    function getWeatherAdjustment(weather) {
-
+    const weatherAdj = getWeatherAdjustment(weather.start || weather);
     prediction.homeRuns += weatherAdj / 2;
     prediction.awayRuns += weatherAdj / 2;
 
@@ -1085,4 +1084,4 @@ $("btn").onclick = load;
 $("date").onchange = load;
 
 load();
-}
+
