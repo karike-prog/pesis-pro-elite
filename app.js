@@ -744,7 +744,7 @@ const TOP20_LYOJAT = [
   { name: "Maria Kaakinen", team: "JoMa", series: "Naiset" },
   { name: "Lotta Nummikari", team: "Pesäkarhut", series: "Naiset" },
   { name: "Hanna Toivanen", team: "JoMa", series: "Naiset" },
-  { name: "Anna Ala-Kauhaluoma", team: "Manse", series: "Naiset" }
+  { name: "Anna Ala-Kauhaluoma", team: "Manse", series: "Naiset" },
 ];
 
 function getLineupAdjustment(match, lineup) {
