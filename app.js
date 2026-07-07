@@ -449,27 +449,31 @@ function shootoutProbability(prediction) {
   return Math.round(Math.max(8, Math.min(42, p)));
 }
 
-function getWeatherAdjustment(weather) {
+function weatherAdjustment(weather) {
   if (!weather) return 0;
 
-  const temp = Number(weather.temp ?? weather.temperature ?? 0);
-  const wind = Number(weather.wind ?? weather.windSpeed ?? 0);
-  const rain = Number(weather.rain ?? weather.precipitation ?? 0);
+  const temp = Number(weather.gameTemp ?? weather.temperature ?? 0);
+  const wind = Number(weather.gameWind ?? weather.wind ?? 0);
+  const rain = Number(weather.gameRain ?? weather.rain ?? 0);
 
   let adj = 0;
 
-  if (rain >= 3) adj -= 0.8;
-  else if (rain >= 1) adj -= 0.5;
-  else if (rain >= 0.2) adj -= 0.2;
+  // lämpötila
+  if (temp >= 24) adj += 0.2;
+  else if (temp < 6) adj -= 1.5;
+  else if (temp < 9) adj -= 1.0;
+  else if (temp < 12) adj -= 0.5;
+  else if (temp < 15) adj -= 0.2;
 
-  if (wind >= 12) adj -= 0.4;
-  else if (wind >= 8) adj -= 0.2;
+  // sade
+  if (rain >= 1.0) adj -= 0.5;
+  else if (rain >= 0.3) adj -= 0.2;
 
-  if (temp >= 24 && temp <= 30) adj += 0.2;
-  if (temp <= 10 && temp > -50) adj -= 0.3;
+  // tuuli
+  if (wind >= 8) adj -= 0.4;
+  else if (wind >= 6) adj -= 0.2;
 
-  adj = Math.max(-1.0, Math.min(0.5, adj));
-  return Number(adj.toFixed(1));
+  return Math.round(adj * 10) / 10;
 }
 
 function weatherHtml(weather) {
