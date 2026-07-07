@@ -664,22 +664,21 @@ const KEY_PITCHERS = {
   "AA": ["Seeti Surakka"],
   "Tahko": ["Petteri Alanen"],
   "JoMa": ["Ukko Schroderus"],
-  "KiPa": ["Joona Lehtinen"],
+  "KiPa": ["Rasmus Surakka"],
   "KPL": ["Elias Pitkänen"],
-  "Manse": ["Juha Puhtimäki"],
-  "PattU": ["Topi Kosonen"],
-  "SoJy": ["Aapo Komulainen"],
+  "Manse": ["Aapo Komulainen"],
+  "PattU": ["Topi Still"],
+  "SoJy": ["Elmeri Iivonen"],
   "ViVe": ["Ville Soini"],
 
   // Naisten Superpesis
-  "Fera": ["Ilona Hakoniemi"],
-  "JoMa N": ["Veera Toikka"],
-  "Kirittäret": ["Mari Mantsinen"],
+  "Fera": ["Jutta Jyrkkä"],
+  "Kirittäret": ["Ronja Salmela"],
   "Virkiä": ["Anni Heikkilä"],
   "Pesäkarhut": ["Minttu Vettenranta"],
-  "PöU Pesis": ["Minttu Reunanen"],
+  "PöU Pesis": ["Lydia Eskola"],
   "Roihuttaret": ["Riina Kallio"],
-  "Mailattaret": ["Jenna Saari"]
+  "Mailattaret": ["Marianne Sivonen"]
 
   // Ei korjausta:
   // KeKi: Jani Lassila / Topi Still
