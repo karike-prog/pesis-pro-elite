@@ -460,11 +460,14 @@ const rain = Number(String(weather.gameRain ?? weather.rain ?? 0).replace(",", "
   let adj = 0;
 
   // lämpötila
-  if (temp >= 24) adj += 0.2;
-  else if (temp < 6) adj -= 1.5;
-  else if (temp < 9) adj -= 1.0;
-  else if (temp < 12) adj -= 0.5;
-  else if (temp < 15) adj -= 0.2;
+ // lämpötila
+
+if (temp >= 24) adj += 0.2;
+else if (temp < 6) adj -= 1.5;
+else if (temp < 9) adj -= 1.0;
+else if (temp < 12) adj -= 0.7;
+else if (temp < 15) adj -= 0.4;
+else if (temp < 17) adj -= 0.2;
 
   // sade
   if (rain >= 1.0) adj -= 0.5;
