@@ -452,9 +452,9 @@ function shootoutProbability(prediction) {
 function weatherAdjustment(weather) {
   if (!weather) return 0;
 
-  const temp = Number(weather.gameTemp ?? weather.temperature ?? 0);
-  const wind = Number(weather.gameWind ?? weather.wind ?? 0);
-  const rain = Number(weather.gameRain ?? weather.rain ?? 0);
+const temp = Number(String(weather.gameTemp ?? weather.temperature ?? 0).replace(",", "."));
+const wind = Number(String(weather.gameWind ?? weather.wind ?? 0).replace(",", "."));
+const rain = Number(String(weather.gameRain ?? weather.rain ?? 0).replace(",", "."));
 
   let adj = 0;
 
