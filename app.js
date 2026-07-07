@@ -663,22 +663,24 @@ const KEY_PITCHERS_MEN = {
   "AA": ["Seeti Surakka"],
   "Tahko": ["Petteri Alanen"],
   "JoMa": ["Ukko Schroderus"],
-  "KiPa": ["Joona Lehtinen"],
+  "KiPa": ["Rasmus Surakka"],
   "KPL": ["Elias Pitkänen"],
-  "Manse": ["Juha Puhtimäki"],
+  "Manse": ["Aapo Komulainen"],
   "PattU": ["Topi Still"],
-  "SoJy": ["Aapo Komulainen"],
+  "SoJy": ["Elmeri Iivonen"],
   "ViVe": ["Ville Soini"]
 };
 
 const KEY_PITCHERS_WOMEN = {
-  "Fera": ["Jutta Jyrkkä"],
+  
   "Kirittäret": ["Ronja Salmela"],
   "Virkiä": ["Anni Heikkilä"],
   "Pesäkarhut": ["Minttu Vettenranta"],
   "PöU Pesis": ["Lydia Eskola"],
-  "Roihuttaret": ["Riina Kallio"],
+  "Roihuttaret": ["Erica Rosendahl"],
   "Mailattaret": ["Marianne Sivonen"]
+  "Lippo Naiset": ["Venla Ronkainen"]
+  "Jyske": ["Emilia Hannuksela"]
 };
 
 function keyPitcherAbsenceAdjustment(match, lineup, selectedSeries) {
