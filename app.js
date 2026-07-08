@@ -770,50 +770,52 @@ function getLineupAdjustment(match, lineup) {
   };
 }
 
-function keyPlayerAbsenceHtml(match, lineup, selectedSeries) {
+function lineupWarningsHtml(match, lineup, selectedSeries) {
   const data = lineup?.data || lineup?.match || lineup;
-
   const homePlayers = data?.home?.players || [];
   const awayPlayers = data?.away?.players || [];
 
-  if (!homePlayers.length || !awayPlayers.length) return "";
+  if (!homePlayers.length && !awayPlayers.length) return "";
 
-  const homeName = match.home.shorthand || match.home.name;
-  const awayName = match.away.shorthand || match.away.name;
+  const homeName = match.home.shortName || match.home.name;
+  const awayName = match.away.shortName || match.away.name;
 
   const homeLineupNames = homePlayers.map(p => p.name);
   const awayLineupNames = awayPlayers.map(p => p.name);
 
-  const missing = [];
+  const warnings = [];
 
-  TOP20_LYOJAT.forEach(player => {
+  TOP20_LYÖJÄT.forEach(player => {
     if (player.series !== selectedSeries) return;
 
     if (player.team === homeName && !homeLineupNames.includes(player.name)) {
-      missing.push(`${player.name} (${player.team}) pois kokoonpanosta`);
+      warnings.push(`👤 ${player.name} (${player.team}) poissa kokoonpanosta`);
     }
 
     if (player.team === awayName && !awayLineupNames.includes(player.name)) {
-      missing.push(`${player.name} (${player.team}) pois kokoonpanosta`);
+      warnings.push(`👤 ${player.name} (${player.team}) poissa kokoonpanosta`);
     }
   });
-if (!missing.length) return "";
 
-return `
-<div class="lineupWarnings">
+  const pitchers =
+    selectedSeries === "Miehet" ? KEY_PITCHERS_MEN : KEY_PITCHERS_WOMEN;
 
-  <div class="warningTitle">
-    ⚠️ Kokoonpanohuomiot
-  </div>
+  if (pitchers[homeName]?.some(name => !homeLineupNames.includes(name))) {
+    warnings.push(`🥎 ${homeName}: ykköslukkari puuttuu`);
+  }
 
-  ${missing.map(m => `
-    <div class="warningItem">
-      ${m}
+  if (pitchers[awayName]?.some(name => !awayLineupNames.includes(name))) {
+    warnings.push(`🥎 ${awayName}: ykköslukkari puuttuu`);
+  }
+
+  if (!warnings.length) return "";
+
+  return `
+    <div class="lineupWarnings">
+      <div class="warningTitle">⚠️ Kokoonpanohuomiot</div>
+      ${warnings.map(w => `<div class="warningItem">${w}</div>`).join("")}
     </div>
-  `).join("")}
-
-</div>
-`;
+  `;
 }
 
 function sumRuns(arr) {
@@ -1089,8 +1091,7 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
         ${playerPowerHtml}
         ${resultHtml(match, prediction)}
         ${(match.result || match.liveResult?.finished) ? "" : weatherHtml(weather)}
-        ${keyPlayerAbsenceHtml(match, lineup, selectedSeries)}
-        ${pitcherAdj.note ? `<div class="keyAbsence">⚠️ ${pitcherAdj.note}</div>` : ""}
+        ${lineupWarningsHtml(match, lineup, selectedSeries)}
         ${lineupHtml(lineup)}
         ${prediction.note ? `<div class="reason">${prediction.note}</div>` : ""}
       </div>
