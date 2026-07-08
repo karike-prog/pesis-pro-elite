@@ -777,15 +777,15 @@ function lineupWarningsHtml(match, lineup, selectedSeries) {
 
   if (!homePlayers.length && !awayPlayers.length) return "";
 
-  const homeName = match.home.shortName || match.home.name;
-  const awayName = match.away.shortName || match.away.name;
+match.home.shorthand
+match.away.shorthand
 
   const homeLineupNames = homePlayers.map(p => p.name);
   const awayLineupNames = awayPlayers.map(p => p.name);
 
   const warnings = [];
 
-  TOP20_LYÖJÄT.forEach(player => {
+  TOP20_LYOJAT.forEach(player => {
     if (player.series !== selectedSeries) return;
 
     if (player.team === homeName && !homeLineupNames.includes(player.name)) {
