@@ -775,10 +775,10 @@ function lineupWarningsHtml(match, lineup, selectedSeries) {
   const homePlayers = data?.home?.players || [];
   const awayPlayers = data?.away?.players || [];
 
-  if (!homePlayers.length && !awayPlayers.length) return "";
+  if (!homePlayers.length || !awayPlayers.length) return "";
 
-match.home.shorthand
-match.away.shorthand
+  const homeName = match.home.shorthand || match.home.name;
+  const awayName = match.away.shorthand || match.away.name;
 
   const homeLineupNames = homePlayers.map(p => p.name);
   const awayLineupNames = awayPlayers.map(p => p.name);
@@ -797,8 +797,9 @@ match.away.shorthand
     }
   });
 
-  const pitchers =
-    selectedSeries === "Miehet" ? KEY_PITCHERS_MEN : KEY_PITCHERS_WOMEN;
+  const pitchers = selectedSeries === "Miehet"
+    ? KEY_PITCHERS_MEN
+    : KEY_PITCHERS_WOMEN;
 
   if (pitchers[homeName]?.some(name => !homeLineupNames.includes(name))) {
     warnings.push(`🥎 ${homeName}: ykköslukkari puuttuu`);
