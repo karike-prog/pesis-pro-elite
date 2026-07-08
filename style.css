@@ -662,3 +662,23 @@ footer{
     align-items: flex-start;
   }
 }
+.lineupWarnings{
+    margin-top:12px;
+    border:2px solid #f59e0b;
+    border-radius:14px;
+    background:#fff7ed;
+    overflow:hidden;
+}
+
+.warningTitle{
+    background:#f59e0b;
+    color:#fff;
+    font-weight:700;
+    padding:10px 14px;
+}
+
+.warningItem{
+    padding:10px 14px;
+    border-top:1px solid #fed7aa;
+    font-weight:600;
+}
