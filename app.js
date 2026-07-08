@@ -797,15 +797,23 @@ function keyPlayerAbsenceHtml(match, lineup, selectedSeries) {
       missing.push(`${player.name} (${player.team}) pois kokoonpanosta`);
     }
   });
+if (!missing.length) return "";
 
-  if (!missing.length) return "";
+return `
+<div class="lineupWarnings">
 
-  return `
-    <div class="keyAbsence">
-      <strong>⚠️ Avainpelaaja huomio</strong>
-      ${missing.map(m => `<div>${m}</div>`).join("")}
+  <div class="warningTitle">
+    ⚠️ Kokoonpanohuomiot
+  </div>
+
+  ${missing.map(m => `
+    <div class="warningItem">
+      ${m}
     </div>
-  `;
+  `).join("")}
+
+</div>
+`;
 }
 
 function sumRuns(arr) {
