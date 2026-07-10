@@ -328,8 +328,12 @@ const ar = getRuns(m.result, "away");
   });
 }
 function recentAvg(team, field) {
-  const games = team.recent.slice(0, 5);
+  const games = [...team.recent]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 5);
+
   if (!games.length) return null;
+
   return games.reduce((sum, g) => sum + g[field], 0) / games.length;
 }
 
@@ -408,11 +412,11 @@ awayRuns -= fieldWinAdj;
   const aRecentAgainst = recentAvg(away, "against");
 
   if (hRecentFor !== null && aRecentAgainst !== null) {
-    homeRuns = homeRuns * 0.75 + ((hRecentFor + aRecentAgainst) / 2) * 0.25;
+    homeRuns = homeRuns * 0.60 + ((hRecentFor + aRecentAgainst) / 2) * 0.40;
   }
 
   if (aRecentFor !== null && hRecentAgainst !== null) {
-    awayRuns = awayRuns * 0.75 + ((aRecentFor + hRecentAgainst) / 2) * 0.25;
+    awayRuns = awayRuns * 0.60 + ((aRecentFor + hRecentAgainst) / 2) * 0.40;
   }
 
   homeRuns += 0.25;
