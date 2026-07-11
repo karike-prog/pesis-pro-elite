@@ -1128,9 +1128,7 @@ async function renderMatches(matches, allMatches, selectedSeries, targetId, card
 async function refreshLiveResults() {
   const selectedDate = $("date").value || today();
 
-  let anyGameStillRunning = false;
 
- async function refreshLiveResults() {
   const selectedDate = $("date").value || today();
 
   // Vanhoja tai tulevia päivämääriä ei tarvitse päivittää automaattisesti.
