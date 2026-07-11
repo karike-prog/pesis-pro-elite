@@ -1028,7 +1028,6 @@ async function renderMatches(matches, allMatches, selectedSeries, targetId, card
     const lineupAdjustment = getLineupAdjustment(match, lineup);
     const pitcherAdj = keyPitcherAbsenceAdjustment(match, lineup, selectedSeries);
     const prediction = predict(match.home, match.away, stats);
-    lockedPredictions[match.id] = prediction;
 
     prediction.homeRuns += lineupAdjustment.homeRuns;
     prediction.awayRuns += lineupAdjustment.awayRuns;
@@ -1042,6 +1041,7 @@ async function renderMatches(matches, allMatches, selectedSeries, targetId, card
 
     prediction.homeRuns = Math.max(0, prediction.homeRuns);
     prediction.awayRuns = Math.max(0, prediction.awayRuns);
+    lockedPredictions[match.id] = prediction;
 
     const homePlayerPower = getTeamPlayerPower(match.home, playerStats);
     const awayPlayerPower = getTeamPlayerPower(match.away, playerStats);
@@ -1130,6 +1130,21 @@ async function refreshLiveResults() {
 
   let anyGameStillRunning = false;
 
+ async function refreshLiveResults() {
+  const selectedDate = $("date").value || today();
+
+  // Vanhoja tai tulevia päivämääriä ei tarvitse päivittää automaattisesti.
+  if (selectedDate !== today()) {
+    if (liveRefreshTimer) {
+      clearInterval(liveRefreshTimer);
+      liveRefreshTimer = null;
+    }
+    return;
+  }
+
+  let hasUnfinishedGames = false;
+  let gamesFound = false;
+
   async function refreshSeries(series) {
     const level = "Superpesis";
 
@@ -1148,17 +1163,23 @@ async function refreshLiveResults() {
       m => (m.date || "").slice(0, 10) === selectedDate
     );
 
+    if (dayMatches.length) {
+      gamesFound = true;
+    }
+
     for (const match of dayMatches) {
       const resultBox = document.getElementById(`result-${match.id}`);
       const prediction = lockedPredictions[match.id];
+      const finished = match.liveResult?.finished === true;
 
+      // Päivitetään vain tämän ottelun tuloslaatikko.
       if (resultBox && prediction) {
         resultBox.innerHTML = resultHtml(match, prediction);
       }
 
-      // liveResult on olemassa, mutta ottelua ei ole vielä merkitty päättyneeksi.
-      if (match.liveResult && !match.liveResult.finished) {
-        anyGameStillRunning = true;
+      // Myös vielä alkamatta oleva peli pitää ajastimen käynnissä.
+      if (!finished) {
+        hasUnfinishedGames = true;
       }
     }
   }
@@ -1169,9 +1190,9 @@ async function refreshLiveResults() {
       refreshSeries("Naiset")
     ]);
 
-    // Kun kaikki päivän käynnissä olleet ottelut ovat päättyneet,
-    // minuuttipäivitys lopetetaan.
-    if (!anyGameStillRunning && liveRefreshTimer) {
+    // Pysäytetään vasta, kun päivän kaikki ottelut ovat päättyneet
+    // tai päivälle ei ole yhtään ottelua.
+    if ((!gamesFound || !hasUnfinishedGames) && liveRefreshTimer) {
       clearInterval(liveRefreshTimer);
       liveRefreshTimer = null;
     }
@@ -1238,7 +1259,10 @@ async function load() {
 }
 
 $("date").value = today();
-$("btn").onclick = load;
+$("btn").onclick = async () => {
+  await load();
+  startLiveRefresh();
+};
 
 $("date").onchange = async () => {
   if (liveRefreshTimer) {
@@ -1253,14 +1277,18 @@ $("date").onchange = async () => {
 function startLiveRefresh() {
   if (liveRefreshTimer) {
     clearInterval(liveRefreshTimer);
+    liveRefreshTimer = null;
   }
 
- liveRefreshTimer = setInterval(refreshLiveResults, 60000);
+  if (($("date").value || today()) !== today()) {
+    return;
+  }
+
+  // Tarkistetaan tulokset heti.
+  refreshLiveResults();
+
+  // Sen jälkeen minuutin välein.
+  liveRefreshTimer = setInterval(refreshLiveResults, 60000);
 }
-
-load().then(() => {
-  startLiveRefresh();
-});
-
 
 
