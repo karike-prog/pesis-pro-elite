@@ -682,3 +682,9 @@ footer{
     border-top:1px solid #fed7aa;
     font-weight:600;
 }
+.shootoutLive {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+}
