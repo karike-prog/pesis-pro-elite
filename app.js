@@ -834,8 +834,10 @@ function teamShortName(team) {
 function liveScoreboardHtml(match, lr) {
   const p1 = lr.runs?.[0] || { home: [], away: [] };
   const p2 = lr.runs?.[1] || { home: [], away: [] };
+  const kotiutuskisa = lr.runs?.[2] || null;
 
-  const fill = (arr) => Array.from({ length: 4 }, (_, i) => arr?.[i] ?? "–");
+  const fill = (arr) =>
+    Array.from({ length: 4 }, (_, i) => arr?.[i] ?? "–");
 
   const p1Home = fill(p1.home);
   const p1Away = fill(p1.away);
@@ -846,6 +848,14 @@ function liveScoreboardHtml(match, lr) {
   const awayP1 = sumRuns(p1.away);
   const homeP2 = sumRuns(p2.home);
   const awayP2 = sumRuns(p2.away);
+
+  const kotiHome = kotiutuskisa
+    ? sumRuns(kotiutuskisa.home)
+    : null;
+
+  const kotiAway = kotiutuskisa
+    ? sumRuns(kotiutuskisa.away)
+    : null;
 
   const home = teamShortName(match.home);
   const away = teamShortName(match.away);
@@ -880,6 +890,17 @@ function liveScoreboardHtml(match, lr) {
       ${p2Away.map(v => `<div>${v}</div>`).join("")}
       <div class="total">${awayP2}</div>
     </div>
+
+    ${
+      kotiutuskisa
+        ? `
+          <div class="shootoutLive">
+            <strong>Kotiutuskisa:</strong>
+            ${home} ${kotiHome}–${kotiAway} ${away}
+          </div>
+        `
+        : ""
+    }
   `;
 }
 
