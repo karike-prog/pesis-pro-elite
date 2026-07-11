@@ -1146,7 +1146,7 @@ async function refreshLiveResults() {
 async function refreshLiveResults() {
   const selectedDate = $("date").value || today();
 
-  // Vain tämän päivän tuloksia päivitetään automaattisesti.
+  // Automaattisesti päivitetään vain tämän päivän otteluita.
   if (selectedDate !== today()) {
     if (liveRefreshTimer) {
       clearInterval(liveRefreshTimer);
@@ -1155,8 +1155,8 @@ async function refreshLiveResults() {
     return;
   }
 
-  let hasUnfinishedGames = false;
   let gamesFound = false;
+  let hasUnfinishedGames = false;
 
   async function refreshSeries(series) {
     const level = "Superpesis";
@@ -1173,7 +1173,7 @@ async function refreshLiveResults() {
     const matches = Array.isArray(json.data) ? json.data : [];
 
     const dayMatches = matches.filter(
-      m => (m.date || "").slice(0, 10) === selectedDate
+      match => (match.date || "").slice(0, 10) === selectedDate
     );
 
     if (dayMatches.length > 0) {
@@ -1185,12 +1185,12 @@ async function refreshLiveResults() {
       const prediction = lockedPredictions[match.id];
       const finished = match.liveResult?.finished === true;
 
-      // Päivitetään vain tämän ottelun tuloslaatikko.
+      // Vain tämän ottelun tulosruutu vaihtuu.
       if (resultBox && prediction) {
         resultBox.innerHTML = resultHtml(match, prediction);
       }
 
-      // Myös vielä alkamaton ottelu pitää päivityksen käynnissä.
+      // Alkamaton tai käynnissä oleva ottelu pitää päivityksen toiminnassa.
       if (!finished) {
         hasUnfinishedGames = true;
       }
@@ -1203,8 +1203,7 @@ async function refreshLiveResults() {
       refreshSeries("Naiset")
     ]);
 
-    // Lopetetaan vasta, kun päivän kaikki ottelut ovat päättyneet
-    // tai päivälle ei löydy otteluita.
+    // Päivitys loppuu vasta päivän viimeisen ottelun päätyttyä.
     if ((!gamesFound || !hasUnfinishedGames) && liveRefreshTimer) {
       clearInterval(liveRefreshTimer);
       liveRefreshTimer = null;
@@ -1297,11 +1296,10 @@ function startLiveRefresh() {
     return;
   }
 
-  // Ensin käynnistetään minuuttiajastin.
   liveRefreshTimer = setInterval(refreshLiveResults, 60000);
-
-  // Sitten tulokset tarkistetaan heti.
   refreshLiveResults();
 }
 
-
+load().then(() => {
+  startLiveRefresh();
+});
