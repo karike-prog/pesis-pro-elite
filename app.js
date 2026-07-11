@@ -994,6 +994,8 @@ function getTeamPlayerPower(team, playerStats) {
 
   return 0;
 }
+const lockedPredictions = {};
+let liveRefreshTimer = null;
 
 async function renderMatches(matches, allMatches, selectedSeries, targetId, cardClass, playerStats) {
   if (!matches.length) {
@@ -1013,13 +1015,12 @@ async function renderMatches(matches, allMatches, selectedSeries, targetId, card
     const matchesBeforeThisGame = allMatches.filter(m => {
       const previousMatchTime = new Date(m.date).getTime();
 
-      return (
-        m.id !== match.id &&
-        Number.isFinite(previousMatchTime) &&
-        previousMatchTime < matchStart &&
-        m.result &&
-        m.liveResult?.finished
-      );
+    return (
+  m.id !== match.id &&
+  Number.isFinite(previousMatchTime) &&
+  previousMatchTime < matchStart &&
+  Boolean(m.result)
+);
     });
 
     const stats = buildStats(matchesBeforeThisGame);
@@ -1169,7 +1170,9 @@ async function refreshLiveResults() {
     for (const match of dayMatches) {
       const resultBox = document.getElementById(`result-${match.id}`);
       const prediction = lockedPredictions[match.id];
-      const finished = match.liveResult?.finished === true;
+     const finished =
+  match.liveResult?.finished === true ||
+  Boolean(match.result);
 
       // Vain tämän ottelun tulosruutu vaihtuu.
       if (resultBox && prediction) {
