@@ -995,7 +995,7 @@ function getTeamPlayerPower(team, playerStats) {
   return 0;
 }
 
-async function renderMatches(matches, stats, selectedSeries, targetId, cardClass, playerStats) {
+async function renderMatches(matches, allMatches, selectedSeries, targetId, cardClass, playerStats) {
   if (!matches.length) {
     $(targetId).innerHTML = "<p>Otteluita ei löytynyt valitulle päivälle.</p>";
     return;
@@ -1006,6 +1006,24 @@ async function renderMatches(matches, stats, selectedSeries, targetId, cardClass
   const cards = [];
 
   for (const match of matches) {
+        // Käytetään vain ennen tämän ottelun alkua päättyneitä pelejä.
+    // Näin ennuste ei muutu ottelun jälkeen.
+    const matchStart = new Date(match.date).getTime();
+
+    const matchesBeforeThisGame = allMatches.filter(m => {
+      const gameTime = new Date(m.date).getTime();
+
+      return (
+        m.id !== match.id &&
+        Number.isFinite(gameTime) &&
+        gameTime < matchStart &&
+        m.result &&
+        m.liveResult &&
+        m.liveResult.finished
+      );
+    });
+
+    const stats = buildStats(matchesBeforeThisGame);
     const weather = await fetchWeather(match);
     const lineup = await fetchLineup(match);
     const lineupAdjustment = getLineupAdjustment(match, lineup);
@@ -1145,7 +1163,7 @@ async function load() {
       );
 
       renderPowerTable(stats, powerTarget);
-      await renderMatches(dayMatches, stats, series, matchesTarget, cardClass, playerStats);
+      await renderMatches(dayMatches, matches, series, matchesTarget, cardClass, playerStats);
 
       return true;
     } catch (e) {
