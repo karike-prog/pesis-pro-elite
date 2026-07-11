@@ -1006,20 +1006,19 @@ async function renderMatches(matches, allMatches, selectedSeries, targetId, card
   const cards = [];
 
   for (const match of matches) {
-        // Käytetään vain ennen tämän ottelun alkua päättyneitä pelejä.
-    // Näin ennuste ei muutu ottelun jälkeen.
+    // Ennusteessa käytetään vain ennen tämän ottelun alkua
+    // päättyneitä otteluita. Näin prosentit eivät muutu jälkikäteen.
     const matchStart = new Date(match.date).getTime();
 
     const matchesBeforeThisGame = allMatches.filter(m => {
-      const gameTime = new Date(m.date).getTime();
+      const previousMatchTime = new Date(m.date).getTime();
 
       return (
         m.id !== match.id &&
-        Number.isFinite(gameTime) &&
-        gameTime < matchStart &&
+        Number.isFinite(previousMatchTime) &&
+        previousMatchTime < matchStart &&
         m.result &&
-        m.liveResult &&
-        m.liveResult.finished
+        m.liveResult?.finished
       );
     });
 
@@ -1187,4 +1186,9 @@ $("btn").onclick = load;
 $("date").onchange = load;
 
 load();
+
+// Päivittää live-tulokset automaattisesti kerran minuutissa.
+setInterval(() => {
+  load();
+}, 60000);
 
