@@ -1172,8 +1172,11 @@ async function refreshLiveResults() {
 
       // Päivitetään vain tämän ottelun tuloslaatikko.
       if (resultBox && prediction) {
-        resultBox.innerHTML = resultHtml(match, prediction);
-      }
+     const latestMatch = dayMatches.find(m => m.id === match.id);
+
+if (resultBox && prediction && latestMatch) {
+    resultBox.innerHTML = resultHtml(latestMatch, prediction);
+}
 
       // Myös vielä alkamatta oleva peli pitää ajastimen käynnissä.
       if (!finished) {
