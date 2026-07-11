@@ -1028,6 +1028,7 @@ async function renderMatches(matches, allMatches, selectedSeries, targetId, card
     const lineupAdjustment = getLineupAdjustment(match, lineup);
     const pitcherAdj = keyPitcherAbsenceAdjustment(match, lineup, selectedSeries);
     const prediction = predict(match.home, match.away, stats);
+    lockedPredictions[match.id] = prediction;
 
     prediction.homeRuns += lineupAdjustment.homeRuns;
     prediction.awayRuns += lineupAdjustment.awayRuns;
@@ -1111,7 +1112,9 @@ async function renderMatches(matches, allMatches, selectedSeries, targetId, card
         <span class="pill orange">Kotiutuskisa ${shootoutPct} %</span>
 
         ${playerPowerHtml}
-        ${resultHtml(match, prediction)}
+   <div id="result-${match.id}" class="live-result-box">
+  ${resultHtml(match, prediction)}
+</div>
         ${(match.result || match.liveResult?.finished) ? "" : weatherHtml(weather)}
         ${lineupWarningsHtml(match, lineup, selectedSeries)}
         ${lineupHtml(lineup)}
@@ -1122,7 +1125,60 @@ async function renderMatches(matches, allMatches, selectedSeries, targetId, card
 
   $(targetId).innerHTML = cards.join("");
 }
+async function refreshLiveResults() {
+  const selectedDate = $("date").value || today();
 
+  let anyGameStillRunning = false;
+
+  async function refreshSeries(series) {
+    const level = "Superpesis";
+
+    const res = await fetch(
+      `/.netlify/functions/matches?level=${encodeURIComponent(level)}&series=${encodeURIComponent(series)}`
+    );
+
+    if (!res.ok) {
+      throw new Error(`Tulospäivitys epäonnistui: ${res.status}`);
+    }
+
+    const json = await res.json();
+    const matches = Array.isArray(json.data) ? json.data : [];
+
+    const dayMatches = matches.filter(
+      m => (m.date || "").slice(0, 10) === selectedDate
+    );
+
+    for (const match of dayMatches) {
+      const resultBox = document.getElementById(`result-${match.id}`);
+      const prediction = lockedPredictions[match.id];
+
+      if (resultBox && prediction) {
+        resultBox.innerHTML = resultHtml(match, prediction);
+      }
+
+      // liveResult on olemassa, mutta ottelua ei ole vielä merkitty päättyneeksi.
+      if (match.liveResult && !match.liveResult.finished) {
+        anyGameStillRunning = true;
+      }
+    }
+  }
+
+  try {
+    await Promise.all([
+      refreshSeries("Miehet"),
+      refreshSeries("Naiset")
+    ]);
+
+    // Kun kaikki päivän käynnissä olleet ottelut ovat päättyneet,
+    // minuuttipäivitys lopetetaan.
+    if (!anyGameStillRunning && liveRefreshTimer) {
+      clearInterval(liveRefreshTimer);
+      liveRefreshTimer = null;
+    }
+  } catch (error) {
+    console.error("Live-tulosten päivitys epäonnistui:", error);
+  }
+}
 async function load() {
   const selectedDate = $("date").value || today();
 
@@ -1156,7 +1212,7 @@ async function load() {
       if (series === "Naiset") {
         renderOfficialStandings(standings, "standings-women-mobile");
       }
-
+    
       const dayMatches = matches.filter(
         m => (m.date || "").slice(0, 10) === selectedDate
       );
@@ -1183,12 +1239,28 @@ async function load() {
 
 $("date").value = today();
 $("btn").onclick = load;
-$("date").onchange = load;
 
-load();
+$("date").onchange = async () => {
+  if (liveRefreshTimer) {
+    clearInterval(liveRefreshTimer);
+    liveRefreshTimer = null;
+  }
 
-// Päivittää live-tulokset automaattisesti kerran minuutissa.
-setInterval(() => {
-  load();
-}, 60000);
+  await load();
+  startLiveRefresh();
+};
+
+function startLiveRefresh() {
+  if (liveRefreshTimer) {
+    clearInterval(liveRefreshTimer);
+  }
+
+ liveRefreshTimer = setInterval(refreshLiveResults, 60000);
+}
+
+load().then(() => {
+  startLiveRefresh();
+});
+
+
 
