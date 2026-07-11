@@ -1131,8 +1131,6 @@ async function refreshLiveResults() {
   const selectedDate = $("date").value || today();
 
 
-  const selectedDate = $("date").value || today();
-
   // Vanhoja tai tulevia päivämääriä ei tarvitse päivittää automaattisesti.
   if (selectedDate !== today()) {
     if (liveRefreshTimer) {
