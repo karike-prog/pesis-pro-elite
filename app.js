@@ -1127,21 +1127,7 @@ async function renderMatches(matches, allMatches, selectedSeries, targetId, card
 
   $(targetId).innerHTML = cards.join("");
 }
-async function refreshLiveResults() {
-  const selectedDate = $("date").value || today();
 
-
-  // Vanhoja tai tulevia päivämääriä ei tarvitse päivittää automaattisesti.
-  if (selectedDate !== today()) {
-    if (liveRefreshTimer) {
-      clearInterval(liveRefreshTimer);
-      liveRefreshTimer = null;
-    }
-    return;
-  }
-
-  let hasUnfinishedGames = false;
-  let gamesFound = false;
 
 async function refreshLiveResults() {
   const selectedDate = $("date").value || today();
