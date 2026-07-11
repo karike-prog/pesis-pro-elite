@@ -1041,7 +1041,9 @@ async function renderMatches(matches, allMatches, selectedSeries, targetId, card
 
     prediction.homeRuns = Math.max(0, prediction.homeRuns);
     prediction.awayRuns = Math.max(0, prediction.awayRuns);
-    lockedPredictions[match.id] = prediction;
+    lockedPredictions[match.id] = {
+  ...prediction
+};
 
     const homePlayerPower = getTeamPlayerPower(match.home, playerStats);
     const awayPlayerPower = getTeamPlayerPower(match.away, playerStats);
