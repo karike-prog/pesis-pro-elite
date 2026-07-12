@@ -926,10 +926,21 @@ ${
 }
 
 function resultHtml(match, prediction) {
-  if (!match.result && match.liveResult && !match.liveResult.finished) {
+  // Näytetään livetilanne niin kauan kuin lopullinen result-data puuttuu.
+  // Pesistulokset.fi voi merkitä pelin päättyneeksi hieman ennen
+  // varsinaisen lopputuloksen ilmestymistä.
+  if (!match.result && match.liveResult) {
     return `
       <div class="resultBox live">
         ${liveScoreboardHtml(match, match.liveResult)}
+
+        ${
+          match.liveResult.finished
+            ? `<div class="resultWaiting">
+                 🏁 Ottelu päättynyt – lopputulosta vahvistetaan…
+               </div>`
+            : ""
+        }
       </div>
     `;
   }
@@ -1212,9 +1223,7 @@ async function refreshLiveResults() {
     for (const match of dayMatches) {
       const resultBox = document.getElementById(`result-${match.id}`);
       const prediction = lockedPredictions[match.id];
-     const finished =
-  match.liveResult?.finished === true ||
-  Boolean(match.result);
+  const finished = Boolean(match.result);;
 
       // Vain tämän ottelun tulosruutu vaihtuu.
       if (resultBox && prediction) {
