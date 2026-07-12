@@ -832,6 +832,7 @@ function teamShortName(team) {
 }
 
 function liveScoreboardHtml(match, lr) {
+  console.log("LIVE RESULT", lr);
   const p1 = lr.runs?.[0] || { home: [], away: [] };
   const p2 = lr.runs?.[1] || { home: [], away: [] };
   const kotiutuskisa = lr.runs?.[2] || null;
