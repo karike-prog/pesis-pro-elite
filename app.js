@@ -848,6 +848,22 @@ function liveScoreboardHtml(match, lr) {
   const awayP1 = sumRuns(p1.away);
   const homeP2 = sumRuns(p2.home);
   const awayP2 = sumRuns(p2.away);
+  const firstPeriodFinished =
+  (p1.home?.length || 0) >= 4 &&
+  (p1.away?.length || 0) >= 4;
+
+const secondPeriodFinished =
+  (p2.home?.length || 0) >= 4 &&
+  (p2.away?.length || 0) >= 4;
+
+const periodsAreOneOne =
+  (homeP1 > awayP1 && awayP2 > homeP2) ||
+  (awayP1 > homeP1 && homeP2 > awayP2);
+
+const showShootout =
+  firstPeriodFinished &&
+  secondPeriodFinished &&
+  periodsAreOneOne;
 
   const kotiHome = kotiutuskisa
     ? sumRuns(kotiutuskisa.home)
@@ -891,16 +907,16 @@ function liveScoreboardHtml(match, lr) {
       <div class="total">${awayP2}</div>
     </div>
 
-    ${
-      kotiutuskisa
-        ? `
-          <div class="shootoutLive">
-            <strong>Kotiutuskisa:</strong>
-            ${home} ${kotiHome}–${kotiAway} ${away}
-          </div>
-        `
-        : ""
-    }
+  ${
+  showShootout
+    ? `
+      <div class="shootoutLive">
+        <strong>Kotiutuskisa:</strong>
+        ${home} ${kotiHome ?? 0}–${kotiAway ?? 0} ${away}
+      </div>
+    `
+    : ""
+}
   `;
 }
 
