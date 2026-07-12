@@ -835,7 +835,8 @@ function liveScoreboardHtml(match, lr) {
   console.log("LIVE RESULT", lr);
   const p1 = lr.runs?.[0] || { home: [], away: [] };
   const p2 = lr.runs?.[1] || { home: [], away: [] };
-  const kotiutuskisa = lr.runs?.[2] || null;
+  const supervuoro = lr.runs?.[2] || null;
+const kotiutuskisa = lr.runs?.[3] || null;
 
   const fill = (arr) =>
     Array.from({ length: 4 }, (_, i) => arr?.[i] ?? "–");
@@ -861,10 +862,13 @@ const periodsAreOneOne =
   (homeP1 > awayP1 && awayP2 > homeP2) ||
   (awayP1 > homeP1 && homeP2 > awayP2);
 
-const showShootout =
-  firstPeriodFinished &&
-  secondPeriodFinished &&
-  periodsAreOneOne;
+const shootoutHasStarted =
+  Array.isArray(kotiutuskisa?.home) &&
+  Array.isArray(kotiutuskisa?.away) &&
+  (
+    kotiutuskisa.home.length > 0 ||
+    kotiutuskisa.away.length > 0
+  );
 
   const kotiHome = kotiutuskisa
     ? sumRuns(kotiutuskisa.home)
@@ -908,12 +912,12 @@ const showShootout =
       <div class="total">${awayP2}</div>
     </div>
 
-  ${
-  showShootout
+${
+  shootoutHasStarted
     ? `
       <div class="shootoutLive">
         <strong>Kotiutuskisa:</strong>
-        ${home} ${kotiHome ?? 0}–${kotiAway ?? 0} ${away}
+        ${home} ${kotiHome}–${kotiAway} ${away}
       </div>
     `
     : ""
