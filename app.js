@@ -833,13 +833,21 @@ function teamShortName(team) {
 
 function liveScoreboardHtml(match, lr) {
   console.log("LIVE RESULT", lr);
+
   const p1 = lr.runs?.[0] || { home: [], away: [] };
   const p2 = lr.runs?.[1] || { home: [], away: [] };
-  const supervuoro = lr.runs?.[2] || null;
-const kotiutuskisa = lr.runs?.[3] || null;
+  const kotiutuskisa = lr.runs?.[3] || { home: [], away: [] };
 
-  const fill = (arr) =>
-    Array.from({ length: 4 }, (_, i) => arr?.[i] ?? "–");
+  const fill = arr =>
+    Array.from({ length: 4 }, (_, i) => {
+      const value = arr?.[i];
+
+      if (value === undefined || value === null) {
+        return "–";
+      }
+
+      return value;
+    });
 
   const p1Home = fill(p1.home);
   const p1Away = fill(p1.away);
@@ -850,43 +858,100 @@ const kotiutuskisa = lr.runs?.[3] || null;
   const awayP1 = sumRuns(p1.away);
   const homeP2 = sumRuns(p2.home);
   const awayP2 = sumRuns(p2.away);
-  const firstPeriodFinished =
-  (p1.home?.length || 0) >= 4 &&
-  (p1.away?.length || 0) >= 4;
-
-const secondPeriodFinished =
-  (p2.home?.length || 0) >= 4 &&
-  (p2.away?.length || 0) >= 4;
-
-const periodsAreOneOne =
-  (homeP1 > awayP1 && awayP2 > homeP2) ||
-  (awayP1 > homeP1 && homeP2 > awayP2);
-
-const shootoutHasStarted =
-  Array.isArray(kotiutuskisa?.home) &&
-  Array.isArray(kotiutuskisa?.away) &&
-  (
-    kotiutuskisa.home.length > 0 ||
-    kotiutuskisa.away.length > 0
-  );
-
-  const kotiHome = kotiutuskisa
-    ? sumRuns(kotiutuskisa.home)
-    : null;
-
-  const kotiAway = kotiutuskisa
-    ? sumRuns(kotiutuskisa.away)
-    : null;
 
   const home = teamShortName(match.home);
   const away = teamShortName(match.away);
 
+  /*
+   * Kotiutuskisa voidaan pelata vain, jos joukkueet ovat voittaneet
+   * yhden jakson kumpikin.
+   */
+  const periodsAreOneOne =
+    (homeP1 > awayP1 && awayP2 > homeP2) ||
+    (awayP1 > homeP1 && homeP2 > awayP2);
+
+  const kotiHome = sumRuns(kotiutuskisa.home);
+  const kotiAway = sumRuns(kotiutuskisa.away);
+
+  /*
+   * Pesistulokset.fi voi antaa kotiutuskisalle valmiiksi arvot 0–0,
+   * vaikka kotiutuskisaa ei olisi pelattu.
+   *
+   * Siksi numeroita näytetään vain, jos:
+   * 1. jaksot ovat 1–1 ja
+   * 2. kotiutuskisassa on oikeasti syntynyt vähintään yksi juoksu
+   *    tai live-data kertoo kotiutuskisavaiheen olevan käynnissä.
+   */
+  const eventText = Array.isArray(lr.lastEventText)
+    ? lr.lastEventText
+        .map(item => {
+          if (typeof item === "string") return item;
+          return item?.text || item?.type || "";
+        })
+        .join(" ")
+        .toLowerCase()
+    : String(lr.lastEventText || "").toLowerCase();
+
+  const shootoutPhaseActive =
+    eventText.includes("kotiutus") ||
+    eventText.includes("kotiutuskisa") ||
+    eventText.includes("super inning") ||
+    Number(lr.currentPeriod) >= 4 ||
+    Number(lr.lastPeriod) >= 4 ||
+    Number(lr.maxPlayedPeriod) >= 4;
+
+  const shootoutHasRealData =
+    periodsAreOneOne &&
+    (
+      kotiHome > 0 ||
+      kotiAway > 0 ||
+      shootoutPhaseActive
+    );
+
+  /*
+   * Teksti-TV-tyylinen K-sarake:
+   *
+   * – Jos peli ei voi mennä kotiutuskisaan, näytetään x.
+   * – Jos peli on 1–1 mutta kotiutuskisa ei ole vielä alkanut, näytetään x.
+   * – Kun kotiutuskisa alkaa, näytetään oikeat lukemat.
+   *
+   * Näin väärää Kotiutuskisa 0–0 -riviä ei enää tule.
+   */
+  const kotiHomeDisplay = shootoutHasRealData ? kotiHome : "x";
+  const kotiAwayDisplay = shootoutHasRealData ? kotiAway : "x";
+
   return `
-    <div class="inningsCompact">
-      <div class="periodTitle period1">1. jakso</div>
-      <div class="periodTitle period2">2. jakso</div>
+    <div
+      class="inningsCompact"
+      style="
+        grid-template-columns:
+          minmax(105px, 1.5fr)
+          repeat(11, minmax(27px, 1fr));
+      "
+    >
+      <div
+        class="periodTitle period1"
+        style="grid-column: 2 / span 5;"
+      >
+        1. jakso
+      </div>
+
+      <div
+        class="periodTitle period2"
+        style="grid-column: 7 / span 5;"
+      >
+        2. jakso
+      </div>
+
+      <div
+        class="periodTitle"
+        style="grid-column: 12; text-align:center;"
+      >
+        K
+      </div>
 
       <div class="teamCell"></div>
+
       <div class="headCell">1</div>
       <div class="headCell">2</div>
       <div class="headCell">3</div>
@@ -898,30 +963,29 @@ const shootoutHasStarted =
       <div class="headCell">3</div>
       <div class="headCell">4</div>
       <div class="headCell total">Y</div>
+
+      <div class="headCell total">K</div>
 
       <div class="teamCell">${home}</div>
-      ${p1Home.map(v => `<div>${v}</div>`).join("")}
+
+      ${p1Home.map(value => `<div>${value}</div>`).join("")}
       <div class="total">${homeP1}</div>
-      ${p2Home.map(v => `<div>${v}</div>`).join("")}
+
+      ${p2Home.map(value => `<div>${value}</div>`).join("")}
       <div class="total">${homeP2}</div>
 
-      <div class="teamCell">${away}</div>
-      ${p1Away.map(v => `<div>${v}</div>`).join("")}
-      <div class="total">${awayP1}</div>
-      ${p2Away.map(v => `<div>${v}</div>`).join("")}
-      <div class="total">${awayP2}</div>
-    </div>
+      <div class="total">${kotiHomeDisplay}</div>
 
-${
-  shootoutHasStarted
-    ? `
-      <div class="shootoutLive">
-        <strong>Kotiutuskisa:</strong>
-        ${home} ${kotiHome}–${kotiAway} ${away}
-      </div>
-    `
-    : ""
-}
+      <div class="teamCell">${away}</div>
+
+      ${p1Away.map(value => `<div>${value}</div>`).join("")}
+      <div class="total">${awayP1}</div>
+
+      ${p2Away.map(value => `<div>${value}</div>`).join("")}
+      <div class="total">${awayP2}</div>
+
+      <div class="total">${kotiAwayDisplay}</div>
+    </div>
   `;
 }
 
