@@ -1541,7 +1541,7 @@ async function refreshLiveResults() {
     for (const match of dayMatches) {
       const resultBox = document.getElementById(`result-${match.id}`);
       const prediction = lockedPredictions[match.id];
-  const finished = Boolean(match.result);
+  const finished = Boolean(match.result);;
 
       // Vain tämän ottelun tulosruutu vaihtuu.
       if (resultBox && prediction) {
