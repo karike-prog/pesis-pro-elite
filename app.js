@@ -1374,13 +1374,32 @@ async function renderMatches(matches, allMatches, selectedSeries, targetId, card
 );
     });
 
-    const stats = buildStats(matchesBeforeThisGame);
-    const weather = await fetchWeather(match);
-    const lineup = await fetchLineup(match);
-    const lineupAdjustment = getLineupAdjustment(match, lineup);
-    const pitcherAdj = keyPitcherAbsenceAdjustment(match, lineup, selectedSeries);
-    const standings = buildStandings(matchesBeforeThisGame);
-    const prediction = predict(match.home, match.away, stats);
+ const stats = buildStats(matchesBeforeThisGame);
+const standings = buildStandings(matchesBeforeThisGame);
+
+const weather = await fetchWeather(match);
+const lineup = await fetchLineup(match);
+const lineupAdjustment = getLineupAdjustment(match, lineup);
+const pitcherAdj = keyPitcherAbsenceAdjustment(
+  match,
+  lineup,
+  selectedSeries
+);
+
+const totalGames =
+  selectedSeries === "Miehet" ? 33 : 26;
+
+const leagueType =
+  selectedSeries === "Miehet" ? "men" : "women";
+
+const prediction = predict(
+  match.home,
+  match.away,
+  stats,
+  standings,
+  totalGames,
+  leagueType
+);
 
     prediction.homeRuns += lineupAdjustment.homeRuns;
     prediction.awayRuns += lineupAdjustment.awayRuns;
