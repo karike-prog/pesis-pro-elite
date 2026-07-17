@@ -264,7 +264,7 @@ function buildStandings(matches, mode = "all") {
     }
 
     return table[team.id];
-  }hed
+
 
   matches
     .filter(m => m.result)
