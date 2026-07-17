@@ -264,6 +264,7 @@ function buildStandings(matches, mode = "all") {
     }
 
     return table[team.id];
+    }
 
 
   matches
