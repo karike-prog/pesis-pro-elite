@@ -250,6 +250,7 @@ function buildStandings(matches, mode = "all") {
 
     if (!table[team.id]) {
       table[team.id] = {
+        teamId: team.id,
         team: name,
         o: 0,
         v: 0,
@@ -265,16 +266,16 @@ function buildStandings(matches, mode = "all") {
     return table[team.id];
   }
 
-matches
-  .filter(m => m.result)
-  .forEach(m => {
-const d = m.result.details || m.result;
+  matches
+    .filter(m => m.result)
+    .forEach(m => {
+      const d = m.result.details || m.result;
 
-const hp = Number(d.periods_home || 0);
-const ap = Number(d.periods_away || 0);
+      const hp = Number(d.periods_home || 0);
+      const ap = Number(d.periods_away || 0);
 
-const hr = getRuns(m.result, "home");
-const ar = getRuns(m.result, "away");
+      const hr = getRuns(m.result, "home");
+      const ar = getRuns(m.result, "away");
 
       if (!Number.isFinite(hr) || !Number.isFinite(ar)) return;
 
@@ -318,14 +319,24 @@ const ar = getRuns(m.result, "away");
       }
     });
 
-  return Object.values(table).sort((a, b) => {
+  const sorted = Object.values(table).sort((a, b) => {
     if (b.p !== a.p) return b.p - a.p;
     if (b.v !== a.v) return b.v - a.v;
-    if ((b.runsFor - b.runsAgainst) !== (a.runsFor - a.runsAgainst)) {
-      return (b.runsFor - b.runsAgainst) - (a.runsFor - a.runsAgainst);
+
+    const bRunDiff = b.runsFor - b.runsAgainst;
+    const aRunDiff = a.runsFor - a.runsAgainst;
+
+    if (bRunDiff !== aRunDiff) {
+      return bRunDiff - aRunDiff;
     }
+
     return a.team.localeCompare(b.team);
   });
+
+  return sorted.map((row, index) => ({
+    ...row,
+    position: index + 1
+  }));
 }
 function recentAvg(team, field) {
   const games = [...team.recent]
@@ -343,7 +354,121 @@ function average(a, b, fallback) {
   return values.reduce((sum, v) => sum + v, 0) / values.length;
 }
 
-function predict(homeTeam, awayTeam, stats) {
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function getLinePressure(teamId, standings, totalGames, leagueType = "men") {
+  if (!Array.isArray(standings) || standings.length === 0) return 0;
+
+  const team = standings.find(row => String(row.teamId) === String(teamId));
+  if (!team) return 0;
+
+  const gamesPlayed = Number(team.o || 0);
+  const gamesRemaining = Math.max(0, totalGames - gamesPlayed);
+
+  if (gamesRemaining === 0) return 0;
+
+  /*
+    Miesten Superpesis:
+    8 = viimeinen pudotuspelipaikka
+    10 = viimeinen putoamiskarsinnan välttävä sija
+
+    Naisten Superpesis:
+    6 = suora puolivälieräpaikka
+    10 = viimeinen puolivälieräkarsintapaikka
+  */
+  const safeLines =
+    leagueType === "women"
+      ? [6, 10]
+      : [8, 10];
+
+  let strongestPressure = 0;
+
+  safeLines.forEach(safePosition => {
+    const aboveLine = standings[safePosition - 1];
+    const belowLine = standings[safePosition];
+
+    if (!aboveLine || !belowLine) return;
+
+    const positionalDistance = Math.min(
+      Math.abs(team.position - safePosition),
+      Math.abs(team.position - (safePosition + 1))
+    );
+
+    /*
+      Painotus kohdistuu ensisijaisesti noin kahden sijoituksen
+      päähän viivasta.
+    */
+    if (positionalDistance > 2) return;
+
+    const linePoints =
+      team.position <= safePosition
+        ? Number(belowLine.p || 0)
+        : Number(aboveLine.p || 0);
+
+    const pointGap = Math.abs(Number(team.p || 0) - linePoints);
+
+    /*
+      Joukkue voi saada enintään kolme pistettä ottelusta.
+      Jos ero ei ole enää realistisesti kurottavissa, painetta ei lisätä.
+    */
+    const maxAvailablePoints = gamesRemaining * 3;
+
+    if (
+      team.position > safePosition &&
+      pointGap > maxAvailablePoints
+    ) {
+      return;
+    }
+
+    /*
+      Mitä pienempi piste-ero, sitä suurempi paine.
+
+      0–1 pisteen ero = erittäin suuri
+      2–3 pistettä    = suuri
+      4–6 pistettä    = kohtalainen
+      yli 6 pistettä  = pieni
+    */
+    const pointCloseness = clamp(1 - pointGap / 7, 0, 1);
+
+    /*
+      Viivan välittömässä läheisyydessä olevat joukkueet
+      saavat suurimman painon.
+    */
+    const positionCloseness =
+      positionalDistance === 0
+        ? 1
+        : positionalDistance === 1
+          ? 0.75
+          : 0.45;
+
+    /*
+      Panoksen merkitys kasvaa runkosarjan loppua kohti.
+      Nyt vaikutus on kuitenkin käytössä jo heti.
+    */
+    const seasonProgress = clamp(gamesPlayed / totalGames, 0, 1);
+    const seasonWeight = 0.40 + seasonProgress * 0.60;
+
+    const pressure =
+      pointCloseness *
+      positionCloseness *
+      seasonWeight;
+
+    strongestPressure = Math.max(strongestPressure, pressure);
+  });
+
+  return clamp(strongestPressure, 0, 1);
+}
+
+function predict(
+  homeTeam,
+  awayTeam,
+  stats,
+  standings = [],
+  totalGames = 33,
+  leagueType = "men"
+) {
   const home = stats[homeTeam.id];
   const away = stats[awayTeam.id];
 
@@ -353,83 +478,192 @@ function predict(homeTeam, awayTeam, stats) {
       awayRuns: 0,
       homePct: 50,
       awayPct: 50,
+      homePressure: 0,
+      awayPressure: 0,
       note: "Dataa liian vähän."
     };
   }
 
-  const leagueAvg =
-    Object.values(stats).reduce((sum, t) => sum + t.for, 0) /
-    Math.max(1, Object.values(stats).reduce((sum, t) => sum + t.played, 0));
+  const teams = Object.values(stats);
 
- const HOME_AWAY_WEIGHT = 0.20;
-const BASE_WEIGHT = 0.80;
+  const totalRuns = teams.reduce(
+    (sum, team) => sum + Number(team.for || 0),
+    0
+  );
 
-const homeAttackBase = home.for / home.played;
-const homeDefenseBase = home.against / home.played;
-const awayAttackBase = away.for / away.played;
-const awayDefenseBase = away.against / away.played;
+  const totalPlayed = teams.reduce(
+    (sum, team) => sum + Number(team.played || 0),
+    0
+  );
 
-const homeAttackField = home.homePlayed
-  ? home.homeFor / home.homePlayed
-  : homeAttackBase;
+  const leagueAvg = totalRuns / Math.max(1, totalPlayed);
 
-const homeDefenseField = home.homePlayed
-  ? home.homeAgainst / home.homePlayed
-  : homeDefenseBase;
+  const HOME_AWAY_WEIGHT = 0.20;
+  const BASE_WEIGHT = 0.80;
 
-const awayAttackField = away.awayPlayed
-  ? away.awayFor / away.awayPlayed
-  : awayAttackBase;
+  const homeAttackBase = home.for / home.played;
+  const homeDefenseBase = home.against / home.played;
+  const awayAttackBase = away.for / away.played;
+  const awayDefenseBase = away.against / away.played;
 
-const awayDefenseField = away.awayPlayed
-  ? away.awayAgainst / away.awayPlayed
-  : awayDefenseBase;
+  const homeAttackField = home.homePlayed
+    ? home.homeFor / home.homePlayed
+    : homeAttackBase;
 
-const homeAttack =
-  homeAttackBase * BASE_WEIGHT + homeAttackField * HOME_AWAY_WEIGHT;
+  const homeDefenseField = home.homePlayed
+    ? home.homeAgainst / home.homePlayed
+    : homeDefenseBase;
 
-const homeDefense =
-  homeDefenseBase * BASE_WEIGHT + homeDefenseField * HOME_AWAY_WEIGHT;
+  const awayAttackField = away.awayPlayed
+    ? away.awayFor / away.awayPlayed
+    : awayAttackBase;
 
-const awayAttack =
-  awayAttackBase * BASE_WEIGHT + awayAttackField * HOME_AWAY_WEIGHT;
+  const awayDefenseField = away.awayPlayed
+    ? away.awayAgainst / away.awayPlayed
+    : awayDefenseBase;
 
-const awayDefense =
-  awayDefenseBase * BASE_WEIGHT + awayDefenseField * HOME_AWAY_WEIGHT;
+  const homeAttack =
+    homeAttackBase * BASE_WEIGHT +
+    homeAttackField * HOME_AWAY_WEIGHT;
 
-let homeRuns = average(homeAttack, awayDefense, leagueAvg);
-let awayRuns = average(awayAttack, homeDefense, leagueAvg);
+  const homeDefense =
+    homeDefenseBase * BASE_WEIGHT +
+    homeDefenseField * HOME_AWAY_WEIGHT;
 
-const fieldWinDiff = (home.homeWinPct || 0.5) - (away.awayWinPct || 0.5);
-const fieldWinAdj = Math.max(-0.3, Math.min(0.3, fieldWinDiff * 0.6));
+  const awayAttack =
+    awayAttackBase * BASE_WEIGHT +
+    awayAttackField * HOME_AWAY_WEIGHT;
 
-homeRuns += fieldWinAdj;
-awayRuns -= fieldWinAdj;
+  const awayDefense =
+    awayDefenseBase * BASE_WEIGHT +
+    awayDefenseField * HOME_AWAY_WEIGHT;
 
+  let homeRuns = average(
+    homeAttack,
+    awayDefense,
+    leagueAvg
+  );
+
+  let awayRuns = average(
+    awayAttack,
+    homeDefense,
+    leagueAvg
+  );
+
+  /*
+    Koti- ja vieraspelaamisen vaikutus.
+  */
+  const fieldWinDiff =
+    (home.homeWinPct || 0.5) -
+    (away.awayWinPct || 0.5);
+
+  const fieldWinAdj = clamp(
+    fieldWinDiff * 0.6,
+    -0.3,
+    0.3
+  );
+
+  homeRuns += fieldWinAdj;
+  awayRuns -= fieldWinAdj;
+
+  /*
+    Viiden viimeisen ottelun painotus 40 %.
+  */
   const hRecentFor = recentAvg(home, "for");
   const hRecentAgainst = recentAvg(home, "against");
   const aRecentFor = recentAvg(away, "for");
   const aRecentAgainst = recentAvg(away, "against");
 
   if (hRecentFor !== null && aRecentAgainst !== null) {
-    homeRuns = homeRuns * 0.60 + ((hRecentFor + aRecentAgainst) / 2) * 0.40;
+    const recentHomeEstimate =
+      (hRecentFor + aRecentAgainst) / 2;
+
+    homeRuns =
+      homeRuns * 0.60 +
+      recentHomeEstimate * 0.40;
   }
 
   if (aRecentFor !== null && hRecentAgainst !== null) {
-    awayRuns = awayRuns * 0.60 + ((aRecentFor + hRecentAgainst) / 2) * 0.40;
+    const recentAwayEstimate =
+      (aRecentFor + hRecentAgainst) / 2;
+
+    awayRuns =
+      awayRuns * 0.60 +
+      recentAwayEstimate * 0.40;
   }
 
+  /*
+    Normaali kotietu.
+  */
   homeRuns += 0.25;
 
+  /*
+    UUSI: viivapaine.
+
+    Joukkue saa arvon 0–1:
+    0 = ei erityistä sarjataulukkopainetta
+    1 = erittäin suuri pisteiden tarve viivan tuntumassa
+  */
+  const homePressure = getLinePressure(
+    homeTeam.id,
+    standings,
+    totalGames,
+    leagueType
+  );
+
+  const awayPressure = getLinePressure(
+    awayTeam.id,
+    standings,
+    totalGames,
+    leagueType
+  );
+
+  /*
+    Vain joukkueiden paine-ero vaikuttaa ennusteeseen.
+
+    Näin kahden yhtä motivoituneen viivajoukkueen ottelussa
+    kumpikaan ei saa perusteetonta etua.
+
+    Maksimivaikutus on noin 0,30 juoksua.
+  */
+  const pressureDifference = homePressure - awayPressure;
+  const pressureAdjustment = pressureDifference * 0.30;
+
+  homeRuns += pressureAdjustment;
+  awayRuns -= pressureAdjustment;
+
+  homeRuns = Math.max(0, homeRuns);
+  awayRuns = Math.max(0, awayRuns);
+
   const diff = homeRuns - awayRuns;
-  const homePct = Math.max(25, Math.min(75, 50 + diff * 6));
+
+  const homePct = clamp(
+    50 + diff * 6,
+    25,
+    75
+  );
+
+  let note = "";
+
+  if (homePressure >= 0.65 || awayPressure >= 0.65) {
+    if (Math.abs(homePressure - awayPressure) < 0.15) {
+      note = "Molemmilla joukkueilla suuri viivapaine.";
+    } else if (homePressure > awayPressure) {
+      note = "Kotijoukkueella tavallista suurempi pisteiden tarve.";
+    } else {
+      note = "Vierasjoukkueella tavallista suurempi pisteiden tarve.";
+    }
+  }
 
   return {
     homeRuns,
     awayRuns,
     homePct,
     awayPct: 100 - homePct,
-    note: ""
+    homePressure,
+    awayPressure,
+    pressureAdjustment,
+    note
   };
 }
 
@@ -1145,6 +1379,7 @@ async function renderMatches(matches, allMatches, selectedSeries, targetId, card
     const lineup = await fetchLineup(match);
     const lineupAdjustment = getLineupAdjustment(match, lineup);
     const pitcherAdj = keyPitcherAbsenceAdjustment(match, lineup, selectedSeries);
+    const standings = buildStandings(matchesBeforeThisGame);
     const prediction = predict(match.home, match.away, stats);
 
     prediction.homeRuns += lineupAdjustment.homeRuns;
