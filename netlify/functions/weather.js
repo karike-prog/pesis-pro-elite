@@ -367,21 +367,23 @@ exports.handler = async function handler(event) {
 
     const xml = await response.text();
 
-    if (!response.ok) {
-      console.error("FMI HTTP error", {
-        status: response.status,
-        statusText: response.statusText,
-        url,
-        response:
-          xml.slice(0, 2000)
-      });
+if (!response.ok) {
+  console.error("FMI HTTP error", {
+    status: response.status,
+    statusText: response.statusText,
+    url,
+    response: xml.slice(0, 4000)
+  });
 
-      return jsonResponse(502, {
-        error:
-          `FMI-haku epäonnistui: ` +
-          `${response.status} ${response.statusText}`
-      });
-    }
+  return jsonResponse(502, {
+    error:
+      `FMI-haku epäonnistui: ` +
+      `${response.status} ${response.statusText}`,
+
+    fmiResponse: xml.slice(0, 4000),
+    requestedUrl: url
+  });
+}
 
     if (
       /ExceptionReport/i.test(xml) ||
