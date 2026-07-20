@@ -272,13 +272,6 @@ function calculateWindSpeed(
  * lähinnä oleva arvo.
  */
 function buildFmiUrl(lat, lon) {
-  const base =
-    "https://opendata.fmi.fi/wfs" +
-    "?service=WFS" +
-    "&version=2.0.0" +
-    "&request=getFeature" +
-    "&storedquery_id=fmi::forecast::harmonie::surface::point::timevaluepair";
-
   const parameters = [
     "Temperature",
     "WindUMS",
@@ -287,7 +280,11 @@ function buildFmiUrl(lat, lon) {
   ].join(",");
 
   return (
-    base +
+    "https://opendata.fmi.fi/wfs" +
+    "?service=WFS" +
+    "&version=2.0.0" +
+    "&request=getFeature" +
+    "&storedquery_id=ecmwf::forecast::surface::point::timevaluepair" +
     "&latlon=" + lat + "," + lon +
     "&parameters=" + parameters
   );
