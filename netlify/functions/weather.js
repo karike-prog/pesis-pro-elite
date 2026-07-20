@@ -81,63 +81,77 @@ function decodeXml(value) {
  * Etsii FMI:n XML-vastauksesta parametrin aikasarjan.
  */
 function extractSeries(xml, parameterName) {
-  const result = [];
   const wanted = String(parameterName).toLowerCase();
+  const results = [];
 
+  // Erottele jokainen wfs:member. Sallii myös attribuutit.
   const memberRegex =
-    /<(?:\w+:)?member\b[^>]*>([\s\S]*?)<\/(?:\w+:)?member>/gi;
+    /<(?:[a-zA-Z0-9_-]+:)?member\b[^>]*>([\s\S]*?)<\/(?:[a-zA-Z0-9_-]+:)?member>/gi;
 
   let memberMatch;
 
   while ((memberMatch = memberRegex.exec(xml)) !== null) {
     const member = memberMatch[1];
-    const memberLower = member.toLowerCase();
+    const lowerMember = member.toLowerCase();
 
     /*
-     * observedProperty-linkissä tai jäsenen muussa metadatassa
-     * pitää esiintyä haettu parametrinimi.
+     * Etsitään parametrin nimi erityisesti FMI:n
+     * observedProperty/meta-linkistä.
      */
-    if (!memberLower.includes(wanted)) {
+    const parameterPatterns = [
+      `param=${wanted}`,
+      `parameter=${wanted}`,
+      `name="${wanted}"`,
+      `>${wanted}<`
+    ];
+
+    const isWantedMember = parameterPatterns.some(pattern =>
+      lowerMember.includes(pattern)
+    );
+
+    if (!isWantedMember) {
       continue;
     }
 
-    const tvpRegex =
-      /<(?:\w+:)?MeasurementTVP\b[^>]*>[\s\S]*?<(?:\w+:)?time\b[^>]*>(.*?)<\/(?:\w+:)?time>[\s\S]*?<(?:\w+:)?value\b[^>]*>(.*?)<\/(?:\w+:)?value>[\s\S]*?<\/(?:\w+:)?MeasurementTVP>/gi;
+    /*
+     * Etsitään jokainen aika–arvo-pari.
+     * Ei vaadita MeasurementTVP-elementin tarkkaa rakennetta.
+     */
+    const timeValueRegex =
+      /<(?:[a-zA-Z0-9_-]+:)?time\b[^>]*>\s*([^<]+?)\s*<\/(?:[a-zA-Z0-9_-]+:)?time>[\s\S]*?<(?:[a-zA-Z0-9_-]+:)?value\b[^>]*>\s*([^<]+?)\s*<\/(?:[a-zA-Z0-9_-]+:)?value>/gi;
 
-    let tvpMatch;
+    let valueMatch;
 
-    while ((tvpMatch = tvpRegex.exec(member)) !== null) {
-      const time = decodeXml(tvpMatch[1]).trim();
-      const rawValue = decodeXml(tvpMatch[2]).trim();
+    while ((valueMatch = timeValueRegex.exec(member)) !== null) {
+      const time = valueMatch[1].trim();
+      const rawValue = valueMatch[2].trim();
       const value = Number(rawValue);
 
       if (
         Number.isFinite(value) &&
         Number.isFinite(new Date(time).getTime())
       ) {
-        result.push({
+        results.push({
           time,
           value
         });
       }
     }
 
-    /*
-     * Yksi wfs:member vastaa yhtä parametria.
-     * Kun oikea jäsen löytyi, muiden jäsenten läpikäyntiä
-     * ei tarvitse jatkaa.
-     */
-    if (result.length > 0) {
+    if (results.length > 0) {
       break;
     }
   }
-
-  return result;
+console.log("FMI extracted series", {
+  xmlLength: xml.length,
+  temperature: temperatureSeries.length,
+  windU: windUSeries.length,
+  windV: windVSeries.length,
+  precipitation: precipitationSeries.length,
+  xmlStart: xml.slice(0, 500)
+});
+  return results;
 }
-
-/**
- * Valitsee pyydettyä ajankohtaa lähimmän arvon.
- */
 function pickNearest(series, targetTime) {
   if (!Array.isArray(series) || series.length === 0) {
     return null;
