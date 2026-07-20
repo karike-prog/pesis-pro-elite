@@ -272,39 +272,25 @@ function calculateWindSpeed(
  * lähinnä oleva arvo.
  */
 function buildFmiUrl(lat, lon) {
-  const url = new URL(
-    "https://opendata.fmi.fi/wfs"
+  const base =
+    "https://opendata.fmi.fi/wfs" +
+    "?service=WFS" +
+    "&version=2.0.0" +
+    "&request=getFeature" +
+    "&storedquery_id=fmi::forecast::harmonie::surface::point::timevaluepair";
+
+  const parameters = [
+    "Temperature",
+    "WindUMS",
+    "WindVMS",
+    "Precipitation1h"
+  ].join(",");
+
+  return (
+    base +
+    "&latlon=" + lat + "," + lon +
+    "&parameters=" + parameters
   );
-
-  url.searchParams.set("service", "WFS");
-  url.searchParams.set("version", "2.0.0");
-  url.searchParams.set("request", "getFeature");
-
-  url.searchParams.set(
-    "storedquery_id",
-    "fmi::forecast::harmonie::surface::point::timevaluepair"
-  );
-
-  url.searchParams.set(
-    "latlon",
-    `${lat},${lon}`
-  );
-
-  /*
-   * WindSpeedMS jätetään pois.
-   * Harmonie-aineistosta haetaan U- ja V-komponentit.
-   */
-  url.searchParams.set(
-    "parameters",
-    [
-      "Temperature",
-      "WindUMS",
-      "WindVMS",
-      "Precipitation1h"
-    ].join(",")
-  );
-
-  return url.toString();
 }
 
 function jsonResponse(statusCode, body) {
