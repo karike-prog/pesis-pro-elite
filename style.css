@@ -359,7 +359,11 @@ footer{
 .total {
   color:#14532d;
 }
-
+.inningsCompact .total,
+.mobileInningsGrid .total {
+    font-weight: 900;
+    color: #14532d;
+}
 /* PC: sarjataulukot näkyvät */
 .desktop-only {
   display:block;
@@ -679,7 +683,9 @@ footer{
 
 .warningItem{
     padding:10px 14px;
-    border-top:1px solid #fed7aa;
+    border-top: 2px solid #9fd7ae;
+margin-top: 10px;
+padding-top: 12px;
     font-weight:600;
 }
 .shootoutLive {
@@ -983,4 +989,7 @@ main,
   .mobileShootoutRow strong {
     font-size: 16px;
   }
+}
+.teamCell {
+    font-weight: 800;
 }
