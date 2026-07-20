@@ -142,14 +142,7 @@ function extractSeries(xml, parameterName) {
       break;
     }
   }
-console.log("FMI extracted series", {
-  xmlLength: xml.length,
-  temperature: temperatureSeries.length,
-  windU: windUSeries.length,
-  windV: windVSeries.length,
-  precipitation: precipitationSeries.length,
-  xmlStart: xml.slice(0, 500)
-});
+
   return results;
 }
 function pickNearest(series, targetTime) {
@@ -429,7 +422,14 @@ if (!response.ok) {
         xml,
         "Precipitation1h"
       );
-
+console.log("FMI extracted series", {
+  xmlLength: xml.length,
+  temperature: temperatureSeries.length,
+  windU: windUSeries.length,
+  windV: windVSeries.length,
+  precipitation: precipitationSeries.length,
+  xmlStart: xml.slice(0, 500)
+});
     const temperature =
       pickNearest(
         temperatureSeries,
