@@ -688,3 +688,184 @@ footer{
   font-size: 16px;
   font-weight: 700;
 }
+/* =====================================================
+   MOBIILIKORJAUS – ottelukortti ja live-tulostaulu
+===================================================== */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+main,
+.panel,
+.match,
+.elite-layout,
+.elite-main,
+.resultBox,
+.weather,
+.lineup {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.match {
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.teams,
+.team,
+.name,
+.runs {
+  min-width: 0;
+}
+
+.runs {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 850px) {
+
+  main {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .panel {
+    padding: 10px;
+  }
+
+  .match {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 8px;
+    margin-left: 0;
+    margin-right: 0;
+    overflow: hidden;
+  }
+
+  /* Joukkueet pysyvät puhelimessakin rinnakkain */
+  .teams {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  .vs {
+    display: block;
+    font-size: 13px;
+  }
+
+  .team-logo {
+    width: 46px;
+    height: 46px;
+  }
+
+  .name {
+    font-size: 18px;
+  }
+
+  .pct {
+    font-size: 27px;
+  }
+
+  .runs {
+    font-size: 23px;
+    line-height: 1.15;
+    margin: 14px 0 10px;
+    white-space: normal;
+  }
+
+  /* Live-tulostaulu mahtuu näytölle */
+  .resultBox {
+    padding: 8px 4px;
+    overflow: hidden;
+  }
+
+  .inningsCompact {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    grid-template-columns:
+      minmax(54px, 1.4fr)
+      repeat(10, minmax(18px, 1fr));
+    gap: 0;
+    padding: 6px 0;
+    font-size: 11px;
+  }
+
+  .inningsCompact .teamCell {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 11px;
+    padding-right: 2px;
+  }
+
+  .inningsCompact .headCell,
+  .inningsCompact .total {
+    min-width: 0;
+    text-align: center;
+  }
+
+  .periodTitle {
+    font-size: 12px;
+  }
+
+  .weather,
+  .lineup {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 420px) {
+
+  .match {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+
+  .teams {
+    gap: 3px;
+  }
+
+  .team-logo {
+    width: 42px;
+    height: 42px;
+  }
+
+  .name {
+    font-size: 17px;
+  }
+
+  .pct {
+    font-size: 25px;
+  }
+
+  .runs {
+    font-size: 21px;
+  }
+
+  .pill {
+    padding: 6px 9px;
+    font-size: 11px;
+    margin: 2px;
+  }
+
+  .inningsCompact {
+    grid-template-columns:
+      minmax(48px, 1.35fr)
+      repeat(10, minmax(16px, 1fr));
+    font-size: 10px;
+  }
+
+  .inningsCompact .teamCell {
+    font-size: 10px;
+  }
+}
