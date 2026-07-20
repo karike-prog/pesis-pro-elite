@@ -1155,33 +1155,18 @@ function liveScoreboardHtml(match, lr) {
   const kotiHomeDisplay = shootoutHasRealData ? kotiHome : "x";
   const kotiAwayDisplay = shootoutHasRealData ? kotiAway : "x";
 
-  return `
-    <div
-      class="inningsCompact"
-      style="
-        grid-template-columns:
-          minmax(105px, 1.5fr)
-          repeat(11, minmax(27px, 1fr));
-      "
-    >
-      <div
-        class="periodTitle period1"
-        style="grid-column: 2 / span 5;"
-      >
+return `
+  <div class="inningsDesktop">
+    <div class="inningsCompact">
+      <div class="periodTitle period1">
         1. jakso
       </div>
 
-      <div
-        class="periodTitle period2"
-        style="grid-column: 7 / span 5;"
-      >
+      <div class="periodTitle period2">
         2. jakso
       </div>
 
-      <div
-        class="periodTitle"
-        style="grid-column: 12; text-align:center;"
-      >
+      <div class="periodTitle shootoutTitle">
         K
       </div>
 
@@ -1221,7 +1206,72 @@ function liveScoreboardHtml(match, lr) {
 
       <div class="total">${kotiAwayDisplay}</div>
     </div>
-  `;
+  </div>
+
+  <div class="inningsMobile">
+    <div class="mobilePeriod">
+      <div class="mobilePeriodTitle">1. jakso</div>
+
+      <div class="mobileInningsGrid">
+        <div class="teamCell"></div>
+        <div class="headCell">1</div>
+        <div class="headCell">2</div>
+        <div class="headCell">3</div>
+        <div class="headCell">4</div>
+        <div class="headCell total">Y</div>
+
+        <div class="teamCell">${home}</div>
+        ${p1Home.map(value => `<div>${value}</div>`).join("")}
+        <div class="total">${homeP1}</div>
+
+        <div class="teamCell">${away}</div>
+        ${p1Away.map(value => `<div>${value}</div>`).join("")}
+        <div class="total">${awayP1}</div>
+      </div>
+    </div>
+
+    <div class="mobilePeriod">
+      <div class="mobilePeriodTitle">2. jakso</div>
+
+      <div class="mobileInningsGrid">
+        <div class="teamCell"></div>
+        <div class="headCell">1</div>
+        <div class="headCell">2</div>
+        <div class="headCell">3</div>
+        <div class="headCell">4</div>
+        <div class="headCell total">Y</div>
+
+        <div class="teamCell">${home}</div>
+        ${p2Home.map(value => `<div>${value}</div>`).join("")}
+        <div class="total">${homeP2}</div>
+
+        <div class="teamCell">${away}</div>
+        ${p2Away.map(value => `<div>${value}</div>`).join("")}
+        <div class="total">${awayP2}</div>
+      </div>
+    </div>
+
+    ${
+      shootoutHasRealData
+        ? `
+          <div class="mobileShootout">
+            <div class="mobilePeriodTitle">Kotiutuskisa</div>
+
+            <div class="mobileShootoutRow">
+              <span>${home}</span>
+              <strong>${kotiHome}</strong>
+            </div>
+
+            <div class="mobileShootoutRow">
+              <span>${away}</span>
+              <strong>${kotiAway}</strong>
+            </div>
+          </div>
+        `
+        : ""
+    }
+  </div>
+`;
 }
 
 function resultHtml(match, prediction) {
