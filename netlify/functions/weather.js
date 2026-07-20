@@ -1,11 +1,17 @@
 /**
  * netlify/functions/weather.js
  *
- * Hakee FMI Open Datasta:
- * - lämpötilan
- * - tuulen nopeuden
- * - tunnin sademäärän
+ * Hakee FMI Open Datasta ottelupaikan ennusteen:
+ * - lämpötila
+ * - tuulen nopeus
+ * - tunnin sademäärä
+ *
+ * Tuulen nopeus lasketaan WindUMS- ja WindVMS-komponenteista.
  */
+
+/* -------------------------------------------------------
+   Ajan käsittely
+------------------------------------------------------- */
 
 function finlandTimeToUtcIso(time) {
   if (!time) {
@@ -14,7 +20,7 @@ function finlandTimeToUtcIso(time) {
 
   const value = String(time).trim();
 
-  // Aika sisältää jo aikavyöhykkeen.
+  // Jos aika sisältää jo Z:n tai aikavyöhykkeen, käytä sellaisenaan.
   if (
     value.endsWith("Z") ||
     /[+-]\d{2}:\d{2}$/.test(value)
@@ -28,6 +34,12 @@ function finlandTimeToUtcIso(time) {
     return date.toISOString();
   }
 
+  /*
+   * Esimerkiksi:
+   * 2026-07-20T18:00:00
+   *
+   * Pesäpallokausi on Suomen kesäaikaa UTC+3.
+   */
   const match = value.match(
     /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/
   );
@@ -45,7 +57,6 @@ function finlandTimeToUtcIso(time) {
   const minute = Number(match[5]);
   const second = Number(match[6] || 0);
 
-  // Pesäpallokausi: Suomen kesäaika UTC+3.
   const utcMilliseconds = Date.UTC(
     year,
     month,
@@ -58,6 +69,10 @@ function finlandTimeToUtcIso(time) {
   return new Date(utcMilliseconds).toISOString();
 }
 
+/* -------------------------------------------------------
+   XML-apufunktiot
+------------------------------------------------------- */
+
 function decodeXml(value) {
   return String(value)
     .replaceAll("&lt;", "<")
@@ -68,64 +83,225 @@ function decodeXml(value) {
 }
 
 /**
- * Etsii FMI:n XML-vastauksesta yhden parametrin aikasarjan.
+ * Pilkkoo FMI:n vastauksen wfs:member-osioihin.
  */
-function extractSeries(xml, parameterName) {
+function splitMembers(xml) {
+  const members = [];
+
+  const regex =
+    /<wfs:member\b[^>]*>([\s\S]*?)<\/wfs:member>/gi;
+
+  let match;
+
+  while ((match = regex.exec(xml)) !== null) {
+    members.push(match[1]);
+  }
+
+  /*
+   * Varavaihtoehto, jos FMI joskus vaihtaa nimiavaruuden
+   * etuliitettä mutta säilyttää member-elementin.
+   */
+  if (members.length === 0) {
+    const fallbackRegex =
+      /<(?:[a-zA-Z0-9_-]+:)?member\b[^>]*>([\s\S]*?)<\/(?:[a-zA-Z0-9_-]+:)?member>/gi;
+
+    while ((match = fallbackRegex.exec(xml)) !== null) {
+      members.push(match[1]);
+    }
+  }
+
+  return members;
+}
+
+/**
+ * Tarkistaa, kuuluuko jäsen pyydetylle parametrille.
+ */
+function memberContainsParameter(member, parameterName) {
+  const lower = member.toLowerCase();
   const wanted = String(parameterName).toLowerCase();
+
+  if (lower.includes(wanted)) {
+    return true;
+  }
+
+  /*
+   * Mahdollisia FMI:n tapoja esittää parametrinimi:
+   * Temperature
+   * temperature
+   * .../Temperature
+   * ...#Temperature
+   */
+  const normalizedMember = lower.replace(
+    /[^a-z0-9]/g,
+    ""
+  );
+
+  const normalizedWanted = wanted.replace(
+    /[^a-z0-9]/g,
+    ""
+  );
+
+  return normalizedMember.includes(
+    normalizedWanted
+  );
+}
+
+/**
+ * Poimii yhden jäsenen MeasurementTVP-aika-arvoparit.
+ */
+function extractTimeValuePairs(member) {
   const results = [];
 
-  const memberRegex =
-    /<(?:[a-zA-Z0-9_-]+:)?member\b[^>]*>([\s\S]*?)<\/(?:[a-zA-Z0-9_-]+:)?member>/gi;
+  /*
+   * Tavallinen FMI-rakenne:
+   *
+   * <wml2:MeasurementTVP>
+   *   <wml2:time>...</wml2:time>
+   *   <wml2:value>...</wml2:value>
+   * </wml2:MeasurementTVP>
+   */
+  const tvpRegex =
+    /<(?:[a-zA-Z0-9_-]+:)?MeasurementTVP\b[^>]*>([\s\S]*?)<\/(?:[a-zA-Z0-9_-]+:)?MeasurementTVP>/gi;
 
-  let memberMatch;
+  let tvpMatch;
 
-  while ((memberMatch = memberRegex.exec(xml)) !== null) {
-    const member = memberMatch[1];
+  while ((tvpMatch = tvpRegex.exec(member)) !== null) {
+    const block = tvpMatch[1];
 
-    /*
-     * FMI:n parametrin nimi voi esiintyä esimerkiksi
-     * observedProperty-linkissä. Pelkkä includes on tässä
-     * varmempi kuin liian tarkat tekstimallit.
-     */
-    if (!member.toLowerCase().includes(wanted)) {
+    const timeMatch = block.match(
+      /<(?:[a-zA-Z0-9_-]+:)?time\b[^>]*>\s*([^<]+?)\s*<\/(?:[a-zA-Z0-9_-]+:)?time>/i
+    );
+
+    const valueMatch = block.match(
+      /<(?:[a-zA-Z0-9_-]+:)?value\b[^>]*>\s*([^<]*?)\s*<\/(?:[a-zA-Z0-9_-]+:)?value>/i
+    );
+
+    if (!timeMatch || !valueMatch) {
       continue;
     }
 
-    const tvpRegex =
-      /<(?:[a-zA-Z0-9_-]+:)?MeasurementTVP\b[^>]*>[\s\S]*?<(?:[a-zA-Z0-9_-]+:)?time\b[^>]*>\s*([^<]+?)\s*<\/(?:[a-zA-Z0-9_-]+:)?time>[\s\S]*?<(?:[a-zA-Z0-9_-]+:)?value\b[^>]*>\s*([^<]+?)\s*<\/(?:[a-zA-Z0-9_-]+:)?value>[\s\S]*?<\/(?:[a-zA-Z0-9_-]+:)?MeasurementTVP>/gi;
+    const time = decodeXml(
+      timeMatch[1]
+    ).trim();
 
-    let valueMatch;
+    const rawValue = decodeXml(
+      valueMatch[1]
+    ).trim();
 
-    while ((valueMatch = tvpRegex.exec(member)) !== null) {
-      const time = decodeXml(valueMatch[1]).trim();
-      const rawValue = decodeXml(valueMatch[2]).trim();
-      const value = Number(rawValue);
-
-      if (
-        Number.isFinite(value) &&
-        Number.isFinite(new Date(time).getTime())
-      ) {
-        results.push({
-          time,
-          value
-        });
-      }
+    /*
+     * Tyhjä arvo tai NaN jätetään pois.
+     */
+    if (
+      rawValue === "" ||
+      rawValue.toLowerCase() === "nan"
+    ) {
+      continue;
     }
 
-    if (results.length > 0) {
-      break;
+    const value = Number(rawValue);
+    const timestamp = new Date(time).getTime();
+
+    if (
+      Number.isFinite(value) &&
+      Number.isFinite(timestamp)
+    ) {
+      results.push({
+        time,
+        value
+      });
     }
   }
 
   return results;
 }
 
-function pickNearestItem(series, targetTime) {
-  if (!Array.isArray(series) || series.length === 0) {
+/**
+ * Etsii FMI:n XML-vastauksesta parametrin koko aikasarjan.
+ */
+function extractSeries(xml, parameterName) {
+  const members = splitMembers(xml);
+
+  for (const member of members) {
+    if (
+      !memberContainsParameter(
+        member,
+        parameterName
+      )
+    ) {
+      continue;
+    }
+
+    const series =
+      extractTimeValuePairs(member);
+
+    if (series.length > 0) {
+      return series;
+    }
+  }
+
+  /*
+   * Varahaku:
+   * etsitään parametrin sijainti koko XML:stä ja poimitaan
+   * sitä ympäröivä member-osio.
+   */
+  const lowerXml = xml.toLowerCase();
+  const wanted =
+    String(parameterName).toLowerCase();
+
+  const parameterIndex =
+    lowerXml.indexOf(wanted);
+
+  if (parameterIndex !== -1) {
+    const memberStart =
+      lowerXml.lastIndexOf(
+        "<wfs:member",
+        parameterIndex
+      );
+
+    const memberEnd =
+      lowerXml.indexOf(
+        "</wfs:member>",
+        parameterIndex
+      );
+
+    if (
+      memberStart !== -1 &&
+      memberEnd !== -1
+    ) {
+      const member = xml.slice(
+        memberStart,
+        memberEnd + "</wfs:member>".length
+      );
+
+      const series =
+        extractTimeValuePairs(member);
+
+      if (series.length > 0) {
+        return series;
+      }
+    }
+  }
+
+  return [];
+}
+
+/* -------------------------------------------------------
+   Lähimmän ennusteen valinta
+------------------------------------------------------- */
+
+function pickNearestItem(
+  series,
+  targetTime
+) {
+  if (
+    !Array.isArray(series) ||
+    series.length === 0
+  ) {
     return null;
   }
 
-  const target = new Date(targetTime).getTime();
+  const target =
+    new Date(targetTime).getTime();
 
   if (!Number.isFinite(target)) {
     return null;
@@ -135,13 +311,15 @@ function pickNearestItem(series, targetTime) {
   let bestDifference = Infinity;
 
   for (const item of series) {
-    const itemTime = new Date(item.time).getTime();
+    const itemTime =
+      new Date(item.time).getTime();
 
     if (!Number.isFinite(itemTime)) {
       continue;
     }
 
-    const difference = Math.abs(itemTime - target);
+    const difference =
+      Math.abs(itemTime - target);
 
     if (difference < bestDifference) {
       best = item;
@@ -149,9 +327,12 @@ function pickNearestItem(series, targetTime) {
     }
   }
 
-  // Älä hyväksy yli kolmen tunnin päässä olevaa ennustetta.
+  /*
+   * ECMWF:n ennuste voi olla esimerkiksi kolmen tunnin välein.
+   * Hyväksytään enintään neljän tunnin ero.
+   */
   const maximumDifference =
-    3 * 60 * 60 * 1000;
+    4 * 60 * 60 * 1000;
 
   if (
     !best ||
@@ -163,7 +344,10 @@ function pickNearestItem(series, targetTime) {
   return best;
 }
 
-function pickNearest(series, targetTime) {
+function pickNearest(
+  series,
+  targetTime
+) {
   const item = pickNearestItem(
     series,
     targetTime
@@ -171,6 +355,10 @@ function pickNearest(series, targetTime) {
 
   return item ? item.value : null;
 }
+
+/* -------------------------------------------------------
+   Tuulen laskenta
+------------------------------------------------------- */
 
 function calculateWindSpeed(
   windUSeries,
@@ -206,6 +394,10 @@ function calculateWindSpeed(
   );
 }
 
+/* -------------------------------------------------------
+   FMI-kysely
+------------------------------------------------------- */
+
 function buildFmiUrl(lat, lon) {
   const parameters = [
     "Temperature",
@@ -225,211 +417,248 @@ function buildFmiUrl(lat, lon) {
   );
 }
 
-function jsonResponse(statusCode, body) {
+function jsonResponse(
+  statusCode,
+  body
+) {
   return {
     statusCode,
     headers: {
       "Content-Type":
         "application/json; charset=utf-8",
-      "Cache-Control": "no-store",
-      "Access-Control-Allow-Origin": "*"
+
+      "Cache-Control":
+        "no-store",
+
+      "Access-Control-Allow-Origin":
+        "*"
     },
+
     body: JSON.stringify(body)
   };
 }
 
-exports.handler = async function handler(event) {
-  const query =
-    event.queryStringParameters || {};
+/* -------------------------------------------------------
+   Netlify Function
+------------------------------------------------------- */
 
-  const lat = query.lat;
-  const lon = query.lon;
+exports.handler =
+  async function handler(event) {
+    const query =
+      event.queryStringParameters || {};
 
-  const originalTime =
-    query.time || new Date().toISOString();
+    const lat = query.lat;
+    const lon = query.lon;
 
-  if (!lat || !lon) {
-    return jsonResponse(400, {
-      error: "lat/lon puuttuu"
-    });
-  }
+    const originalTime =
+      query.time ||
+      new Date().toISOString();
 
-  const latitude = Number(lat);
-  const longitude = Number(lon);
-
-  if (
-    !Number.isFinite(latitude) ||
-    !Number.isFinite(longitude)
-  ) {
-    return jsonResponse(400, {
-      error:
-        "lat/lon ei ole kelvollinen numero"
-    });
-  }
-
-  try {
-    const targetUtc =
-      finlandTimeToUtcIso(originalTime);
-
-    const url = buildFmiUrl(
-      latitude,
-      longitude
-    );
-
-    /*
-     * Tässä oli koodissasi syntaksivirhe:
-     * headers tarvitsee oman objektinsa.
-     */
-    const response = await fetch(url, {
-      headers: {
-        Accept:
-          "application/xml,text/xml;q=0.9,*/*;q=0.8"
-      }
-    });
-
-    const xml = await response.text();
-
-    if (!response.ok) {
-      console.error("FMI HTTP error", {
-        status: response.status,
-        statusText: response.statusText,
-        url,
-        response: xml.slice(0, 4000)
-      });
-
-      return jsonResponse(502, {
-        error:
-          `FMI-haku epäonnistui: ` +
-          `${response.status} ${response.statusText}`,
-        fmiResponse: xml.slice(0, 4000),
-        requestedUrl: url
+    if (!lat || !lon) {
+      return jsonResponse(400, {
+        error: "lat/lon puuttuu"
       });
     }
+
+    const latitude = Number(lat);
+    const longitude = Number(lon);
 
     if (
-      /ExceptionReport/i.test(xml) ||
-      /ExceptionText/i.test(xml)
+      !Number.isFinite(latitude) ||
+      !Number.isFinite(longitude)
     ) {
-      const exceptionMatch = xml.match(
-        /<(?:\w+:)?ExceptionText\b[^>]*>([\s\S]*?)<\/(?:\w+:)?ExceptionText>/i
-      );
-
-      const message = exceptionMatch
-        ? decodeXml(exceptionMatch[1]).trim()
-        : "FMI palautti XML-virheen";
-
-      console.error("FMI XML error", {
-        message,
-        url,
-        response: xml.slice(0, 2000)
-      });
-
-      return jsonResponse(502, {
-        error: message
+      return jsonResponse(400, {
+        error:
+          "lat/lon ei ole kelvollinen numero"
       });
     }
 
-    const temperatureSeries =
-      extractSeries(xml, "Temperature");
+    try {
+      const targetUtc =
+        finlandTimeToUtcIso(
+          originalTime
+        );
 
-    const windUSeries =
-      extractSeries(xml, "WindUMS");
-
-    const windVSeries =
-      extractSeries(xml, "WindVMS");
-
-    const precipitationSeries =
-      extractSeries(
-        xml,
-        "Precipitation1h"
+      const url = buildFmiUrl(
+        latitude,
+        longitude
       );
 
-    /*
-     * Tämä loki on nyt oikeassa paikassa:
-     * muuttujat ovat jo olemassa.
-     */
-    console.log("FMI extracted series", {
-      xmlLength: xml.length,
-      temperature:
-        temperatureSeries.length,
-      windU:
-        windUSeries.length,
-      windV:
-        windVSeries.length,
-      precipitation:
-        precipitationSeries.length,
-      xmlStart:
-        xml.slice(0, 500)
-    });
+      const response =
+        await fetch(url, {
+          headers: {
+            Accept:
+              "application/xml,text/xml;q=0.9,*/*;q=0.8"
+          }
+        });
 
-    const temperature =
-      pickNearest(
-        temperatureSeries,
-        targetUtc
+      const xml =
+        await response.text();
+
+      if (!response.ok) {
+        console.error(
+          "FMI HTTP error",
+          {
+            status: response.status,
+            statusText:
+              response.statusText,
+            url,
+            response:
+              xml.slice(0, 3000)
+          }
+        );
+
+        return jsonResponse(502, {
+          error:
+            `FMI-haku epäonnistui: ` +
+            `${response.status} ` +
+            `${response.statusText}`
+        });
+      }
+
+      if (
+        /ExceptionReport/i.test(xml) ||
+        /ExceptionText/i.test(xml)
+      ) {
+        const exceptionMatch =
+          xml.match(
+            /<(?:\w+:)?ExceptionText\b[^>]*>([\s\S]*?)<\/(?:\w+:)?ExceptionText>/i
+          );
+
+        const message =
+          exceptionMatch
+            ? decodeXml(
+                exceptionMatch[1]
+              ).trim()
+            : "FMI palautti XML-virheen";
+
+        console.error(
+          "FMI XML error",
+          {
+            message,
+            url
+          }
+        );
+
+        return jsonResponse(502, {
+          error: message
+        });
+      }
+
+      const temperatureSeries =
+        extractSeries(
+          xml,
+          "Temperature"
+        );
+
+      const windUSeries =
+        extractSeries(
+          xml,
+          "WindUMS"
+        );
+
+      const windVSeries =
+        extractSeries(
+          xml,
+          "WindVMS"
+        );
+
+      const precipitationSeries =
+        extractSeries(
+          xml,
+          "Precipitation1h"
+        );
+
+      const temperature =
+        pickNearest(
+          temperatureSeries,
+          targetUtc
+        );
+
+      const windSpeedRaw =
+        calculateWindSpeed(
+          windUSeries,
+          windVSeries,
+          targetUtc
+        );
+
+      const precipitation =
+        pickNearest(
+          precipitationSeries,
+          targetUtc
+        );
+
+      const windSpeed =
+        Number.isFinite(windSpeedRaw)
+          ? Math.round(
+              windSpeedRaw * 10
+            ) / 10
+          : null;
+
+      const result = {
+        source: "FMI Open Data",
+        originalTime,
+        targetUtc,
+        requestedTime:
+          originalTime,
+
+        temperature:
+          Number.isFinite(temperature)
+            ? temperature
+            : null,
+
+        windSpeed,
+
+        precipitation:
+          Number.isFinite(precipitation)
+            ? precipitation
+            : null
+      };
+
+      /*
+       * Netlifyn lokiin jää vain tiivis tarkistus.
+       * Debug-tietoja ei lähetetä käyttäjälle.
+       */
+      console.log(
+        "FMI weather result",
+        {
+          latitude,
+          longitude,
+          targetUtc,
+
+          seriesLengths: {
+            temperature:
+              temperatureSeries.length,
+
+            windU:
+              windUSeries.length,
+
+            windV:
+              windVSeries.length,
+
+            precipitation:
+              precipitationSeries.length
+          },
+
+          result
+        }
       );
 
-    const windSpeedRaw =
-      calculateWindSpeed(
-        windUSeries,
-        windVSeries,
-        targetUtc
+      return jsonResponse(
+        200,
+        result
+      );
+    } catch (error) {
+      console.error(
+        "Weather function error",
+        error
       );
 
-    const precipitation =
-      pickNearest(
-        precipitationSeries,
-        targetUtc
-      );
-
-    const windSpeed =
-      Number.isFinite(windSpeedRaw)
-        ? Math.round(windSpeedRaw * 10) / 10
-        : null;
-
- const result = {
-  source: "FMI Open Data",
-  originalTime,
-  targetUtc,
-  requestedTime: originalTime,
-  temperature,
-  windSpeed,
-  precipitation,
-
-  debug: {
-    xmlLength: xml.length,
-
-    seriesLengths: {
-      temperature: temperatureSeries.length,
-      windU: windUSeries.length,
-      windV: windVSeries.length,
-      precipitation: precipitationSeries.length
-    },
-
-    containsMeasurementTVP: xml.includes("MeasurementTVP"),
-    containsTemperature: xml.toLowerCase().includes("temperature"),
-    containsWindUMS: xml.toLowerCase().includes("windums"),
-
-    xmlStart: xml.slice(0, 3000)
-  }
-};
-
-    console.log(
-      "FMI weather result",
-      result
-    );
-
-    return jsonResponse(200, result);
-  } catch (error) {
-    console.error(
-      "Weather function error",
-      error
-    );
-
-    return jsonResponse(500, {
-      error:
-        error instanceof Error
-          ? error.message
-          : String(error)
-    });
-  }
-};
+      return jsonResponse(500, {
+        error:
+          error instanceof Error
+            ? error.message
+            : String(error)
+      });
+    }
+  };
