@@ -168,8 +168,8 @@ button:hover{
 }
 
 .reason{
-  border-top:1px solid #e5e7eb;
-  margin-top:12px;
+ border-top: 2px solid #b9d9c0;
+margin: 12px 0;
   padding-top:10px;
   color:#334155;
 }
