@@ -386,15 +386,32 @@ exports.handler = async function handler(event) {
         ? Math.round(windSpeedRaw * 10) / 10
         : null;
 
-    const result = {
-      source: "FMI Open Data",
-      originalTime,
-      targetUtc,
-      requestedTime: originalTime,
-      temperature,
-      windSpeed,
-      precipitation
-    };
+ const result = {
+  source: "FMI Open Data",
+  originalTime,
+  targetUtc,
+  requestedTime: originalTime,
+  temperature,
+  windSpeed,
+  precipitation,
+
+  debug: {
+    xmlLength: xml.length,
+
+    seriesLengths: {
+      temperature: temperatureSeries.length,
+      windU: windUSeries.length,
+      windV: windVSeries.length,
+      precipitation: precipitationSeries.length
+    },
+
+    containsMeasurementTVP: xml.includes("MeasurementTVP"),
+    containsTemperature: xml.toLowerCase().includes("temperature"),
+    containsWindUMS: xml.toLowerCase().includes("windums"),
+
+    xmlStart: xml.slice(0, 3000)
+  }
+};
 
     console.log(
       "FMI weather result",
