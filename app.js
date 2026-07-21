@@ -648,11 +648,11 @@ function predict(
 
   if (homePressure >= 0.65 || awayPressure >= 0.65) {
     if (Math.abs(homePressure - awayPressure) < 0.15) {
-      note = "Molemmilla joukkueilla suuri viivapaine.";
+      note = "🔥 Ottelu on molemmille tärkeä sarjasijoituksen kannalta.";
     } else if (homePressure > awayPressure) {
-      note = "Kotijoukkueella tavallista suurempi pisteiden tarve.";
+      note = "🏠 Ottelu on kotijoukkueelle tärkeä sarjasijoituksen kannalta.";
     } else {
-      note = "Vierasjoukkueella tavallista suurempi pisteiden tarve.";
+      note = "🚌 Ottelu on vierasjoukkueelle tärkeä sarjasijoituksen kannalta.";
     }
   }
 
