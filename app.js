@@ -1462,60 +1462,33 @@ const prediction = predict(
     prediction.homeRuns += weatherAdj / 2;
     prediction.awayRuns += weatherAdj / 2;
 
-    prediction.homeRuns = Math.max(0, prediction.homeRuns);
+     prediction.homeRuns = Math.max(0, prediction.homeRuns);
     prediction.awayRuns = Math.max(0, prediction.awayRuns);
-    // Tallennetaan ennuste Supabaseen ennen ottelun alkua
-if (!match.result && !match.liveResult?.finished) {
-  fetch("/.netlify/functions/save-snapshot", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      match_id: String(match.id),
-      match_date: match.date,
-      league: selectedSeries,
 
-      home_team: homeName,
-      away_team: awayName,
-
-      elite_home_win: Math.round(prediction.homePct),
-      elite_away_win: Math.round(prediction.awayPct),
-
-      elite_home_runs: Number(prediction.homeRuns.toFixed(1)),
-      elite_away_runs: Number(prediction.awayRuns.toFixed(1)),
-      elite_total: Number(total.toFixed(1)),
-      elite_shootout: shootoutPct,
-
-      elite_classification: tag,
-      elite_note: prediction.note || "",
-
-      weather_adjustment: weatherAdj,
-      home_pressure: prediction.homePressure,
-      away_pressure: prediction.awayPressure,
-
-      home_lineup_adjustment: lineupAdjustment.homeRuns,
-      away_lineup_adjustment: lineupAdjustment.awayRuns,
-
-      home_pitcher_missing: pitcherAdj.awayRuns > 0,
-      away_pitcher_missing: pitcherAdj.homeRuns > 0
-    })
-  })
-  .catch(console.error);
-}
     lockedPredictions[match.id] = {
-  ...prediction
-};
+      ...prediction
+    };
 
-    const homePlayerPower = getTeamPlayerPower(match.home, playerStats);
-    const awayPlayerPower = getTeamPlayerPower(match.away, playerStats);
-    const playerPowerDiff = homePlayerPower - awayPlayerPower;
+    const homePlayerPower =
+      getTeamPlayerPower(match.home, playerStats);
 
-    const total = prediction.homeRuns + prediction.awayRuns;
-    const shootoutPct = shootoutProbability(prediction);
+    const awayPlayerPower =
+      getTeamPlayerPower(match.away, playerStats);
 
-    const homeFav = prediction.homePct >= prediction.awayPct;
-    const confidence = Math.abs(prediction.homePct - 50);
+    const playerPowerDiff =
+      homePlayerPower - awayPlayerPower;
+
+    const total =
+      prediction.homeRuns + prediction.awayRuns;
+
+    const shootoutPct =
+      shootoutProbability(prediction);
+
+    const homeFav =
+      prediction.homePct >= prediction.awayPct;
+
+    const confidence =
+      Math.abs(prediction.homePct - 50);
 
     let tag = "Tasainen";
     let tagClass = "orange";
@@ -1528,11 +1501,193 @@ if (!match.result && !match.liveResult?.finished) {
       tagClass = "blue";
     }
 
-    const homeName = match.home.shorthand || match.home.name;
-    const awayName = match.away.shorthand || match.away.name;
+    const homeName =
+      match.home.shorthand || match.home.name;
 
-    const homeLogo = TEAM_LOGOS[homeName] || "images/logos/default.png";
-    const awayLogo = TEAM_LOGOS[awayName] || "images/logos/default.png";
+    const awayName =
+      match.away.shorthand || match.away.name;
+
+    const homeLogo =
+      TEAM_LOGOS[homeName] ||
+      "images/logos/default.png";
+
+    const awayLogo =
+      TEAM_LOGOS[awayName] ||
+      "images/logos/default.png";
+
+    const lineupData =
+      lineup?.data ||
+      lineup?.match ||
+      lineup ||
+      null;
+
+    const homeLineupPlayers =
+      lineupData?.home?.players || [];
+
+    const awayLineupPlayers =
+      lineupData?.away?.players || [];
+
+    const lineupsAvailable =
+      homeLineupPlayers.length > 0 &&
+      awayLineupPlayers.length > 0;
+
+    /*
+     * Tallennetaan ennen ottelua viimeisin Elite-ennuste
+     * Supabaseen. Save-snapshot-funktio lukitsee rivin
+     * viisi minuuttia ennen ottelun alkua.
+     */
+    if (
+      !match.result &&
+      !match.liveResult?.finished
+    ) {
+      fetch(
+        "/.netlify/functions/save-snapshot",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            match_id: String(match.id),
+
+            match_date:
+              (match.date || "").slice(0, 10),
+
+            league: selectedSeries,
+            start_time: match.date,
+
+            venue:
+              match.stadium?.name || "",
+
+            home_team: homeName,
+            away_team: awayName,
+
+            elite_home_win:
+              Math.round(prediction.homePct),
+
+            elite_away_win:
+              Math.round(prediction.awayPct),
+
+            elite_home_runs:
+              Number(
+                prediction.homeRuns.toFixed(1)
+              ),
+
+            elite_away_runs:
+              Number(
+                prediction.awayRuns.toFixed(1)
+              ),
+
+            elite_total:
+              Number(total.toFixed(1)),
+
+            elite_run_difference:
+              Number(
+                (
+                  prediction.homeRuns -
+                  prediction.awayRuns
+                ).toFixed(1)
+              ),
+
+            elite_shootout:
+              shootoutPct,
+
+            elite_classification:
+              tag,
+
+            elite_note:
+              prediction.note || "",
+
+            home_pressure:
+              prediction.homePressure,
+
+            away_pressure:
+              prediction.awayPressure,
+
+            pressure_adjustment:
+              prediction.pressureAdjustment,
+
+            weather_temp:
+              weather?.start?.temperature ??
+              weather?.temperature ??
+              null,
+
+            weather_wind:
+              weather?.start?.windSpeed ??
+              weather?.windSpeed ??
+              null,
+
+            weather_rain:
+              weather?.start?.precipitation ??
+              weather?.precipitation ??
+              null,
+
+            weather_adjustment:
+              weatherAdj,
+
+            lineups_available:
+              lineupsAvailable,
+
+            lineup_home_missing:
+              lineupsAvailable
+                ? Math.max(
+                    0,
+                    12 - homeLineupPlayers.length
+                  )
+                : null,
+
+            lineup_away_missing:
+              lineupsAvailable
+                ? Math.max(
+                    0,
+                    12 - awayLineupPlayers.length
+                  )
+                : null,
+
+            home_lineup_adjustment:
+              lineupAdjustment.homeRuns,
+
+            away_lineup_adjustment:
+              lineupAdjustment.awayRuns,
+
+            home_pitcher_missing:
+              pitcherAdj.awayRuns > 0,
+
+            away_pitcher_missing:
+              pitcherAdj.homeRuns > 0,
+
+            lineup_notes:
+              pitcherAdj.note || "",
+
+            lineup_data:
+              lineupData
+          })
+        }
+      )
+        .then(async response => {
+          const data = await response.json();
+
+          if (
+            !response.ok &&
+            response.status !== 409
+          ) {
+            console.warn(
+              "Snapshot-tallennus epäonnistui:",
+              data
+            );
+          }
+
+          return data;
+        })
+        .catch(error => {
+          console.error(
+            "Snapshot-tallennusvirhe:",
+            error
+          );
+        });
+    }
 
     const playerPowerHtml = "";
 
@@ -1546,60 +1701,138 @@ if (!match.result && !match.liveResult?.finished) {
         <div class="teams">
           <div class="team">
             <div class="name">
-              <img src="${homeLogo}" class="team-logo" alt="${homeName}">
+              <img
+                src="${homeLogo}"
+                class="team-logo"
+                alt="${homeName}"
+              >
               <span>${homeName}</span>
             </div>
-            <div class="pct ${homeFav ? "fav" : ""}">${prediction.homePct.toFixed(0)} %</div>
+
+            <div
+              class="pct ${homeFav ? "fav" : ""}"
+            >
+              ${prediction.homePct.toFixed(0)} %
+            </div>
           </div>
 
           <div class="vs">vs</div>
 
           <div class="team">
             <div class="name">
-              <img src="${awayLogo}" class="team-logo" alt="${awayName}">
+              <img
+                src="${awayLogo}"
+                class="team-logo"
+                alt="${awayName}"
+              >
               <span>${awayName}</span>
             </div>
-            <div class="pct ${!homeFav ? "fav" : ""}">${prediction.awayPct.toFixed(0)} %</div>
+
+            <div
+              class="pct ${!homeFav ? "fav" : ""}"
+            >
+              ${prediction.awayPct.toFixed(0)} %
+            </div>
           </div>
         </div>
 
         <div class="runs">
-          Juoksuarvio: ${prediction.homeRuns.toFixed(1)} – ${prediction.awayRuns.toFixed(1)}
+          Juoksuarvio:
+          ${prediction.homeRuns.toFixed(1)}
+          –
+          ${prediction.awayRuns.toFixed(1)}
         </div>
 
-        <span class="pill ${tagClass}">${tag}</span>
-        <span class="pill blue">Total ${total.toFixed(1)}</span>
-        ${prediction.lineupAdjusted ? `<span class="pill orange">Kokoonpanomuutos huomioitu</span>` : ""}
-        ${Math.abs(weatherAdj) >= 0.1
-  ? `<span class="pill orange">Sääkorjaus ${weatherAdj.toFixed(1)}</span>`
-  : ""}
-        <span class="pill orange">Kotiutuskisa ${shootoutPct} %</span>
+        <span class="pill ${tagClass}">
+          ${tag}
+        </span>
+
+        <span class="pill blue">
+          Total ${total.toFixed(1)}
+        </span>
+
+        ${
+          prediction.lineupAdjusted
+            ? `
+              <span class="pill orange">
+                Kokoonpanomuutos huomioitu
+              </span>
+            `
+            : ""
+        }
+
+        ${
+          Math.abs(weatherAdj) >= 0.1
+            ? `
+              <span class="pill orange">
+                Sääkorjaus ${weatherAdj.toFixed(1)}
+              </span>
+            `
+            : ""
+        }
+
+        <span class="pill orange">
+          Kotiutuskisa ${shootoutPct} %
+        </span>
 
         ${playerPowerHtml}
-   <div id="result-${match.id}" class="live-result-box">
-  ${resultHtml(match, prediction)}
-</div>
-        ${(match.result || match.liveResult?.finished) ? "" : weatherHtml(weather)}
-        ${lineupWarningsHtml(match, lineup, selectedSeries)}
+
+        <div
+          id="result-${match.id}"
+          class="live-result-box"
+        >
+          ${resultHtml(match, prediction)}
+        </div>
+
+        ${
+          match.result ||
+          match.liveResult?.finished
+            ? ""
+            : weatherHtml(weather)
+        }
+
+        ${
+          lineupWarningsHtml(
+            match,
+            lineup,
+            selectedSeries
+          )
+        }
+
         ${lineupHtml(lineup)}
-        ${prediction.note ? `<div class="reason">${prediction.note}</div>` : ""}
+
+        ${
+          prediction.note
+            ? `
+              <div class="reason">
+                ${prediction.note}
+              </div>
+            `
+            : ""
+        }
       </div>
     `);
   }
 
-  $(targetId).innerHTML = cards.join("");
+  $(targetId).innerHTML =
+    cards.join("");
 }
 
 
 async function refreshLiveResults() {
-  const selectedDate = $("date").value || today();
+  const selectedDate =
+    $("date").value || today();
 
-  // Automaattisesti päivitetään vain tämän päivän otteluita.
+  /*
+   * Automaattisesti päivitetään vain
+   * tämän päivän otteluita.
+   */
   if (selectedDate !== today()) {
     if (liveRefreshTimer) {
       clearInterval(liveRefreshTimer);
       liveRefreshTimer = null;
     }
+
     return;
   }
 
@@ -1610,18 +1843,28 @@ async function refreshLiveResults() {
     const level = "Superpesis";
 
     const res = await fetch(
-      `/.netlify/functions/matches?level=${encodeURIComponent(level)}&series=${encodeURIComponent(series)}`
+      `/.netlify/functions/matches` +
+      `?level=${encodeURIComponent(level)}` +
+      `&series=${encodeURIComponent(series)}`
     );
 
     if (!res.ok) {
-      throw new Error(`Tulospäivitys epäonnistui: ${res.status}`);
+      throw new Error(
+        `Tulospäivitys epäonnistui: ${res.status}`
+      );
     }
 
     const json = await res.json();
-    const matches = Array.isArray(json.data) ? json.data : [];
+
+    const matches =
+      Array.isArray(json.data)
+        ? json.data
+        : [];
 
     const dayMatches = matches.filter(
-      match => (match.date || "").slice(0, 10) === selectedDate
+      match =>
+        (match.date || "").slice(0, 10) ===
+        selectedDate
     );
 
     if (dayMatches.length > 0) {
@@ -1629,16 +1872,30 @@ async function refreshLiveResults() {
     }
 
     for (const match of dayMatches) {
-      const resultBox = document.getElementById(`result-${match.id}`);
-      const prediction = lockedPredictions[match.id];
-  const finished = Boolean(match.result);
+      const resultBox =
+        document.getElementById(
+          `result-${match.id}`
+        );
 
-      // Vain tämän ottelun tulosruutu vaihtuu.
+      const prediction =
+        lockedPredictions[match.id];
+
+      const finished =
+        Boolean(match.result);
+
+      /*
+       * Vain tämän ottelun tulosruutu
+       * vaihdetaan.
+       */
       if (resultBox && prediction) {
-        resultBox.innerHTML = resultHtml(match, prediction);
+        resultBox.innerHTML =
+          resultHtml(match, prediction);
       }
 
-      // Alkamaton tai käynnissä oleva ottelu pitää päivityksen toiminnassa.
+      /*
+       * Alkamaton tai käynnissä oleva ottelu
+       * pitää päivityksen toiminnassa.
+       */
       if (!finished) {
         hasUnfinishedGames = true;
       }
@@ -1651,78 +1908,168 @@ async function refreshLiveResults() {
       refreshSeries("Naiset")
     ]);
 
-    // Päivitys loppuu vasta päivän viimeisen ottelun päätyttyä.
-    if ((!gamesFound || !hasUnfinishedGames) && liveRefreshTimer) {
+    /*
+     * Päivitys loppuu vasta päivän viimeisen
+     * ottelun päätyttyä.
+     */
+    if (
+      (!gamesFound || !hasUnfinishedGames) &&
+      liveRefreshTimer
+    ) {
       clearInterval(liveRefreshTimer);
       liveRefreshTimer = null;
     }
   } catch (error) {
-    console.error("Live-tulosten päivitys epäonnistui:", error);
+    console.error(
+      "Live-tulosten päivitys epäonnistui:",
+      error
+    );
   }
 }
+
+
 async function load() {
-  const selectedDate = $("date").value || today();
+  const selectedDate =
+    $("date").value || today();
 
-  $("status").textContent = "Ladataan Miesten ja Naisten Superpesis...";
+  $("status").textContent =
+    "Ladataan Miesten ja Naisten Superpesis...";
 
-  async function loadSeries(series, matchesTarget, powerTarget, cardClass, standingsTarget) {
+  async function loadSeries(
+    series,
+    matchesTarget,
+    powerTarget,
+    cardClass,
+    standingsTarget
+  ) {
     const level = "Superpesis";
 
     try {
       const res = await fetch(
-        `/.netlify/functions/matches?level=${encodeURIComponent(level)}&series=${encodeURIComponent(series)}`
+        `/.netlify/functions/matches` +
+        `?level=${encodeURIComponent(level)}` +
+        `&series=${encodeURIComponent(series)}`
       );
 
-      if (!res.ok) throw new Error(`Otteluhaku epäonnistui: ${res.status}`);
+      if (!res.ok) {
+        throw new Error(
+          `Otteluhaku epäonnistui: ${res.status}`
+        );
+      }
 
       const json = await res.json();
-      const matches = Array.isArray(json.data) ? json.data : [];
-      const stats = buildStats(matches);
-      const playerStats = await fetchPlayerStats(series);
 
-      if (series === "Miehet") currentMenMatches = matches;
-      if (series === "Naiset") currentWomenMatches = matches;
+      const matches =
+        Array.isArray(json.data)
+          ? json.data
+          : [];
 
-      const standings = buildStandings(matches, currentStandingsMode);
-      renderOfficialStandings(standings, standingsTarget);
+      const stats =
+        buildStats(matches);
+
+      const playerStats =
+        await fetchPlayerStats(series);
 
       if (series === "Miehet") {
-        renderOfficialStandings(standings, "standings-men-mobile");
+        currentMenMatches = matches;
       }
 
       if (series === "Naiset") {
-        renderOfficialStandings(standings, "standings-women-mobile");
+        currentWomenMatches = matches;
       }
-    
-      const dayMatches = matches.filter(
-        m => (m.date || "").slice(0, 10) === selectedDate
+
+      const standings =
+        buildStandings(
+          matches,
+          currentStandingsMode
+        );
+
+      renderOfficialStandings(
+        standings,
+        standingsTarget
       );
 
-      renderPowerTable(stats, powerTarget);
-      await renderMatches(dayMatches, matches, series, matchesTarget, cardClass, playerStats);
+      if (series === "Miehet") {
+        renderOfficialStandings(
+          standings,
+          "standings-men-mobile"
+        );
+      }
+
+      if (series === "Naiset") {
+        renderOfficialStandings(
+          standings,
+          "standings-women-mobile"
+        );
+      }
+
+      const dayMatches = matches.filter(
+        match =>
+          (match.date || "").slice(0, 10) ===
+          selectedDate
+      );
+
+      renderPowerTable(
+        stats,
+        powerTarget
+      );
+
+      await renderMatches(
+        dayMatches,
+        matches,
+        series,
+        matchesTarget,
+        cardClass,
+        playerStats
+      );
 
       return true;
-    } catch (e) {
-      console.error(`${series} haku epäonnistui`, e);
-      $(matchesTarget).innerHTML = `<p>${series}: datan haku epäonnistui.</p>`;
+    } catch (error) {
+      console.error(
+        `${series} haku epäonnistui`,
+        error
+      );
+
+      $(matchesTarget).innerHTML =
+        `<p>${series}: datan haku epäonnistui.</p>`;
+
       return false;
     }
   }
 
-  const menOk = await loadSeries("Miehet", "matches-men", "power-men", "men", "standings-men");
-  const womenOk = await loadSeries("Naiset", "matches-women", "power-women", "women", "standings-women");
+  const menOk = await loadSeries(
+    "Miehet",
+    "matches-men",
+    "power-men",
+    "men",
+    "standings-men"
+  );
+
+  const womenOk = await loadSeries(
+    "Naiset",
+    "matches-women",
+    "power-women",
+    "women",
+    "standings-women"
+  );
 
   $("status").textContent =
     menOk || womenOk
-      ? `Päivitetty ${new Date().toLocaleTimeString("fi-FI")}`
+      ? `Päivitetty ${
+          new Date().toLocaleTimeString("fi-FI")
+        }`
       : "Datan haku epäonnistui. Tarkista Netlify Functions.";
 }
 
+
 $("date").value = today();
+
+
 $("btn").onclick = async () => {
   await load();
   startLiveRefresh();
 };
+
 
 $("date").onchange = async () => {
   if (liveRefreshTimer) {
@@ -1734,19 +2081,28 @@ $("date").onchange = async () => {
   startLiveRefresh();
 };
 
+
 function startLiveRefresh() {
   if (liveRefreshTimer) {
     clearInterval(liveRefreshTimer);
     liveRefreshTimer = null;
   }
 
-  if (($("date").value || today()) !== today()) {
+  if (
+    ($("date").value || today()) !== today()
+  ) {
     return;
   }
 
-  liveRefreshTimer = setInterval(refreshLiveResults, 60000);
+  liveRefreshTimer =
+    setInterval(
+      refreshLiveResults,
+      60000
+    );
+
   refreshLiveResults();
 }
+
 
 load().then(() => {
   startLiveRefresh();
