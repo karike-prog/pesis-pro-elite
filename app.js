@@ -1464,6 +1464,45 @@ const prediction = predict(
 
     prediction.homeRuns = Math.max(0, prediction.homeRuns);
     prediction.awayRuns = Math.max(0, prediction.awayRuns);
+    // Tallennetaan ennuste Supabaseen ennen ottelun alkua
+if (!match.result && !match.liveResult?.finished) {
+  fetch("/.netlify/functions/save-snapshot", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      match_id: String(match.id),
+      match_date: match.date,
+      league: selectedSeries,
+
+      home_team: homeName,
+      away_team: awayName,
+
+      elite_home_win: Math.round(prediction.homePct),
+      elite_away_win: Math.round(prediction.awayPct),
+
+      elite_home_runs: Number(prediction.homeRuns.toFixed(1)),
+      elite_away_runs: Number(prediction.awayRuns.toFixed(1)),
+      elite_total: Number(total.toFixed(1)),
+      elite_shootout: shootoutPct,
+
+      elite_classification: tag,
+      elite_note: prediction.note || "",
+
+      weather_adjustment: weatherAdj,
+      home_pressure: prediction.homePressure,
+      away_pressure: prediction.awayPressure,
+
+      home_lineup_adjustment: lineupAdjustment.homeRuns,
+      away_lineup_adjustment: lineupAdjustment.awayRuns,
+
+      home_pitcher_missing: pitcherAdj.awayRuns > 0,
+      away_pitcher_missing: pitcherAdj.homeRuns > 0
+    })
+  })
+  .catch(console.error);
+}
     lockedPredictions[match.id] = {
   ...prediction
 };
