@@ -1338,8 +1338,27 @@ async function saveFinalResult(match) {
   const r = match.result;
   const d = r.details || r;
 
-  const periodsHome = Number(d.periods_home);
-  const periodsAway = Number(d.periods_away);
+  const periodsHome = Number(d.periods_home || 0);
+  const periodsAway = Number(d.periods_away || 0);
+
+  const firstHome =
+    Number(d.runs_home_first_period || 0);
+
+  const firstAway =
+    Number(d.runs_away_first_period || 0);
+
+  const secondHome =
+    Number(d.runs_home_second_period || 0);
+
+  const secondAway =
+    Number(d.runs_away_second_period || 0);
+
+  const finalHomeRuns = firstHome + secondHome;
+  const finalAwayRuns = firstAway + secondAway;
+
+  // Kotiutuskisan juoksuja ei lasketa Totaliin.
+  const actualTotal =
+    finalHomeRuns + finalAwayRuns;
 
   let actualWinner = null;
 
@@ -1347,88 +1366,54 @@ async function saveFinalResult(match) {
     actualWinner = "home";
   } else if (periodsAway > periodsHome) {
     actualWinner = "away";
-  } else {
-    actualWinner = "draw";
   }
 
-  const firstHome = Number(d.runs_home_first_period || 0);
-  const firstAway = Number(d.runs_away_first_period || 0);
+  const shootoutPlayed =
+    !d.super_inning_is_not_played;
 
-  const secondHome = Number(d.runs_home_second_period || 0);
-  const secondAway = Number(d.runs_away_second_period || 0);
+  const response = await fetch(
+    "/.netlify/functions/update-result",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        match_id: String(match.id),
 
-  const shootoutPlayed = !d.super_inning_is_not_played;
+        result_string: r.result_string,
 
-  const shootoutHome = shootoutPlayed
-    ? Number(d.runs_home_super_inning || 0)
-    : null;
+        periods_home: periodsHome,
+        periods_away: periodsAway,
 
-  const shootoutAway = shootoutPlayed
-    ? Number(d.runs_away_super_inning || 0)
-    : null;
+        final_home_runs: finalHomeRuns,
+        final_away_runs: finalAwayRuns,
 
-  // Totalissa ei huomioida kotiutuskisan juoksuja.
-  const actualTotal =
-    firstHome +
-    firstAway +
-    secondHome +
-    secondAway;
+        actual_total: actualTotal,
+        actual_winner: actualWinner,
 
-  const finalHomeRuns =
-    firstHome +
-    secondHome;
+        actual_shootout_home: shootoutPlayed
+          ? Number(d.runs_home_super_inning || 0)
+          : null,
 
-  const finalAwayRuns =
-    firstAway +
-    secondAway;
-
-  try {
-    const response = await fetch(
-      "/.netlify/functions/update-result",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          match_id: String(match.id),
-
-          result_string: r.result_string,
-
-          periods_home: periodsHome,
-          periods_away: periodsAway,
-
-          final_home_runs: finalHomeRuns,
-          final_away_runs: finalAwayRuns,
-
-          actual_total: actualTotal,
-          actual_winner: actualWinner,
-
-          actual_shootout_home: shootoutHome,
-          actual_shootout_away: shootoutAway
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("Tuloksen tallennus epäonnistui:", data);
-      return;
+        actual_shootout_away: shootoutPlayed
+          ? Number(d.runs_away_super_inning || 0)
+          : null
+      })
     }
+  );
 
-    console.log(
-      "Lopputulos tallennettu:",
-      match.id,
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error(
+      "Lopputuloksen tallennus epäonnistui:",
       data
     );
-  } catch (error) {
-    console.error(
-      "Tuloksen tallennusvirhe:",
-      match.id,
-      error
-    );
+    return;
   }
+
+  console.log("Lopputulos tallennettu:", data);
 }
 function renderPowerTable(stats, targetId) {
   const target = $(targetId);
@@ -1977,28 +1962,28 @@ async function refreshLiveResults() {
       const prediction =
         lockedPredictions[match.id];
 
-      const finished =
-        Boolean(match.result);
-      if (finished) {
+const finished = Boolean(match.result);
+
+if (finished) {
   await saveFinalResult(match);
 }
 
-      /*
-       * Vain tämän ottelun tulosruutu
-       * vaihdetaan.
-       */
-      if (resultBox && prediction) {
-        resultBox.innerHTML =
-          resultHtml(match, prediction);
-      }
+/*
+ * Vain tämän ottelun tulosruutu
+ * vaihdetaan.
+ */
+if (resultBox && prediction) {
+  resultBox.innerHTML =
+    resultHtml(match, prediction);
+}
 
-      /*
-       * Alkamaton tai käynnissä oleva ottelu
-       * pitää päivityksen toiminnassa.
-       */
-      if (!finished) {
-        hasUnfinishedGames = true;
-      }
+/*
+ * Alkamaton tai käynnissä oleva ottelu
+ * pitää päivityksen toiminnassa.
+ */
+if (!finished) {
+  hasUnfinishedGames = true;
+}
     }
   }
 
