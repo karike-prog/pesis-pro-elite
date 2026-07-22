@@ -1378,12 +1378,13 @@ async function saveFinalResult(match) {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        match_id: String(match.id),
+   body: JSON.stringify({
+  match_id: String(match.id),
 
-        result_string: r.result_string,
+  result_string: r.result_string,
+  result_data: d,
 
-        periods_home: periodsHome,
+  periods_home: periodsHome,
         periods_away: periodsAway,
 
         final_home_runs: finalHomeRuns,
