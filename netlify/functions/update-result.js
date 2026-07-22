@@ -105,9 +105,10 @@ exports.handler = async function handler(event) {
       nullableNumber(input.actual_shootout_away)
   };
 
-  const endpoint =
-    `${supabaseUrl}/rest/v1/match_history` +
-    `?match_id=eq.${encodeURIComponent(matchId)}`;
+ const endpoint =
+  `${supabaseUrl}/rest/v1/match_history` +
+  `?match_id=eq.${encodeURIComponent(matchId)}` +
+  `&result_updated_at=is.null`;
 
   try {
     const response = await fetch(endpoint, {
@@ -139,12 +140,14 @@ exports.handler = async function handler(event) {
       });
     }
 
-    if (!Array.isArray(data) || data.length === 0) {
-      return jsonResponse(404, {
-        error: "Ottelua ei löytynyt tietokannasta",
-        match_id: matchId
-      });
-    }
+if (!Array.isArray(data) || data.length === 0) {
+  return jsonResponse(200, {
+    ok: true,
+    action: "already-updated",
+    match_id: matchId,
+    message: "Lopputulos oli jo tallennettu"
+  });
+}
 
     return jsonResponse(200, {
       ok: true,
