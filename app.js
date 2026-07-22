@@ -1964,7 +1964,8 @@ async function refreshLiveResults() {
 
 const finished = Boolean(match.result);
 
-if (finished) {
+if (finished && !match.resultSaved) {
+  match.resultSaved = true;
   await saveFinalResult(match);
 }
 
