@@ -1332,7 +1332,104 @@ function resultHtml(match, prediction) {
     </div>
   `;
 }
+async function saveFinalResult(match) {
+  if (!match?.result) return;
 
+  const r = match.result;
+  const d = r.details || r;
+
+  const periodsHome = Number(d.periods_home);
+  const periodsAway = Number(d.periods_away);
+
+  let actualWinner = null;
+
+  if (periodsHome > periodsAway) {
+    actualWinner = "home";
+  } else if (periodsAway > periodsHome) {
+    actualWinner = "away";
+  } else {
+    actualWinner = "draw";
+  }
+
+  const firstHome = Number(d.runs_home_first_period || 0);
+  const firstAway = Number(d.runs_away_first_period || 0);
+
+  const secondHome = Number(d.runs_home_second_period || 0);
+  const secondAway = Number(d.runs_away_second_period || 0);
+
+  const shootoutPlayed = !d.super_inning_is_not_played;
+
+  const shootoutHome = shootoutPlayed
+    ? Number(d.runs_home_super_inning || 0)
+    : null;
+
+  const shootoutAway = shootoutPlayed
+    ? Number(d.runs_away_super_inning || 0)
+    : null;
+
+  // Totalissa ei huomioida kotiutuskisan juoksuja.
+  const actualTotal =
+    firstHome +
+    firstAway +
+    secondHome +
+    secondAway;
+
+  const finalHomeRuns =
+    firstHome +
+    secondHome;
+
+  const finalAwayRuns =
+    firstAway +
+    secondAway;
+
+  try {
+    const response = await fetch(
+      "/.netlify/functions/update-result",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          match_id: String(match.id),
+
+          result_string: r.result_string,
+
+          periods_home: periodsHome,
+          periods_away: periodsAway,
+
+          final_home_runs: finalHomeRuns,
+          final_away_runs: finalAwayRuns,
+
+          actual_total: actualTotal,
+          actual_winner: actualWinner,
+
+          actual_shootout_home: shootoutHome,
+          actual_shootout_away: shootoutAway
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("Tuloksen tallennus epäonnistui:", data);
+      return;
+    }
+
+    console.log(
+      "Lopputulos tallennettu:",
+      match.id,
+      data
+    );
+  } catch (error) {
+    console.error(
+      "Tuloksen tallennusvirhe:",
+      match.id,
+      error
+    );
+  }
+}
 function renderPowerTable(stats, targetId) {
   const target = $(targetId);
   if (!target) return;
@@ -1882,6 +1979,9 @@ async function refreshLiveResults() {
 
       const finished =
         Boolean(match.result);
+      if (finished) {
+  await saveFinalResult(match);
+}
 
       /*
        * Vain tämän ottelun tulosruutu
