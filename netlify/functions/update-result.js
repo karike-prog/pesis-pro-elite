@@ -83,6 +83,11 @@ exports.handler = async function handler(event) {
     result_updated_at: new Date().toISOString(),
 
     result_string: cleanText(input.result_string),
+    result_data:
+  input.result_data &&
+  typeof input.result_data === "object"
+    ? input.result_data
+    : null,
 
     periods_home: nullableNumber(input.periods_home),
     periods_away: nullableNumber(input.periods_away),
