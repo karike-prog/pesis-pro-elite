@@ -1639,8 +1639,162 @@ function getTeamPlayerPower(team, playerStats) {
 }
 const lockedPredictions = {};
 let liveRefreshTimer = null;
+async function fetchValueData(date) {
+  try {
+    const response = await fetch(
+      `/.netlify/functions/value-data` +
+      `?date=${encodeURIComponent(date)}`
+    );
 
-async function renderMatches(matches, allMatches, selectedSeries, targetId, cardClass, playerStats) {
+    if (!response.ok) {
+      console.error(
+        "Arvokohdedatan haku epäonnistui:",
+        response.status
+      );
+
+      return {};
+    }
+
+    const json = await response.json();
+    const rows =
+      Array.isArray(json.data)
+        ? json.data
+        : [];
+
+    return Object.fromEntries(
+      rows.map(row => [
+        String(row.match_id),
+        row
+      ])
+    );
+  } catch (error) {
+    console.error(
+      "Arvokohdedatan haku epäonnistui:",
+      error
+    );
+
+    return {};
+  }
+}
+
+function buildValuePicks(
+  match,
+  prediction,
+  total,
+  market
+) {
+  if (!market) return [];
+
+  const picks = [];
+
+  /*
+   * LOPULLINEN VOITTAJA
+   *
+   * Näytetään vain, jos odotusarvo on
+   * vähintään 1.08 eli noin +8 %.
+   */
+  const homeFinalOdds =
+    Number(market.veikkaus_final_home);
+
+  const awayFinalOdds =
+    Number(market.veikkaus_final_away);
+
+  const homeFinalValue =
+    Number.isFinite(homeFinalOdds)
+      ? prediction.homePct /
+        100 *
+        homeFinalOdds
+      : null;
+
+  const awayFinalValue =
+    Number.isFinite(awayFinalOdds)
+      ? prediction.awayPct /
+        100 *
+        awayFinalOdds
+      : null;
+
+  if (
+    homeFinalValue !== null &&
+    homeFinalValue >= 1.08 &&
+    (
+      awayFinalValue === null ||
+      homeFinalValue > awayFinalValue
+    )
+  ) {
+    picks.push(
+      `🏆 Lopullinen voittaja ${
+        match.home.shorthand ||
+        match.home.name
+      }`
+    );
+  } else if (
+    awayFinalValue !== null &&
+    awayFinalValue >= 1.08
+  ) {
+    picks.push(
+      `🏆 Lopullinen voittaja ${
+        match.away.shorthand ||
+        match.away.name
+      }`
+    );
+  }
+
+  /*
+   * TOTAL
+   *
+   * Arvokohde syntyy, kun Elite eroaa
+   * Veikkauksen linjasta vähintään
+   * 1,5 juoksua.
+   */
+  const marketLine =
+    Number(market.veikkaus_total_line);
+
+  if (Number.isFinite(marketLine)) {
+    const totalDifference =
+      total - marketLine;
+
+    if (totalDifference >= 1.5) {
+      picks.push(
+        `📈 Total yli ${marketLine
+          .toFixed(1)
+          .replace(".", ",")} juoksua`
+      );
+    } else if (totalDifference <= -1.5) {
+      picks.push(
+        `📉 Total alle ${marketLine
+          .toFixed(1)
+          .replace(".", ",")} juoksua`
+      );
+    }
+  }
+
+  return picks;
+}
+
+function valuePicksHtml(picks) {
+  if (!Array.isArray(picks) || !picks.length) {
+    return "";
+  }
+
+  return `
+    <div class="valuePicks">
+      <div class="valuePicksTitle">
+        ⚡ Eliten arvokohteet
+      </div>
+
+      ${picks
+        .map(
+          pick => `
+            <div class="valuePick">
+              ${pick}
+            </div>
+          `
+        )
+        .join("")}
+    </div>
+  `;
+}
+async function renderMatches(matches, allMatches, selectedSeries, targetId, cardClass, playerStats, valueData) {
   if (!matches.length) {
     $(targetId).innerHTML = "<p>Otteluita ei löytynyt valitulle päivälle.</p>";
     return;
@@ -1721,6 +1875,19 @@ const prediction = predict(
 
     const total =
       prediction.homeRuns + prediction.awayRuns;
+      const market =
+  valueData?.[String(match.id)] || null;
+
+const valuePicks =
+  buildValuePicks(
+    match,
+    prediction,
+    total,
+    market
+  );
+
+const valueHtml =
+  valuePicksHtml(valuePicks);
 
     const shootoutPct =
       shootoutProbability(prediction);
@@ -1987,6 +2154,7 @@ const prediction = predict(
         <span class="pill ${tagClass}">
           ${tag}
         </span>
+        ${valueHtml}
 
         <span class="pill blue">
           Total ${total.toFixed(1)}
@@ -2176,6 +2344,8 @@ if (!finished) {
 async function load() {
   const selectedDate =
     $("date").value || today();
+    const valueData =
+  await fetchValueData(selectedDate);
 
   $("status").textContent =
     "Ladataan Miesten ja Naisten Superpesis...";
@@ -2259,14 +2429,15 @@ async function load() {
         powerTarget
       );
 
-      await renderMatches(
-        dayMatches,
-        matches,
-        series,
-        matchesTarget,
-        cardClass,
-        playerStats
-      );
+     await renderMatches(
+  dayMatches,
+  matches,
+  series,
+  matchesTarget,
+  cardClass,
+  playerStats,
+  valueData
+);
 
       return true;
     } catch (error) {

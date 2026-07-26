@@ -70,6 +70,60 @@ function getWinnerOdds(eventItem) {
     away: oddsFor("A")
   };
 }
+function getFinalWinnerOdds(eventItem) {
+  const finalWinnerMarket = (eventItem.markets || []).find(
+    (market) => {
+      const name = String(
+        market?.name || ""
+      ).toLowerCase();
+
+      const outcomes = market?.outcomes || [];
+
+      const hasHome = outcomes.some(
+        outcome => outcome?.subType === "H"
+      );
+
+      const hasAway = outcomes.some(
+        outcome => outcome?.subType === "A"
+      );
+
+      const hasDraw = outcomes.some(
+        outcome => outcome?.subType === "D"
+      );
+
+      return (
+        hasHome &&
+        hasAway &&
+        !hasDraw &&
+        (
+          name.includes("lopullinen voittaja") ||
+          name.includes("ottelun voittaja") ||
+          name === "voittaja"
+        )
+      );
+    }
+  );
+
+  const outcomes =
+    finalWinnerMarket?.outcomes || [];
+
+  function oddsFor(subType) {
+    const outcome = outcomes.find(
+      item => item?.subType === subType
+    );
+
+    const price = (outcome?.prices || []).find(
+      item => item?.priceType === "LP"
+    );
+
+    return price?.decimal ?? null;
+  }
+
+  return {
+    home: oddsFor("H"),
+    away: oddsFor("A")
+  };
+}
 function getTotalOdds(eventItem) {
   const totalMarket = (eventItem.markets || []).find((market) => {
     const name = String(market?.name || "").toLowerCase();
@@ -224,8 +278,7 @@ exports.handler = async function handler(event) {
         .toISOString()
         .slice(0, 10);
 
-      const odds = getWinnerOdds(eventItem);
-      const totals = getTotalOdds(eventItem);
+      const odds = getWinnerOdds(eventItem
 
       const endpoint =
         `${supabaseUrl}/rest/v1/match_history` +
@@ -240,6 +293,8 @@ exports.handler = async function handler(event) {
         veikkaus_home_odds: odds.home,
         veikkaus_draw_odds: odds.draw,
         veikkaus_away_odds: odds.away,
+        veikkaus_final_home: finalOdds.home,
+        veikkaus_final_away: finalOdds.away,
         veikkaus_total_line: totals.line,
         veikkaus_over_odds: totals.over,
         veikkaus_under_odds: totals.under

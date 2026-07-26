@@ -993,3 +993,22 @@ main,
 .teamCell {
     font-weight: 800;
 }
+.valuePicks {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #f0b429;
+  border-radius: 12px;
+  background: #fff9e8;
+}
+
+.valuePicksTitle {
+  margin-bottom: 7px;
+  font-weight: 800;
+  color: #7a4d00;
+}
+
+.valuePick {
+  margin-top: 4px;
+  font-weight: 700;
+  color: #263238;
+}
