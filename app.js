@@ -198,7 +198,12 @@ function buildStats(matches) {
       home.homePlayed++;
       home.homeFor += homeRuns;
       home.homeAgainst += awayRuns;
-      home.recent.push({ date: m.date, for: homeRuns, against: awayRuns });
+      home.recent.push({
+  date: m.date,
+  for: homeRuns,
+  against: awayRuns,
+  opponentId: m.away.id
+});
 
       away.played++;
       away.for += awayRuns;
@@ -206,7 +211,12 @@ function buildStats(matches) {
       away.awayPlayed++;
       away.awayFor += awayRuns;
       away.awayAgainst += homeRuns;
-      away.recent.push({ date: m.date, for: awayRuns, against: homeRuns });
+      away.recent.push({
+  date: m.date,
+  for: awayRuns,
+  against: homeRuns,
+  opponentId: m.home.id
+});
 
       if (hp > ap) {
         home.homeWins = (home.homeWins || 0) + 1;
@@ -348,7 +358,129 @@ function recentAvg(team, field) {
 
   return games.reduce((sum, g) => sum + g[field], 0) / games.length;
 }
+function recentOpponentAdjustedAvg(team, field, stats) {
+  const games = [...team.recent]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 5);
 
+  if (!games.length) return null;
+
+  /*
+   * Uusin ottelu vaikuttaa eniten.
+   * Painojen summa on 1,00.
+   */
+  const RECENCY_WEIGHTS = [
+    0.30,
+    0.25,
+    0.20,
+    0.15,
+    0.10
+  ];
+
+  const teams = Object.values(stats)
+    .filter(item =>
+      Number(item.played || 0) > 0
+    );
+
+  const totalRuns = teams.reduce(
+    (sum, item) =>
+      sum + Number(item.for || 0),
+    0
+  );
+
+  const totalPlayed = teams.reduce(
+    (sum, item) =>
+      sum + Number(item.played || 0),
+    0
+  );
+
+  const leagueAverage =
+    totalRuns / Math.max(1, totalPlayed);
+
+  let weightedTotal = 0;
+  let usedWeight = 0;
+
+  games.forEach((game, index) => {
+    const rawValue = Number(game[field]);
+
+    if (!Number.isFinite(rawValue)) {
+      return;
+    }
+
+    const opponent =
+      stats[game.opponentId];
+
+    let adjustedValue = rawValue;
+
+    if (
+      opponent &&
+      Number(opponent.played || 0) > 0 &&
+      leagueAverage > 0
+    ) {
+      /*
+       * Tehtyjä juoksuja arvioitaessa katsotaan
+       * vastustajan puolustusvoimaa.
+       *
+       * Vahvaa puolustusta vastaan tehdyt juoksut
+       * saavat suuremman arvon.
+       */
+      if (field === "for") {
+        const opponentDefense =
+          Number(opponent.against || 0) /
+          Number(opponent.played);
+
+        if (opponentDefense > 0) {
+          const opponentFactor = clamp(
+            leagueAverage / opponentDefense,
+            0.75,
+            1.25
+          );
+
+          adjustedValue =
+            rawValue * opponentFactor;
+        }
+      }
+
+      /*
+       * Päästettyjä juoksuja arvioitaessa katsotaan
+       * vastustajan hyökkäysvoimaa.
+       *
+       * Vahvaa hyökkäystä vastaan päästettyjen
+       * juoksujen merkitystä pienennetään.
+       */
+      if (field === "against") {
+        const opponentAttack =
+          Number(opponent.for || 0) /
+          Number(opponent.played);
+
+        if (opponentAttack > 0) {
+          const opponentFactor = clamp(
+            leagueAverage / opponentAttack,
+            0.75,
+            1.25
+          );
+
+          adjustedValue =
+            rawValue * opponentFactor;
+        }
+      }
+    }
+
+    const weight =
+      RECENCY_WEIGHTS[index] || 0;
+
+    weightedTotal +=
+      adjustedValue * weight;
+
+    usedWeight += weight;
+  });
+
+  if (usedWeight <= 0) {
+    return null;
+  }
+
+  return weightedTotal / usedWeight;
+}
 function average(a, b, fallback) {
   const values = [a, b].filter(v => Number.isFinite(v) && v > 0);
   if (!values.length) return fallback;
@@ -570,18 +702,44 @@ function predict(
   /*
     Viiden viimeisen ottelun painotus 40 %.
   */
-  const hRecentFor = recentAvg(home, "for");
-  const hRecentAgainst = recentAvg(home, "against");
-  const aRecentFor = recentAvg(away, "for");
-  const aRecentAgainst = recentAvg(away, "against");
+ const hRecentFor =
+  recentOpponentAdjustedAvg(
+    home,
+    "for",
+    stats
+  );
 
+const hRecentAgainst =
+  recentOpponentAdjustedAvg(
+    home,
+    "against",
+    stats
+  );
+
+const aRecentFor =
+  recentOpponentAdjustedAvg(
+    away,
+    "for",
+    stats
+  );
+
+const aRecentAgainst =
+  recentOpponentAdjustedAvg(
+    away,
+    "against",
+    stats
+  );
+/*
+  Viiden viimeisen vastustajakorjatun ottelun
+  painotus 65 %.
+*/
   if (hRecentFor !== null && aRecentAgainst !== null) {
     const recentHomeEstimate =
       (hRecentFor + aRecentAgainst) / 2;
 
     homeRuns =
-      homeRuns * 0.60 +
-      recentHomeEstimate * 0.40;
+  homeRuns * 0.35 +
+  recentHomeEstimate * 0.65;
   }
 
   if (aRecentFor !== null && hRecentAgainst !== null) {
@@ -589,8 +747,8 @@ function predict(
       (aRecentFor + hRecentAgainst) / 2;
 
     awayRuns =
-      awayRuns * 0.60 +
-      recentAwayEstimate * 0.40;
+  awayRuns * 0.35 +
+  recentAwayEstimate * 0.65;
   }
 
   /*
