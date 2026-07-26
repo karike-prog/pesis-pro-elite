@@ -22,6 +22,10 @@ const TEAM_NAMES = {
   "Koskenkorvan Urheilijat": "KoU",
   "Oulun Lippo N": "Lippo Naiset",
   "Pöytyän Urheilijat N": "PöU Pesis",
+  "Kiteen Pallo": "KiPa",
+"Kouvolan Pallonlyöjät": "KPL",
+"Mailattaret Vaasa N": "Mailattaret",
+"Joensuun Maila N": "JoMa",
 };
 
 function jsonResponse(statusCode, body) {
