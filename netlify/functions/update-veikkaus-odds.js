@@ -273,6 +273,17 @@ exports.handler = async function handler(event) {
         getMappedTeamName(awayOriginal);
 
       const startTime = new Date(eventItem.startTime);
+      const lockTime = new Date(
+  startTime.getTime() - 5 * 60 * 1000
+);
+
+if (Date.now() >= lockTime.getTime()) {
+  console.log(
+    `Ohitetaan ${homeTeam} - ${awayTeam}, markkina lukittu`
+  );
+  continue;
+}
+
 
       const matchDate = startTime
         .toISOString()

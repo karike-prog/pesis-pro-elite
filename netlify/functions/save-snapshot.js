@@ -171,13 +171,14 @@ exports.handler = async function handler(event) {
     startTimestamp - 5 * 60 * 1000;
 
   if (Date.now() >= lockTime) {
-    return jsonResponse(409, {
-      error:
-        "Ottelun ennuste on jo lukittu",
-      match_id: matchId,
-      start_time: startTime
-    });
-  }
+  return jsonResponse(200, {
+    ok: true,
+    skipped: true,
+    reason: "Ottelun ennuste on jo lukittu",
+    match_id: matchId,
+    start_time: startTime
+  });
+}
 
   const normalizedStartTime =
     new Date(startTimestamp).toISOString();
