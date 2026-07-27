@@ -279,8 +279,12 @@ exports.handler = async function handler(event) {
 
 if (Date.now() >= lockTime.getTime()) {
   console.log(
-    `Ohitetaan ${homeTeam} - ${awayTeam}, markkina lukittu`
-  );
+  "Ohitetaan " +
+    homeTeam +
+    " - " +
+    awayTeam +
+    ", markkina lukittu"
+);
   continue;
 }
 
@@ -289,7 +293,9 @@ if (Date.now() >= lockTime.getTime()) {
         .toISOString()
         .slice(0, 10);
 
-      const odds = getWinnerOdds(eventItem
+      const odds = getWinnerOdds(eventItem);
+      const finalOdds = getFinalWinnerOdds(eventItem);
+      const totals = getTotalOdds(eventItem);
 
       const endpoint =
         `${supabaseUrl}/rest/v1/match_history` +

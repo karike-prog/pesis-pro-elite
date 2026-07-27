@@ -1693,25 +1693,43 @@ function buildValuePicks(
    * Näytetään vain, jos odotusarvo on
    * vähintään 1.08 eli noin +8 %.
    */
-  const homeFinalOdds =
-    Number(market.veikkaus_final_home);
+  const rawHomeFinalOdds =
+  market.veikkaus_final_home;
 
-  const awayFinalOdds =
-    Number(market.veikkaus_final_away);
+const rawAwayFinalOdds =
+  market.veikkaus_final_away;
+
+const homeFinalOdds =
+  rawHomeFinalOdds === null ||
+  rawHomeFinalOdds === undefined ||
+  rawHomeFinalOdds === ""
+    ? null
+    : Number(rawHomeFinalOdds);
+
+const awayFinalOdds =
+  rawAwayFinalOdds === null ||
+  rawAwayFinalOdds === undefined ||
+  rawAwayFinalOdds === ""
+    ? null
+    : Number(rawAwayFinalOdds);
 
   const homeFinalValue =
-    Number.isFinite(homeFinalOdds)
-      ? prediction.homePct /
-        100 *
-        homeFinalOdds
-      : null;
+  homeFinalOdds !== null &&
+  Number.isFinite(homeFinalOdds) &&
+  homeFinalOdds > 1
+    ? prediction.homePct /
+      100 *
+      homeFinalOdds
+    : null;
 
-  const awayFinalValue =
-    Number.isFinite(awayFinalOdds)
-      ? prediction.awayPct /
-        100 *
-        awayFinalOdds
-      : null;
+const awayFinalValue =
+  awayFinalOdds !== null &&
+  Number.isFinite(awayFinalOdds) &&
+  awayFinalOdds > 1
+    ? prediction.awayPct /
+      100 *
+      awayFinalOdds
+    : null;
 
   if (
     homeFinalValue !== null &&
@@ -1746,10 +1764,21 @@ function buildValuePicks(
    * Veikkauksen linjasta vähintään
    * 1,5 juoksua.
    */
-  const marketLine =
-    Number(market.veikkaus_total_line);
+  const rawMarketLine =
+  market.veikkaus_total_line;
 
-  if (Number.isFinite(marketLine)) {
+const marketLine =
+  rawMarketLine === null ||
+  rawMarketLine === undefined ||
+  rawMarketLine === ""
+    ? null
+    : Number(rawMarketLine);
+
+if (
+  marketLine !== null &&
+  Number.isFinite(marketLine) &&
+  marketLine > 0
+) {
     const totalDifference =
       total - marketLine;
 
