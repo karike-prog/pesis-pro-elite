@@ -966,7 +966,7 @@ function parseLineupRows({
 
         raw_player: {
           side,
-          ...player
+          player
         }
       });
     }
