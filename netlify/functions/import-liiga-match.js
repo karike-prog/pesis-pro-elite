@@ -101,7 +101,45 @@ function findValueByKeys(
 
   return undefined;
 }
+function findEventObject(source, eventId) {
+  if (!source) return null;
 
+  if (Array.isArray(source)) {
+    for (const item of source) {
+      const found =
+        findEventObject(item, eventId);
+
+      if (found) return found;
+    }
+
+    return null;
+  }
+
+  if (typeof source !== "object") {
+    return null;
+  }
+
+  const objectEventId =
+    source.eventId ??
+    source.event_id ??
+    source.id;
+
+  if (
+    objectEventId !== undefined &&
+    String(objectEventId) === String(eventId)
+  ) {
+    return source;
+  }
+
+  for (const value of Object.values(source)) {
+    const found =
+      findEventObject(value, eventId);
+
+    if (found) return found;
+  }
+
+  return null;
+}
 function findLineupContainer(source) {
   if (!source) return null;
 
@@ -1159,38 +1197,54 @@ const awayTeamName = String(
       });
     }
 
+       /*
+     * Etsitään juuri tämän ottelun varsinainen
+     * tapahtumaobjekti. Näin emme poimi
+     * vahingossa ensimmäisen erän tulosta.
+     */
+    const eventObject =
+      findEventObject(
+        rawDetails,
+        eventId
+      ) ||
+      findEventObject(
+        details,
+        eventId
+      ) ||
+      details;
+
     const homeScore = toInteger(
-  findValueByKeys(details, [
-    "eventHomeScore",
-    "homeScore",
-    "homeFullTimeResult",
-    "scoreHome",
-    "homeResult"
-  ])
-);
+      firstDefined(
+        eventObject?.eventHomeScore,
+        eventObject?.homeFullTimeResult,
+        eventObject?.homeScore,
+        eventObject?.scoreHome,
+        eventObject?.homeResult
+      )
+    );
 
-const awayScore = toInteger(
-  findValueByKeys(details, [
-    "eventAwayScore",
-    "awayScore",
-    "awayFullTimeResult",
-    "scoreAway",
-    "awayResult"
-  ])
-);
+    const awayScore = toInteger(
+      firstDefined(
+        eventObject?.eventAwayScore,
+        eventObject?.awayFullTimeResult,
+        eventObject?.awayScore,
+        eventObject?.scoreAway,
+        eventObject?.awayResult
+      )
+    );
 
-const rawStartTime =
-  findValueByKeys(details, [
-    "startDateTimeUtc",
-    "startDateTime",
-    "eventStartTime",
-    "startTime",
-    "startUTCTime",
-    "timestamp"
-  ]);
+    const rawStartTime =
+      firstDefined(
+        eventObject?.startDateTimeUtc,
+        eventObject?.startDateTime,
+        eventObject?.eventStartTime,
+        eventObject?.startTime,
+        eventObject?.startUTCTime,
+        eventObject?.timestamp
+      );
 
-const startTime =
-  normalizeTimestamp(rawStartTime);
+    const startTime =
+      normalizeTimestamp(rawStartTime);
 
     const periodScores =
       parsePeriodScores(details);
@@ -1354,9 +1408,41 @@ const startTime =
           savedLineups.length
       },
 
-      diagnostics: {
+            diagnostics: {
         rawStartTime:
           rawStartTime ?? null,
+
+        detectedEventObject: {
+          eventId:
+            eventObject?.eventId ??
+            eventObject?.id ??
+            null,
+
+          eventHomeScore:
+            eventObject?.eventHomeScore ??
+            null,
+
+          eventAwayScore:
+            eventObject?.eventAwayScore ??
+            null,
+
+          homeFullTimeResult:
+            eventObject?.homeFullTimeResult ??
+            null,
+
+          awayFullTimeResult:
+            eventObject?.awayFullTimeResult ??
+            null,
+
+          startDateTimeUtc:
+            eventObject?.startDateTimeUtc ??
+            null,
+
+          startTime:
+            eventObject?.startTime ??
+            null
+        },
+
 
         lineupStructure: {
           homePlayers:
