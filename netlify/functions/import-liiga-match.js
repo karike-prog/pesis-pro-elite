@@ -1120,7 +1120,10 @@ exports.handler = async function handler(event) {
         sportDbApiKey
       )
     ]);
-
+console.log(
+  "SPORTDB RAW DETAILS:",
+  JSON.stringify(rawDetails, null, 2)
+);
     const details =
       unwrapDetails(rawDetails);
 
