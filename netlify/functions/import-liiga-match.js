@@ -378,6 +378,26 @@ async function supabaseUpsert({
       )}`
     : "";
 
+  const allKeys = [
+    ...new Set(
+      rows.flatMap(row =>
+        Object.keys(row)
+      )
+    )
+  ];
+
+  const normalizedRows =
+    rows.map(row =>
+      Object.fromEntries(
+        allKeys.map(key => [
+          key,
+          row[key] === undefined
+            ? null
+            : row[key]
+        ])
+      )
+    );
+
   const response = await fetch(
     `${supabaseUrl}/rest/v1/${table}${conflictQuery}`,
     {
@@ -390,7 +410,7 @@ async function supabaseUpsert({
         Prefer:
           "resolution=merge-duplicates,return=representation"
       },
-      body: JSON.stringify(rows)
+      body: JSON.stringify(normalizedRows)
     }
   );
 
