@@ -1117,27 +1117,7 @@ const awayTeamName = String(
   )
 );
 
-    const homeTeamName = String(
-      firstDefined(
-        details?.eventHomeParticipantName,
-        details?.homeParticipantName,
-        details?.homeTeam?.name,
-        details?.home?.name,
-        details?.homeName,
-        ""
-      )
-    );
-
-    const awayTeamName = String(
-      firstDefined(
-        details?.eventAwayParticipantName,
-        details?.awayParticipantName,
-        details?.awayTeam?.name,
-        details?.away?.name,
-        details?.awayName,
-        ""
-      )
-    );
+ 
 
     if (
       !homeTeamId ||
@@ -1329,7 +1309,7 @@ const startTime =
           "event_id,team_id,player_id"
       });
 
-    return jsonResponse(200, {
+        return jsonResponse(200, {
       ok: true,
 
       eventId,
@@ -1355,21 +1335,24 @@ const startTime =
       },
 
       diagnostics: {
-  rawStartTime:
-    rawStartTime ?? null,
+        rawStartTime:
+          rawStartTime ?? null,
 
-  lineupStructure: {
-    homePlayers:
-      Array.isArray(lineups?.home)
-        ? lineups.home.length
-        : 0,
+        lineupStructure: {
+          homePlayers:
+            Array.isArray(lineups?.home)
+              ? lineups.home.length
+              : 0,
 
-    awayPlayers:
-      Array.isArray(lineups?.away)
-        ? lineups.away.length
-        : 0
-  }
-},
+          awayPlayers:
+            Array.isArray(lineups?.away)
+              ? lineups.away.length
+              : 0
+        }
+      },
+
+      detectedStats:
+        statsRows.map(row => ({
           team:
             row.team_name,
           goals:
