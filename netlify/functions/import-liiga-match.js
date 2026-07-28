@@ -31,7 +31,130 @@ function firstDefined(...values) {
       value !== ""
   );
 }
+function findValueByKeys(
+  source,
+  possibleKeys
+) {
+  if (
+    source === null ||
+    source === undefined
+  ) {
+    return undefined;
+  }
 
+  if (Array.isArray(source)) {
+    for (const item of source) {
+      const found = findValueByKeys(
+        item,
+        possibleKeys
+      );
+
+      if (
+        found !== undefined &&
+        found !== null &&
+        found !== ""
+      ) {
+        return found;
+      }
+    }
+
+    return undefined;
+  }
+
+  if (typeof source !== "object") {
+    return undefined;
+  }
+
+  for (const key of possibleKeys) {
+    if (
+      Object.prototype.hasOwnProperty.call(
+        source,
+        key
+      )
+    ) {
+      const value = source[key];
+
+      if (
+        value !== undefined &&
+        value !== null &&
+        value !== ""
+      ) {
+        return value;
+      }
+    }
+  }
+
+  for (const value of Object.values(source)) {
+    const found = findValueByKeys(
+      value,
+      possibleKeys
+    );
+
+    if (
+      found !== undefined &&
+      found !== null &&
+      found !== ""
+    ) {
+      return found;
+    }
+  }
+
+  return undefined;
+}
+
+function findLineupContainer(source) {
+  if (!source) return null;
+
+  if (Array.isArray(source)) {
+    for (const item of source) {
+      const found =
+        findLineupContainer(item);
+
+      if (found) return found;
+    }
+
+    return null;
+  }
+
+  if (typeof source !== "object") {
+    return null;
+  }
+
+  const home =
+    source.home ||
+    source.homePlayers ||
+    source.homeLineup ||
+    source.local;
+
+  const away =
+    source.away ||
+    source.awayPlayers ||
+    source.awayLineup ||
+    source.visitor;
+
+  if (
+    Array.isArray(home) ||
+    Array.isArray(away)
+  ) {
+    return {
+      home: Array.isArray(home)
+        ? home
+        : [],
+      away: Array.isArray(away)
+        ? away
+        : []
+    };
+  }
+
+  for (const value of Object.values(source)) {
+    const found =
+      findLineupContainer(value);
+
+    if (found) return found;
+  }
+
+  return null;
+}
 function toNumber(value) {
   if (
     value === undefined ||
@@ -300,40 +423,89 @@ function unwrapDetails(rawDetails) {
 }
 
 function unwrapLineups(rawLineups) {
-  if (!Array.isArray(rawLineups)) {
-    return rawLineups || {};
+  const container =
+    findLineupContainer(rawLineups);
+
+  if (container) {
+    return container;
   }
 
   /*
-   * Näyttämässäsi vastauksessa rakenne oli:
-   * [
-   *   {
-   *     home: [...],
-   *     away: [...]
-   *   }
-   * ]
+   * Varavaihtoehto, jos pelaajat tulevat
+   * yhtenä listana ja joukkuepuoli on
+   * merkitty pelaajan tietoihin.
    */
-  if (
-    rawLineups.length === 1 &&
-    (
-      rawLineups[0]?.home ||
-      rawLineups[0]?.away
-    )
-  ) {
-    return rawLineups[0];
+  const allPlayers = [];
+
+  function collectPlayers(source) {
+    if (!source) return;
+
+    if (Array.isArray(source)) {
+      for (const item of source) {
+        collectPlayers(item);
+      }
+
+      return;
+    }
+
+    if (typeof source !== "object") {
+      return;
+    }
+
+    const playerId = firstDefined(
+      source.participantId,
+      source.playerId
+    );
+
+    const playerName = firstDefined(
+      source.participantName,
+      source.playerName
+    );
+
+    if (playerId && playerName) {
+      allPlayers.push(source);
+      return;
+    }
+
+    for (const value of Object.values(source)) {
+      collectPlayers(value);
+    }
   }
 
+  collectPlayers(rawLineups);
+
   return {
-    home: rawLineups.filter(
-      player =>
-        String(player?.side || "")
-          .toLowerCase() === "home"
-    ),
-    away: rawLineups.filter(
-      player =>
-        String(player?.side || "")
-          .toLowerCase() === "away"
-    )
+    home: allPlayers.filter(player => {
+      const side = String(
+        firstDefined(
+          player.side,
+          player.teamSide,
+          player.participantSide,
+          ""
+        )
+      ).toLowerCase();
+
+      return (
+        side === "home" ||
+        side === "local"
+      );
+    }),
+
+    away: allPlayers.filter(player => {
+      const side = String(
+        firstDefined(
+          player.side,
+          player.teamSide,
+          player.participantSide,
+          ""
+        )
+      ).toLowerCase();
+
+      return (
+        side === "away" ||
+        side === "visitor"
+      );
+    })
   };
 }
 
@@ -698,8 +870,11 @@ function parseLineupRows({
         );
 
       const positionKey = String(
-        specialPosition || position || ""
-      ).toUpperCase();
+  specialPosition || position || ""
+)
+  .replace(/[()]/g, "")
+  .trim()
+  .toUpperCase();
 
       const isGoalkeeper =
         positionKey === "G" ||
@@ -895,26 +1070,52 @@ exports.handler = async function handler(event) {
       unwrapLineups(rawLineups);
 
     const homeTeamId = String(
-      firstDefined(
-        details?.eventHomeParticipantId,
-        details?.homeParticipantId,
-        details?.homeTeam?.id,
-        details?.home?.id,
-        details?.homeId,
-        ""
-      )
-    );
+  firstDefined(
+    findValueByKeys(details, [
+      "eventHomeParticipantId",
+      "homeParticipantId",
+      "homeTeamId",
+      "homeId"
+    ]),
+    ""
+  )
+);
 
-    const awayTeamId = String(
-      firstDefined(
-        details?.eventAwayParticipantId,
-        details?.awayParticipantId,
-        details?.awayTeam?.id,
-        details?.away?.id,
-        details?.awayId,
-        ""
-      )
-    );
+const awayTeamId = String(
+  firstDefined(
+    findValueByKeys(details, [
+      "eventAwayParticipantId",
+      "awayParticipantId",
+      "awayTeamId",
+      "awayId"
+    ]),
+    ""
+  )
+);
+
+const homeTeamName = String(
+  firstDefined(
+    findValueByKeys(details, [
+      "eventHomeParticipantName",
+      "homeParticipantName",
+      "homeTeamName",
+      "homeName"
+    ]),
+    ""
+  )
+);
+
+const awayTeamName = String(
+  firstDefined(
+    findValueByKeys(details, [
+      "eventAwayParticipantName",
+      "awayParticipantName",
+      "awayTeamName",
+      "awayName"
+    ]),
+    ""
+  )
+);
 
     const homeTeamName = String(
       firstDefined(
@@ -959,31 +1160,37 @@ exports.handler = async function handler(event) {
     }
 
     const homeScore = toInteger(
-      firstDefined(
-        details?.eventHomeScore,
-        details?.homeScore,
-        details?.score?.home,
-        details?.home?.score
-      )
-    );
+  findValueByKeys(details, [
+    "eventHomeScore",
+    "homeScore",
+    "homeFullTimeResult",
+    "scoreHome",
+    "homeResult"
+  ])
+);
 
-    const awayScore = toInteger(
-      firstDefined(
-        details?.eventAwayScore,
-        details?.awayScore,
-        details?.score?.away,
-        details?.away?.score
-      )
-    );
+const awayScore = toInteger(
+  findValueByKeys(details, [
+    "eventAwayScore",
+    "awayScore",
+    "awayFullTimeResult",
+    "scoreAway",
+    "awayResult"
+  ])
+);
 
-    const startTime = normalizeTimestamp(
-      firstDefined(
-        details?.startDateTimeUtc,
-        details?.startTime,
-        details?.eventStartTime,
-        details?.timestamp
-      )
-    );
+const rawStartTime =
+  findValueByKeys(details, [
+    "startDateTimeUtc",
+    "startDateTime",
+    "eventStartTime",
+    "startTime",
+    "startUTCTime",
+    "timestamp"
+  ]);
+
+const startTime =
+  normalizeTimestamp(rawStartTime);
 
     const periodScores =
       parsePeriodScores(details);
@@ -1147,8 +1354,22 @@ exports.handler = async function handler(event) {
           savedLineups.length
       },
 
-      detectedStats:
-        statsRows.map(row => ({
+      diagnostics: {
+  rawStartTime:
+    rawStartTime ?? null,
+
+  lineupStructure: {
+    homePlayers:
+      Array.isArray(lineups?.home)
+        ? lineups.home.length
+        : 0,
+
+    awayPlayers:
+      Array.isArray(lineups?.away)
+        ? lineups.away.length
+        : 0
+  }
+},
           team:
             row.team_name,
           goals:
