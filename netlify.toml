@@ -16,3 +16,5 @@
   from = "/api/lineup"
   to = "/.netlify/functions/lineup"
   status = 200
+[functions."scheduled-veikkaus-odds"]
+  schedule = "*/30 6-17 * * *"
