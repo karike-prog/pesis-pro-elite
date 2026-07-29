@@ -700,8 +700,8 @@ function predict(
   awayRuns -= fieldWinAdj;
 
   /*
-    Viiden viimeisen ottelun painotus 40 %.
-  */
+  Viiden viimeisen vastustajakorjatun ottelun painotus 65 %.
+*/
  const hRecentFor =
   recentOpponentAdjustedAvg(
     home,
@@ -787,6 +787,56 @@ const aRecentAgainst =
   */
   const pressureDifference = homePressure - awayPressure;
   const pressureAdjustment = pressureDifference * 0.30;
+/*
+  Lähekkäisten sarjasijoitusten ottelu.
+
+  Tämä vaikuttaa vain ottelukortin kommenttiin,
+  ei juoksuarvioon.
+*/
+const homeStanding = standings.find(
+  row => String(row.teamId) === String(homeTeam.id)
+);
+
+const awayStanding = standings.find(
+  row => String(row.teamId) === String(awayTeam.id)
+);
+
+const positionDifference =
+  homeStanding && awayStanding
+    ? Math.abs(
+        Number(homeStanding.position) -
+        Number(awayStanding.position)
+      )
+    : 99;
+
+const pointsDifference =
+  homeStanding && awayStanding
+    ? Math.abs(
+        Number(homeStanding.points || 0) -
+        Number(awayStanding.points || 0)
+      )
+    : 99;
+
+const seasonProgress =
+  homeStanding && awayStanding
+    ? Math.max(
+        Number(
+          homeStanding.o ??
+          homeStanding.played ??
+          0
+        ),
+        Number(
+          awayStanding.o ??
+          awayStanding.played ??
+          0
+        )
+      ) / Math.max(1, totalGames)
+    : 0;
+
+const closeStandingsBattle =
+  positionDifference <= 1 &&
+  pointsDifference <= 6 &&
+  seasonProgress >= 0.60;
 
   homeRuns += pressureAdjustment;
   awayRuns -= pressureAdjustment;
@@ -804,16 +854,38 @@ const aRecentAgainst =
 
   let note = "";
 
-  if (homePressure >= 0.65 || awayPressure >= 0.65) {
-    if (Math.abs(homePressure - awayPressure) < 0.15) {
-      note = "🔥 Ottelu on molemmille tärkeä sarjasijoituksen kannalta.";
-    } else if (homePressure > awayPressure) {
-      note = "🏠 Ottelu on kotijoukkueelle tärkeä sarjasijoituksen kannalta.";
-    } else {
-      note = "🚌 Ottelu on vierasjoukkueelle tärkeä sarjasijoituksen kannalta.";
-    }
+if (homePressure >= 0.65 || awayPressure >= 0.65) {
+  if (Math.abs(homePressure - awayPressure) < 0.15) {
+    note =
+      "🔥 Ottelu on molemmille tärkeä sarjasijoituksen kannalta.";
+  } else if (homePressure > awayPressure) {
+    note =
+      "🏠 Ottelu on kotijoukkueelle tärkeä sarjasijoituksen kannalta.";
+  } else {
+    note =
+      "🚌 Ottelu on vierasjoukkueelle tärkeä sarjasijoituksen kannalta.";
   }
+} else if (closeStandingsBattle) {
+  note =
+    "🔥 Joukkueet ovat sarjassa peräkkäisillä sijoilla, joten ottelu on tärkeä sarjasijoituksen kannalta.";
+}
+console.log({
+  home: homeTeam.name,
+  away: awayTeam.name,
 
+  homePressure,
+  awayPressure,
+
+  homeStanding,
+  awayStanding,
+
+  positionDifference,
+  pointsDifference,
+  seasonProgress,
+
+  closeStandingsBattle,
+  note
+});
   return {
     homeRuns,
     awayRuns,
