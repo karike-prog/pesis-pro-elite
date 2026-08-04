@@ -1851,22 +1851,26 @@ if (
   Number.isFinite(marketLine) &&
   marketLine > 0
 ) {
-    const totalDifference =
-      total - marketLine;
+const totalDifference =
+  total - marketLine;
 
-    if (totalDifference >= 1.5) {
-      picks.push(
-        `📈 Total yli ${marketLine
-          .toFixed(1)
-          .replace(".", ",")} juoksua`
-      );
-    } else if (totalDifference <= -1.5) {
-      picks.push(
-        `📉 Total alle ${marketLine
-          .toFixed(1)
-          .replace(".", ",")} juoksua`
-      );
-    }
+// Helposti säädettävät rajat
+const OVER_EDGE = 2.5;
+const UNDER_EDGE = 1.5;
+
+if (totalDifference >= OVER_EDGE) {
+  picks.push(
+    `📈 Total yli ${marketLine
+      .toFixed(1)
+      .replace(".", ",")} juoksua`
+  );
+} else if (totalDifference <= -UNDER_EDGE) {
+  picks.push(
+    `📉 Total alle ${marketLine
+      .toFixed(1)
+      .replace(".", ",")} juoksua`
+  );
+}
   }
 
   return picks;
